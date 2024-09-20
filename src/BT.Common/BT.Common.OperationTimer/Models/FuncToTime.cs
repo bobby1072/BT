@@ -7,7 +7,7 @@ namespace BT.Common.OperationTimer.Models
         private static readonly Type _taskType = typeof(Task);
         protected static bool IsReturnTypeTask = _taskType.IsAssignableFrom(typeof(TReturn));
     }
-    internal class FuncToTime<TParam, TReturn>(Func<TParam, TReturn> func, IReadOnlyCollection<TParam> data) : FuncToTimeBase<TReturn>, IOperationTimer
+    internal class FuncToTime<TParam, TReturn>(Func<TParam, TReturn> func, IReadOnlyCollection<TParam> data) : FuncToTimeBase<TReturn>, IOperationTimerObject
     {
         public Func<TParam, TReturn> Func { get; init; } = func;
         public IReadOnlyCollection<TParam> Data { get; init; } = data;
@@ -71,7 +71,7 @@ namespace BT.Common.OperationTimer.Models
             return stopWatch.Elapsed;
         }
     }
-    internal class FuncToTime<TReturn>(Func<TReturn> func) : FuncToTimeBase<TReturn>, IOperationTimer
+    internal class FuncToTime<TReturn>(Func<TReturn> func) : FuncToTimeBase<TReturn>, IOperationTimerObject
     {
         public Func<TReturn> Func { get; init; } = func;
         public TimeSpan Run()
