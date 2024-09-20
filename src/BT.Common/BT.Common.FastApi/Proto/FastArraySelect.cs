@@ -15,7 +15,7 @@
             {
                 if (predicate.Invoke(value))
                 {
-                    yield return transformFunc(value);
+                    yield return transformFunc.Invoke(value);
                 }
             }
         }

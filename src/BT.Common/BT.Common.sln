@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.FastArray", "BT.Common.FastApi\BT.Common.FastArray.csproj", "{BF4867C0-B8A2-4C53-9C8D-FD9745EE9D77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.FastArray", "BT.Common.FastApi\BT.Common.FastArray.csproj", "{BF4867C0-B8A2-4C53-9C8D-FD9745EE9D77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.FastArray.Tests", "BT.Common.FastArray.Tests\BT.Common.FastArray.Tests.csproj", "{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BF4867C0-B8A2-4C53-9C8D-FD9745EE9D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF4867C0-B8A2-4C53-9C8D-FD9745EE9D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF4867C0-B8A2-4C53-9C8D-FD9745EE9D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
