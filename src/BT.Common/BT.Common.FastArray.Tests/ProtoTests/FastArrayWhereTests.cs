@@ -1,5 +1,5 @@
 ﻿using BT.Common.FastArray.Proto;
-using BT.Common.FastArray.Tests.Models;
+using BT.Common.FastArray.Tests.TestModels;
 
 namespace BT.Common.FastArray.Tests.ProtoTests
 {

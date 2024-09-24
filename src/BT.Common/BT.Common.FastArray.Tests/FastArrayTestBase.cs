@@ -1,5 +1,4 @@
-﻿
-using BT.Common.FastArray.Tests.Models;
+﻿using BT.Common.FastArray.Tests.TestModels;
 using FluentAssertions;
 
 namespace BT.Common.FastArray.Tests

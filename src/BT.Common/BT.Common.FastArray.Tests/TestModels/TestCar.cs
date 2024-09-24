@@ -1,4 +1,4 @@
-namespace BT.Common.FastArray.Tests.Models
+namespace BT.Common.FastArray.Tests.TestModels
 {
     internal enum DriveSystems
     {

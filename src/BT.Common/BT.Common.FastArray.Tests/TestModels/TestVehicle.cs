@@ -1,4 +1,4 @@
-namespace BT.Common.FastArray.Tests.Models
+namespace BT.Common.FastArray.Tests.TestModels
 {
     internal class TestVehicle
     {
@@ -9,7 +9,7 @@ namespace BT.Common.FastArray.Tests.Models
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            if(obj is TestVehicle vehicle)
+            if (obj is TestVehicle vehicle)
             {
                 return Make == vehicle.Make &&
                    Model == vehicle.Model &&

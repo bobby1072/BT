@@ -1,5 +1,3 @@
-using BT.Common.OperationTimer.Models;
-
 namespace BT.Common.OperationTimer.Proto
 {
     public static class ActionExtensions
