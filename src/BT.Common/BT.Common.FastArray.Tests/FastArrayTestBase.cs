@@ -168,8 +168,12 @@ namespace BT.Common.FastArray.Tests
             expected.Count().Should().Be(yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
-                expected.ElementAt(i)?.Should().BeAssignableTo(arrayData.ElementAt(i)?.GetType());
-                arrayData.ElementAt(i)?.Should().Be(expected.ElementAt(i));
+                if(expected.ElementAt(i)?.GetType() != yourResult.ElementAt(i)?.GetType())
+                {
+                    Console.WriteLine("lololo");
+                }
+                yourResult.ElementAt(i)?.Should().BeOfType(expected.ElementAt(i)?.GetType());
+                yourResult.ElementAt(i)?.Should().Be(expected.ElementAt(i));
             }
         }
     }
