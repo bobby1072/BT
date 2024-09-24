@@ -1,4 +1,5 @@
 ﻿
+using BT.Common.FastArray.Tests.Models;
 using FluentAssertions;
 
 namespace BT.Common.FastArray.Tests
@@ -6,8 +7,12 @@ namespace BT.Common.FastArray.Tests
     public abstract class FastArrayTestBase
     {
 
-        public static readonly IReadOnlyCollection<IReadOnlyCollection<object>> BasicArraysToTestFunctionality =
+        protected static readonly IReadOnlyCollection<IReadOnlyCollection<object>> _basicArraysToTestFunctionality =
         [
+            [
+                new TestPlane {Color = "Red", Make = "Boeing", Model = "747", Year = 1990, NumberOfEngines = 4, NumberOfWings = 2}, new TestCar {Color = "Blue", Make = "Toyota", Model = "Camry", Year = 2020, NumberOfDoors = 4, DriveSystem=  DriveSystems.AWD},
+                new TestCar {Color = "green", Make = "Toyota", Model = "gy86", Year = 2010, NumberOfDoors = 3, DriveSystem=  DriveSystems.FOURWD}
+            ],
         [
             "pete", "boi", "ant", "kate", "marie", "sam", "ben", "joseph", "chris"
         ],
@@ -155,12 +160,16 @@ namespace BT.Common.FastArray.Tests
                 throw new NotImplementedException();
             }
         }
-        protected static void TestRunner<T>(IReadOnlyCollection<T> array, IReadOnlyCollection<T> expected)
+        protected static void FunctionalityTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<T>> actualFunc, Func<IEnumerable<T>, IEnumerable<T>> yourFunc)
         {
-            array.Count.Should().Be(expected.Count);
-            for (int i = 0; i < expected.Count; i++)
+            var expected = actualFunc.Invoke(arrayData);
+            var yourResult = yourFunc.Invoke(arrayData);
+
+            expected.Count().Should().Be(yourResult.Count());
+            for (int i = 0; i < expected.Count(); i++)
             {
-                array.ElementAt(i).Should().BeEquivalentTo(expected.ElementAt(i));
+                expected.ElementAt(i)?.Should().BeAssignableTo(arrayData.ElementAt(i)?.GetType());
+                arrayData.ElementAt(i)?.Should().Be(expected.ElementAt(i));
             }
         }
     }
