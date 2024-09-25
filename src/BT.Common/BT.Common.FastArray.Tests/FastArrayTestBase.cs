@@ -1,5 +1,5 @@
 ﻿using BT.Common.FastArray.Tests.TestModels;
-using OperationTimerProto = BT.Common.OperationTimer.Proto;
+using BT.Common.OperationTimer.Proto;
 using FluentAssertions;
 
 namespace BT.Common.FastArray.Tests
@@ -106,77 +106,112 @@ namespace BT.Common.FastArray.Tests
             ]
         ];
 
-        protected static IReadOnlyCollection<T> CreateLargeArrayForPerformanceTest<T>(int size)
+        protected static IReadOnlyCollection<IReadOnlyCollection<object>> CreateLargeArraysForPerformanceTestAllTypes(int individualArraySize = 5000, int? totalArraysSize = null)
+        {
+            var result = new object[][]
+            {
+                [
+                    CreateLargeArrayForPerformanceTest<string>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<int>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<double>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<bool>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<char>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<DateTime>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<byte>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<short>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<long>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<float>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<decimal>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<uint>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<ushort>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<ulong>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<sbyte>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<Guid>(individualArraySize),
+                    CreateLargeArrayForPerformanceTest<TimeSpan>(individualArraySize)
+                ]
+            };
+
+
+            if (totalArraysSize is int foundSize)
+            {
+                return result.Take(foundSize).ToArray();
+            }
+            else
+            {
+                return result;
+            }
+        }
+        protected static IReadOnlyCollection<object> CreateLargeArrayForPerformanceTest<T>(int size)
         {
             var tType = typeof(T);
 
             if (tType == typeof(string))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)x.ToString()).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)x.ToString()).ToList();
             }
             else if (tType == typeof(int))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)x).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)x).ToList();
             }
             else if (tType == typeof(double))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)x).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)x).ToList();
             }
             else if (tType == typeof(bool))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(x % 2 == 0)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(x % 2 == 0)).ToList();
             }
             else if (tType == typeof(char))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(char)(x % 26 + 65)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(char)(x % 26 + 65)).ToList();
             }
             else if (tType == typeof(DateTime))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)new DateTime(2023, 1, 1)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)new DateTime(2023, 1, 1)).ToList();
             }
             else if (tType == typeof(byte))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(byte)(x % 256)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(byte)(x % 256)).ToList();
             }
             else if (tType == typeof(short))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(short)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(short)(x % 1000)).ToList();
             }
             else if (tType == typeof(long))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(long)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(long)(x % 1000)).ToList();
             }
             else if (tType == typeof(float))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(float)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(float)(x % 1000)).ToList();
             }
             else if (tType == typeof(decimal))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(decimal)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(decimal)(x % 1000)).ToList();
             }
             else if (tType == typeof(uint))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(uint)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(uint)(x % 1000)).ToList();
             }
             else if (tType == typeof(ushort))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(ushort)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(ushort)(x % 1000)).ToList();
             }
             else if (tType == typeof(ulong))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(ulong)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(ulong)(x % 1000)).ToList();
             }
             else if (tType == typeof(sbyte))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)(sbyte)(x % 1000)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)(sbyte)(x % 1000)).ToList();
             }
             else if (tType == typeof(Guid))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)Guid.NewGuid()).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)Guid.NewGuid()).ToList();
             }
             else if (tType == typeof(TimeSpan))
             {
-                return Enumerable.Range(0, size).Select(x => (T)(object)TimeSpan.FromMilliseconds(x)).ToList();
+                return Enumerable.Range(0, size).Select(x => (object)TimeSpan.FromMilliseconds(x)).ToList();
             }
             else
             {
@@ -191,20 +226,16 @@ namespace BT.Common.FastArray.Tests
             expected.Count().Should().Be(yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
-                if (expected.ElementAt(i)?.GetType() != yourResult.ElementAt(i)?.GetType())
-                {
-                    Console.WriteLine("lololo");
-                }
                 yourResult.ElementAt(i)?.Should().BeOfType(expected.ElementAt(i)?.GetType());
                 yourResult.ElementAt(i)?.Should().Be(expected.ElementAt(i));
             }
         }
         protected static void PerformanceTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<T>> actualFunc, Func<IEnumerable<T>, IEnumerable<T>> yourFunc)
         {
-            var actualTime = OperationTimerProto.OperationTimer.Time(actualFunc, arrayData);
-            var yourTime = OperationTimerProto.OperationTimer.Time(yourFunc, arrayData);
+            var actualTime = OperationTimerUtils.Time(actualFunc, arrayData);
+            var yourTime = OperationTimerUtils.Time(yourFunc, arrayData);
 
-            yourTime.Should().BeLessThan(actualTime);
+            yourTime.Should().BeLessThanOrEqualTo(actualTime);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace BT.Common.OperationTimer.Proto
 {
-    public static partial class OperationTimer
+    public static partial class OperationTimerUtils
     {
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took

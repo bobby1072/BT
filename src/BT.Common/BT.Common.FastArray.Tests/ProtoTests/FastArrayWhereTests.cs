@@ -32,5 +32,31 @@ namespace BT.Common.FastArray.Tests.ProtoTests
         {
             FunctionalityTestRunner(arrayData, actualFunc, yourFunc);
         }
+        private class FastArrayWhereTests_Performance_Class_Data : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<object>>, Func<IEnumerable<object>, IEnumerable<object>>>
+        {
+            public FastArrayWhereTests_Performance_Class_Data()
+            {
+                var allArrays = CreateLargeArraysForPerformanceTestAllTypes(4000, 35);
+                foreach (var arrayData in allArrays)
+                {
+                    Add(arrayData, x => x.Where(y => y is not null), x => x.FastArrayWhere(y => y is not null));
+                    Add(arrayData, x => x.Where(y => y is true), x => x.FastArrayWhere(y => y is true));
+                    Add(arrayData, x => x.Where(y => y is false), x => x.FastArrayWhere(y => y is false));
+                    Add(arrayData, x => x.Where(y => y is int), x => x.FastArrayWhere(y => y is int));
+                    Add(arrayData, x => x.Where(y => y is int && (int)y > 100), x => x.FastArrayWhere(y => y is int && (int)y > 100));
+                    Add(arrayData, x => x.Where(y => y is int && (int)y > 1000), x => x.FastArrayWhere(y => y is int && (int)y > 1000));
+                    Add(arrayData, x => x.Where(y => y is string), x => x.FastArrayWhere(y => y is string));
+                    Add(arrayData, x => x.Where(y => y is TestVehicle), x => x.FastArrayWhere(y => y is TestVehicle));
+                    Add(arrayData, x => x.Where(y => y is TestCar), x => x.FastArrayWhere(y => y is TestCar));
+                    Add(arrayData, x => x.Where(y => y is TestPlane), x => x.FastArrayWhere(y => y is TestPlane));
+                }
+            }
+        }
+        [Theory(Skip = "Performance Test")]
+        [ClassData(typeof(FastArrayWhereTests_Performance_Class_Data))]
+        public void FastArrayWhereTests_Performance(IReadOnlyCollection<object> arrayData, Func<IEnumerable<object>, IEnumerable<object>> actualFunc, Func<IEnumerable<object>, IEnumerable<object>> yourFunc)
+        {
+            PerformanceTestRunner(arrayData, actualFunc, yourFunc);
+        }
     }
 }
