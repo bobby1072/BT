@@ -2,45 +2,89 @@
 
 namespace BT.Common.OperationTimer.Models
 {
-    internal abstract class FuncToTimeBase<TReturn>
+    internal class FuncToTime<TParam, TReturn>
     {
         private static readonly Type _taskType = typeof(Task);
-        protected static bool IsReturnTypeTask = _taskType.IsAssignableFrom(typeof(TReturn));
-    }
-    internal class FuncToTime<TParam, TReturn>(Func<TParam, TReturn> func, IReadOnlyCollection<TParam> data) : FuncToTimeBase<TReturn>, IOperationTimerObject
-    {
-        public Func<TParam, TReturn> Func { get; init; } = func;
-        public IReadOnlyCollection<TParam> Data { get; init; } = data;
-        public FuncToTime(Func<TParam, TReturn> func, TParam data) : this(func, [data]) { }
-        public TimeSpan Run()
+        private static bool _isReturnTypeTask = _taskType.IsAssignableFrom(typeof(TReturn));
+        private static bool _isReturnTypeTaskWithResult = _taskType.IsAssignableFrom(typeof(Task<TReturn>));
+        private Func<TParam, TReturn> Func { get; init; }
+        private IReadOnlyCollection<TParam> Data { get; init; }
+        public FuncToTime(Func<TParam, TReturn> func, TParam data)
+        {
+            Func = func;
+            Data = new List<TParam> { data };
+        }
+        public FuncToTime(Func<TParam, TReturn> func, IEnumerable<TParam> data)
+        {
+            Func = func;
+            Data = data.ToArray();
+        }
+        public (TimeSpan TimeTaken, IReadOnlyCollection<object?>? Result) RunWithResult()
         {
             var stopWatch = new Stopwatch();
-            if (IsReturnTypeTask)
+            var resultsList = new List<object?>();
+            foreach (var item in Data)
             {
-                stopWatch.Start();
-                foreach (var item in Data)
+                if (_isReturnTypeTaskWithResult)
                 {
+                    stopWatch.Start();
+                    var funcWithReturn = (Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result.");
+                    var result = funcWithReturn.GetAwaiter().GetResult();
+                    stopWatch.Stop();
+                    resultsList.Add(result);
+                }
+                else if (_isReturnTypeTask)
+                {
+                    stopWatch.Start();
                     var result = Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam, Task> to return a Task result.");
                     result.GetAwaiter().GetResult();
+                    stopWatch.Stop();
                 }
-                stopWatch.Stop();
-
-            }
-            else
-            {
-                stopWatch.Start();
-                foreach (var item in Data)
+                else
                 {
-                    Func.Invoke(item);
+                    stopWatch.Start();
+                    var result = Func.Invoke(item);
+                    stopWatch.Stop();
+                    resultsList.Add(result);
                 }
-                stopWatch.Stop();
             }
-            return stopWatch.Elapsed;
+            var resultsArray = resultsList.ToArray() as object[];
+            return (stopWatch.Elapsed, resultsArray?.Length > 0 ? resultsArray : null);
         }
-        public async Task<TimeSpan> RunAsync(bool awaitAllAtOnce = false)
+        public TimeSpan Run()
+        {
+
+            return RunWithResult().TimeTaken;
+        }
+        public async Task<(TimeSpan TimeTaken, IReadOnlyCollection<object?>? Result)> RunWithResultAsync(bool awaitAllAtOnce = false)
         {
             var stopWatch = new Stopwatch();
-            if (IsReturnTypeTask)
+            if (_isReturnTypeTaskWithResult)
+            {
+                if (awaitAllAtOnce)
+                {
+                    stopWatch.Start();
+                    var jobLists = Data.Select(item => (Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
+                    await Task.WhenAll(jobLists);
+                    stopWatch.Stop();
+                    var resultsArray = jobLists.Select(x => x.Result).ToArray() as object[];
+                    return (stopWatch.Elapsed, resultsArray?.Length > 0 ? resultsArray : null);
+                }
+                else
+                {
+                    var results = new List<object?>();
+                    foreach (var item in Data)
+                    {
+                        stopWatch.Start();
+                        var result = await ((Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
+                        stopWatch.Stop();
+                        results.Add(result);
+                    }
+                    var resultsArray = results.ToArray();
+                    return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
+                }
+            }
+            else if (_isReturnTypeTask)
             {
                 if (awaitAllAtOnce)
                 {
@@ -51,66 +95,24 @@ namespace BT.Common.OperationTimer.Models
                 }
                 else
                 {
-                    stopWatch.Start();
                     foreach (var item in Data)
                     {
+                        stopWatch.Start();
                         var result = Func.Invoke(item);
+                        stopWatch.Stop();
                     }
-                    stopWatch.Stop();
                 }
+                return (stopWatch.Elapsed, null);
             }
             else
             {
-                stopWatch.Start();
-                foreach (var item in Data)
-                {
-                    Func.Invoke(item);
-                }
-                stopWatch.Stop();
+                return RunWithResult();
             }
-            return stopWatch.Elapsed;
-        }
-    }
-    internal class FuncToTime<TReturn>(Func<TReturn> func) : FuncToTimeBase<TReturn>, IOperationTimerObject
-    {
-        public Func<TReturn> Func { get; init; } = func;
-        public TimeSpan Run()
-        {
-            var stopWatch = new Stopwatch();
-            if (IsReturnTypeTask)
-            {
-                stopWatch.Start();
-                var result = Func.Invoke() as Task ?? throw new InvalidOperationException("Func must be a Func<Task> to return a Task result.");
-                result.GetAwaiter().GetResult();
-                stopWatch.Stop();
-            }
-            else
-            {
-                stopWatch.Start();
-                Func.Invoke();
-                stopWatch.Stop();
-            }
-            return stopWatch.Elapsed;
-        }
 
+        }
         public async Task<TimeSpan> RunAsync(bool awaitAllAtOnce = false)
         {
-            var stopWatch = new Stopwatch();
-            if (IsReturnTypeTask)
-            {
-                stopWatch.Start();
-                var result = Func.Invoke() as Task ?? throw new InvalidOperationException("Func must be a Func<Task> to return a Task result.");
-                await result;
-                stopWatch.Stop();
-            }
-            else
-            {
-                stopWatch.Start();
-                Func.Invoke();
-                stopWatch.Stop();
-            }
-            return stopWatch.Elapsed;
+            return (await RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
         }
     }
-
 }

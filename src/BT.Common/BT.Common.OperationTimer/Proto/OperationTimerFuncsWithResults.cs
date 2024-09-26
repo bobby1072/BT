@@ -7,26 +7,29 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
+        public static (TimeSpan, TReturn) TimeWithResults<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
-            return funcToTime.Run();
+            var timedResult = funcToTime.RunWithResult();
+            return (timedResult.TimeTaken, (TReturn?)timedResult.Result?.First());
         }
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data)
+        public static (TimeSpan, IReadOnlyCollection<TReturn>) TimeWithResults<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
-            return funcToTime.Run();
+            var timedResult = funcToTime.RunWithResult();
+            return (timedResult.TimeTaken, (IReadOnlyCollection<TReturn>?)timedResult.Result);
         }
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TReturn>(Func<TReturn> func)
+        public static (TimeSpan, TReturn) TimeWithResults<TReturn>(Func<TReturn> func)
         {
             var funcToTime = new FuncToTime<object?, TReturn>(x => func.Invoke(), [null]);
-            return funcToTime.Run();
+            var timedResult = funcToTime.RunWithResult();
+            return (timedResult.TimeTaken, (TReturn?)timedResult.Result?.First());
         }
         /// <summary>
         /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
@@ -34,26 +37,29 @@ namespace BT.Common.OperationTimer.Proto
         /// <param name="awaitAllAtOnce">
         /// If true, all tasks will be awaited at once. If false, tasks will be awaited as they complete.
         /// </param>
-        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
+        public static async Task<(TimeSpan, IReadOnlyCollection<TReturn>)> TimeAsyncWithResults<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
-            return await funcToTime.RunAsync(awaitAllAtOnce);
+            var timedResult = await funcToTime.RunWithResultAsync(awaitAllAtOnce);
+            return (timedResult.TimeTaken, (IReadOnlyCollection<TReturn>?)timedResult.Result);
         }
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
+        public static async Task<(TimeSpan, TReturn)> TimeAsyncWithResults<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
-            return await funcToTime.RunAsync(false);
+            var timedResult = await funcToTime.RunWithResultAsync(false);
+            return (timedResult.TimeTaken, (TReturn?)timedResult.Result?.First());
         }
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static async Task<TimeSpan> TimeAsync<TReturn>(Func<TReturn> func)
+        public static async Task<(TimeSpan, TReturn)> TimeAsyncWithResults<TReturn>(Func<TReturn> func)
         {
             var funcToTime = new FuncToTime<object?, TReturn>(x => func.Invoke(), [null]);
-            return await funcToTime.RunAsync(false);
+            var timedResult = await funcToTime.RunWithResultAsync(false);
+            return (timedResult.TimeTaken, (TReturn?)timedResult.Result?.First());
         }
     }
 }
