@@ -9,7 +9,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam>(Action<TParam> action, TParam data)
+        public static TimeSpan Time<TParam>(Action<TParam?> action, TParam? data)
         {
             var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
 
@@ -18,7 +18,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam>(Action<TParam> action, IReadOnlyCollection<TParam> data)
+        public static TimeSpan Time<TParam>(Action<TParam?> action, IEnumerable<TParam?> data)
         {
             var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
 
@@ -39,7 +39,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <param name="awaitAllAtOnce">
         /// If true, all tasks will be awaited at once. If false, tasks will be awaited as they complete.
         /// </param>
-        public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, IReadOnlyCollection<TParam> data, bool awaitAllAtOnce = false)
+        public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam?> action, IEnumerable<TParam?> data, bool awaitAllAtOnce = false)
         {
             var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
             return await actionToTime.RunAsync(awaitAllAtOnce);
@@ -47,7 +47,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, TParam data)
+        public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam?> action, TParam? data)
         {
             var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
             return await actionToTime.RunAsync(false);

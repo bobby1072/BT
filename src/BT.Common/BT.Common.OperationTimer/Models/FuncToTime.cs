@@ -7,14 +7,14 @@ namespace BT.Common.OperationTimer.Models
         private static readonly Type _taskType = typeof(Task);
         private static bool _isReturnTypeTask = _taskType.IsAssignableFrom(typeof(TReturn));
         private static bool _isReturnTypeTaskWithResult = _taskType.IsAssignableFrom(typeof(Task<TReturn>));
-        private Func<TParam, TReturn?> Func { get; init; }
-        private IReadOnlyCollection<TParam> Data { get; init; }
-        internal FuncToTime(Func<TParam, TReturn?> func, TParam data)
+        private Func<TParam?, TReturn?> Func { get; init; }
+        private IReadOnlyCollection<TParam?> Data { get; init; }
+        internal FuncToTime(Func<TParam?, TReturn?> func, TParam? data)
         {
             Func = func;
             Data = [data];
         }
-        internal FuncToTime(Func<TParam, TReturn?> func, IEnumerable<TParam> data)
+        internal FuncToTime(Func<TParam?, TReturn?> func, IEnumerable<TParam?> data)
         {
             Func = func;
             Data = data.ToArray();
@@ -28,7 +28,7 @@ namespace BT.Common.OperationTimer.Models
                 if (_isReturnTypeTaskWithResult)
                 {
                     stopWatch.Start();
-                    var funcWithReturn = (Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result.");
+                    var funcWithReturn = (Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam?, Task<TReturn>> to return a Task result.");
                     var result = funcWithReturn.GetAwaiter().GetResult();
                     stopWatch.Stop();
                     resultsList.Add(result);
@@ -36,7 +36,7 @@ namespace BT.Common.OperationTimer.Models
                 else if (_isReturnTypeTask)
                 {
                     stopWatch.Start();
-                    var result = Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam, Task> to return a Task result.");
+                    var result = Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam?, Task> to return a Task result.");
                     result.GetAwaiter().GetResult();
                     stopWatch.Stop();
                 }
@@ -64,7 +64,7 @@ namespace BT.Common.OperationTimer.Models
                 if (awaitAllAtOnce)
                 {
                     stopWatch.Start();
-                    var jobLists = Data.Select(item => (Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
+                    var jobLists = Data.Select(item => (Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam?, Task<TReturn>> to return a Task result."));
                     await Task.WhenAll(jobLists);
                     stopWatch.Stop();
                     var resultsArray = jobLists.Select(x => x.Result).ToArray() as object[];
@@ -76,7 +76,7 @@ namespace BT.Common.OperationTimer.Models
                     foreach (var item in Data)
                     {
                         stopWatch.Start();
-                        var result = await ((Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
+                        var result = await ((Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam?, Task<TReturn>> to return a Task result."));
                         stopWatch.Stop();
                         results.Add(result);
                     }
@@ -89,7 +89,7 @@ namespace BT.Common.OperationTimer.Models
                 if (awaitAllAtOnce)
                 {
                     stopWatch.Start();
-                    var jobLists = Data.Select(item => Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam, Task> to return a Task result."));
+                    var jobLists = Data.Select(item => Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam?, Task> to return a Task result."));
                     await Task.WhenAll(jobLists);
                     stopWatch.Stop();
                 }
