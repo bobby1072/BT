@@ -1,3 +1,4 @@
+using BT.Common.OperationTimer.Common;
 using BT.Common.OperationTimer.Models;
 
 namespace BT.Common.OperationTimer.Proto
@@ -25,7 +26,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TReturn>(Func<TReturn> func)
         {
-            var funcToTime = new FuncToTime<object?, TReturn>(x => func.Invoke(), [null]);
+            var funcToTime = new FuncToTime<object?, TReturn>(func.ToFuncWithParams(), [null]);
             return funcToTime.Run();
         }
         /// <summary>
@@ -52,7 +53,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static async Task<TimeSpan> TimeAsync<TReturn>(Func<TReturn> func)
         {
-            var funcToTime = new FuncToTime<object?, TReturn>(x => func.Invoke(), [null]);
+            var funcToTime = new FuncToTime<object?, TReturn>(func.ToFuncWithParams(), [null]);
             return await funcToTime.RunAsync(false);
         }
     }

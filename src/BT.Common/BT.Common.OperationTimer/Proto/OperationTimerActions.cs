@@ -1,4 +1,5 @@
 
+using BT.Common.OperationTimer.Common;
 using BT.Common.OperationTimer.Models;
 
 namespace BT.Common.OperationTimer.Proto
@@ -10,11 +11,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TParam>(Action<TParam> action, TParam data)
         {
-            var actionToTime = new FuncToTime<TParam, object?>((x) =>
-            {
-                action.Invoke(data);
-                return null;
-            }, data);
+            var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
 
             return actionToTime.Run();
         }
@@ -23,11 +20,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TParam>(Action<TParam> action, IReadOnlyCollection<TParam> data)
         {
-            var actionToTime = new FuncToTime<TParam, object?>((x) =>
-            {
-                action.Invoke(x);
-                return null;
-            }, data);
+            var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
 
             return actionToTime.Run();
         }
@@ -36,11 +29,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time(Action action)
         {
-            var actionToTime = new FuncToTime<object?, object?>((x) =>
-            {
-                action.Invoke();
-                return null;
-            }, [null]);
+            var actionToTime = new FuncToTime<object?, object?>(action.ToFuncWithParams(), [null]);
 
             return actionToTime.Run();
         }
@@ -52,11 +41,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </param>
         public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, IReadOnlyCollection<TParam> data, bool awaitAllAtOnce = false)
         {
-            var actionToTime = new FuncToTime<TParam, object?>((x) =>
-            {
-                action.Invoke(x);
-                return null;
-            }, data);
+            var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
             return await actionToTime.RunAsync(awaitAllAtOnce);
         }
         /// <summary>
@@ -64,11 +49,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, TParam data)
         {
-            var actionToTime = new FuncToTime<TParam, object?>((x) =>
-            {
-                action.Invoke(data);
-                return null;
-            }, data);
+            var actionToTime = new FuncToTime<TParam, object?>(action.ToFuncWithParams(), data);
             return await actionToTime.RunAsync(false);
         }
         /// <summary>
@@ -76,11 +57,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static async Task<TimeSpan> TimeAsync(Action action)
         {
-            var actionToTime = new FuncToTime<object?, object?>((x) =>
-            {
-                action.Invoke();
-                return null;
-            }, [null]);
+            var actionToTime = new FuncToTime<object?, object?>(action.ToFuncWithParams(), [null]);
             return await actionToTime.RunAsync(false);
         }
     }
