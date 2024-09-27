@@ -8,7 +8,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam, TReturn>(Func<TParam?, TReturn?> func, TParam? data)
+        public static TimeSpan Time<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             return funcToTime.Run();
@@ -16,7 +16,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam, TReturn>(Func<TParam?, TReturn?> func, IEnumerable<TParam?> data)
+        public static TimeSpan Time<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             return funcToTime.Run();
@@ -26,7 +26,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TReturn>(Func<TReturn> func)
         {
-            var funcToTime = new FuncToTime<object?, TReturn>(func.ToFuncWithParams(), [null]);
+            var funcToTime = new FuncToTime<object, TReturn>(func.ToFuncWithParams(), [null]);
             return funcToTime.Run();
         }
         /// <summary>
@@ -35,7 +35,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <param name="awaitAllAtOnce">
         /// If true, all tasks will be awaited at once. If false, tasks will be awaited as they complete.
         /// </param>
-        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam?, TReturn?> func, IEnumerable<TParam?> data, bool awaitAllAtOnce = false)
+        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             return await funcToTime.RunAsync(awaitAllAtOnce);
@@ -43,7 +43,7 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam?, TReturn?> func, TParam? data)
+        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             return await funcToTime.RunAsync(false);
@@ -51,9 +51,9 @@ namespace BT.Common.OperationTimer.Proto
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
-        public static async Task<TimeSpan> TimeAsync<TReturn>(Func<TReturn?> func)
+        public static async Task<TimeSpan> TimeAsync<TReturn>(Func<TReturn> func)
         {
-            var funcToTime = new FuncToTime<object?, TReturn>(func.ToFuncWithParams(), [null]);
+            var funcToTime = new FuncToTime<object, TReturn>(func.ToFuncWithParams(), [null]);
             return await funcToTime.RunAsync(false);
         }
     }

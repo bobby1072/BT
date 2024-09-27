@@ -4,10 +4,11 @@ namespace BT.Common.OperationTimer.Tests
     {
         protected static class TestFuncsWithData
         {
-            public static IDictionary<object, Func<object, object>> _dataAndFuncWithParamAndReturn = new Dictionary<object, Func<object, object>>
+            public static IDictionary<IReadOnlyCollection<object>, Func<object, object>> BuildTestDataAndFunctions()
             {
-
-            };
+                var dict = new Dictionary<IReadOnlyCollection<object>, Func<object, object>>();
+                return dict;
+            }
             private static string ReverseString(string input)
             {
                 if (string.IsNullOrEmpty(input)) return input;

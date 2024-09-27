@@ -3,7 +3,7 @@ namespace BT.Common.OperationTimer.Common
 {
     internal static class ActionExtensions
     {
-        internal static Func<TParam, object?> ToFuncWithParams<TParam>(this Action<TParam> action)
+        internal static Func<TParam, object> ToFuncWithParams<TParam>(this Action<TParam> action)
         {
             return x =>
             {
@@ -11,7 +11,7 @@ namespace BT.Common.OperationTimer.Common
                 return null;
             };
         }
-        internal static Func<object?, object?> ToFuncWithParams(this Action action)
+        internal static Func<object, object> ToFuncWithParams(this Action action)
         {
             return x =>
             {
