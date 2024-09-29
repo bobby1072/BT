@@ -1,3 +1,5 @@
+
+using BT.Common.OperationTimer.Common;
 using BT.Common.OperationTimer.Models;
 
 namespace BT.Common.OperationTimer.Proto
@@ -9,15 +11,17 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TParam>(Action<TParam> action, TParam data)
         {
-            var actionToTime = new ActionToTime<TParam>(action, data);
+            var actionToTime = new FuncToTime<TParam, object>(action.ToFuncWithParams(), data);
+
             return actionToTime.Run();
         }
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
         /// </summary>
-        public static TimeSpan Time<TParam>(Action<TParam> action, IReadOnlyCollection<TParam> data)
+        public static TimeSpan Time<TParam>(Action<TParam> action, IEnumerable<TParam> data)
         {
-            var actionToTime = new ActionToTime<TParam>(action, data);
+            var actionToTime = new FuncToTime<TParam, object>(action.ToFuncWithParams(), data);
+
             return actionToTime.Run();
         }
         /// <summary>
@@ -25,7 +29,8 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time(Action action)
         {
-            var actionToTime = new ActionToTime(action);
+            var actionToTime = new FuncToTime<object, object>(action.ToFuncWithParams(), [null]);
+
             return actionToTime.Run();
         }
         /// <summary>
@@ -34,9 +39,9 @@ namespace BT.Common.OperationTimer.Proto
         /// <param name="awaitAllAtOnce">
         /// If true, all tasks will be awaited at once. If false, tasks will be awaited as they complete.
         /// </param>
-        public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, IReadOnlyCollection<TParam> data, bool awaitAllAtOnce = false)
+        public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
-            var actionToTime = new ActionToTime<TParam>(action, data);
+            var actionToTime = new FuncToTime<TParam, object>(action.ToFuncWithParams(), data);
             return await actionToTime.RunAsync(awaitAllAtOnce);
         }
         /// <summary>
@@ -44,7 +49,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static async Task<TimeSpan> TimeAsync<TParam>(Action<TParam> action, TParam data)
         {
-            var actionToTime = new ActionToTime<TParam>(action, data);
+            var actionToTime = new FuncToTime<TParam, object>(action.ToFuncWithParams(), data);
             return await actionToTime.RunAsync(false);
         }
         /// <summary>
@@ -52,7 +57,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static async Task<TimeSpan> TimeAsync(Action action)
         {
-            var actionToTime = new ActionToTime(action);
+            var actionToTime = new FuncToTime<object, object>(action.ToFuncWithParams(), [null]);
             return await actionToTime.RunAsync(false);
         }
     }

@@ -1,3 +1,4 @@
+using BT.Common.OperationTimer.Common;
 using BT.Common.OperationTimer.Models;
 
 namespace BT.Common.OperationTimer.Proto
@@ -17,7 +18,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data)
         {
-            var funcToTime = new FuncToTime<TParam, TReturn>(func, data.ToArray());
+            var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             return funcToTime.Run();
         }
         /// <summary>
@@ -25,7 +26,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static TimeSpan Time<TReturn>(Func<TReturn> func)
         {
-            var funcToTime = new FuncToTime<TReturn>(func);
+            var funcToTime = new FuncToTime<object, TReturn>(func.ToFuncWithParams(), [null]);
             return funcToTime.Run();
         }
         /// <summary>
@@ -36,7 +37,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </param>
         public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
-            var funcToTime = new FuncToTime<TParam, TReturn>(func, data.ToArray());
+            var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             return await funcToTime.RunAsync(awaitAllAtOnce);
         }
         /// <summary>
@@ -52,7 +53,7 @@ namespace BT.Common.OperationTimer.Proto
         /// </summary>
         public static async Task<TimeSpan> TimeAsync<TReturn>(Func<TReturn> func)
         {
-            var funcToTime = new FuncToTime<TReturn>(func);
+            var funcToTime = new FuncToTime<object, TReturn>(func.ToFuncWithParams(), [null]);
             return await funcToTime.RunAsync(false);
         }
     }
