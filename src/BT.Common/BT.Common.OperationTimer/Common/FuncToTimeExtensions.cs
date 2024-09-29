@@ -104,14 +104,10 @@ namespace BT.Common.OperationTimer.Common
         }
         private static async Task<object> CastTaskToObjectAsync(Task task)
         {
-            if (TaskType.IsGenericType && TaskType.GetGenericTypeDefinition() == typeof(Task<>))
-            {
-                var resultProperty = TaskType.GetProperty("Result");
+            var resultProperty = task.GetType().GetProperty("Result");
 
-                await task;
-                return resultProperty?.GetValue(task);
-            }
-            return null;
+            await task;
+            return resultProperty?.GetValue(task);
         }
     }
 }
