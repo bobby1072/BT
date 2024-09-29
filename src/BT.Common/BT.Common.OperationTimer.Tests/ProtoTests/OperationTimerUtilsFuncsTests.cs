@@ -2,7 +2,6 @@ using BT.Common.UkHoliday.Client.Client.Concrete;
 using BT.Common.OperationTimer.Proto;
 using FluentAssertions;
 using BT.Common.UkBankHolidays.Client.Models;
-using System.Security.Principal;
 
 namespace BT.Common.OperationTimer.Tests
 {
@@ -13,10 +12,21 @@ namespace BT.Common.OperationTimer.Tests
         {
             _ukHolidaysClient = new UkHolidaysClient();
         }
-        [Fact(Timeout =10000)]
+        [Fact(Timeout = 10000)]
         public async Task TimeWithResultAsync_Should_Return_TimeSpan_And_Result_For_Real_Request()
         {
-            var (timeTaken, result) = await OperationTimerUtils.TimeAsyncWithResults(_ukHolidaysClient.InvokeAsync);
+            var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(_ukHolidaysClient.InvokeAsync);
+
+
+            timeTaken.Should().BePositive();
+
+            result.Should().NotBeNull();
+            result.Should().BeOfType<UkHolidays>();
+        }
+        [Fact]
+        public void TimeWithResult_Should_Return_TimeSpan_And_Result_For_Real_Request()
+        {
+            var (timeTaken, result) = OperationTimerUtils.TimeWithResults(_ukHolidaysClient.InvokeAsync);
 
 
             timeTaken.Should().BePositive();

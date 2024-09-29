@@ -72,7 +72,7 @@ namespace BT.Common.OperationTimer.Proto
         /// If true, all tasks will be awaited at once. If false, tasks will be awaited as they complete.
         /// </param>
         /// <returns>The time taken to run the function and results if there are any</returns>
-        public static async Task<(TimeSpan, IReadOnlyCollection<TReturn>)> TimeAsyncWithResults<TParam, TReturn>(Func<TParam, Task<TReturn>> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
+        public static async Task<(TimeSpan, IReadOnlyCollection<TReturn>)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, Task<TReturn>> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
             var timedResult = await funcToTime.RunWithResultAsync(awaitAllAtOnce);
@@ -82,7 +82,7 @@ namespace BT.Common.OperationTimer.Proto
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
         /// <returns>The time taken to run the function and results if there are any</returns>
-        public static async Task<(TimeSpan, TReturn)> TimeAsyncWithResults<TParam, TReturn>(Func<TParam, Task<TReturn>> func, TParam data)
+        public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, Task<TReturn>> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
             var timedResult = await funcToTime.RunWithResultAsync(false);
@@ -92,7 +92,7 @@ namespace BT.Common.OperationTimer.Proto
         /// This method will asyncronously run the method and return a timespan for how long it took
         /// </summary>
         /// <returns>The time taken to run the function and results if there are any</returns>
-        public static async Task<(TimeSpan, TReturn)> TimeAsyncWithResults<TReturn>(Func<Task<TReturn>> func)
+        public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TReturn>(Func<Task<TReturn>> func)
         {
             var funcToTime = new FuncToTime<object, Task<TReturn>>(func.ToFuncWithParams(), [null]);
             var timedResult = await funcToTime.RunWithResultAsync(false);

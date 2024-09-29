@@ -79,6 +79,7 @@ namespace BT.Common.OperationTimer.Common
                 return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
             }
         }
+
         internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<object> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime, bool awaitAllAtOnce = false)
         {
             var stopWatch = new Stopwatch();
