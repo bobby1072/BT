@@ -7,8 +7,6 @@ namespace BT.Common.OperationTimer.Models
     {
         public static Type TReturnType = typeof(TReturn);
         public bool IsReturnTypeTask = TReturnType == FuncToTimeExtensions.TaskType;
-        public bool IsReturnTypeTaskWithResult = TReturnType.IsGenericType &&
-                                                  TReturnType.GetGenericTypeDefinition() == typeof(Task<>);
         public Func<TParam, TReturn> Func { get; init; }
         public IReadOnlyCollection<TParam> Data { get; init; }
         internal FuncToTime(Func<TParam, TReturn> func, TParam data)
