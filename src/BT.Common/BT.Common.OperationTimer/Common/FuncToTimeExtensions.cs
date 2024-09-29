@@ -5,21 +5,22 @@ namespace BT.Common.OperationTimer.Common
 {
     internal static class FuncToTimeExtensions
     {
+        public static readonly Type TaskType = typeof(Task);
         internal static (TimeSpan TimeTaken, IReadOnlyCollection<object> Result) RunWithResult<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
         {
             var stopWatch = new Stopwatch();
             var resultsList = new List<object>();
             foreach (var item in funcToTime.Data)
             {
-                if (funcToTime._isReturnTypeTaskWithResult)
+                if (funcToTime.IsReturnTypeTaskWithResult)
                 {
                     stopWatch.Start();
-                    var funcWithReturn = (funcToTime.Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result.");
-                    var result = funcWithReturn.GetAwaiter().GetResult();
+                    var funcWithReturn = (funcToTime.Func.Invoke(item) as Task) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result.");
+                    funcWithReturn.GetAwaiter().GetResult();
                     stopWatch.Stop();
-                    resultsList.Add(result);
+                    resultsList.Add(CastTaskToObjectAsync(funcWithReturn).GetAwaiter().GetResult());
                 }
-                else if (funcToTime._isReturnTypeTask)
+                else if (funcToTime.IsReturnTypeTask)
                 {
                     stopWatch.Start();
                     var result = funcToTime.Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam, Task> to return a Task result.");
@@ -45,15 +46,15 @@ namespace BT.Common.OperationTimer.Common
         internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<object> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime, bool awaitAllAtOnce = false)
         {
             var stopWatch = new Stopwatch();
-            if (funcToTime._isReturnTypeTaskWithResult)
+            if (funcToTime.IsReturnTypeTaskWithResult)
             {
                 if (awaitAllAtOnce)
                 {
                     stopWatch.Start();
-                    var jobLists = funcToTime.Data.Select(item => (funcToTime.Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
+                    var jobLists = funcToTime.Data.Select(item => (funcToTime.Func.Invoke(item) as Task) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
                     await Task.WhenAll(jobLists);
                     stopWatch.Stop();
-                    var resultsArray = jobLists.Select(x => x.Result).ToArray() as object[];
+                    var resultsArray = jobLists.Select(CastTaskToObjectAsync).ToArray() as object[];
                     return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
                 }
                 else
@@ -62,15 +63,16 @@ namespace BT.Common.OperationTimer.Common
                     foreach (var item in funcToTime.Data)
                     {
                         stopWatch.Start();
-                        var result = await ((funcToTime.Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
+                        var task = (funcToTime.Func.Invoke(item) as Task) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result.");
+                        await task;
                         stopWatch.Stop();
-                        results.Add(result);
+                        results.Add(await CastTaskToObjectAsync(task));
                     }
                     var resultsArray = results.ToArray();
                     return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
                 }
             }
-            else if (funcToTime._isReturnTypeTask)
+            else if (funcToTime.IsReturnTypeTask)
             {
                 if (awaitAllAtOnce)
                 {
@@ -99,6 +101,17 @@ namespace BT.Common.OperationTimer.Common
         internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime, bool awaitAllAtOnce = false)
         {
             return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
+        }
+        private static async Task<object> CastTaskToObjectAsync(Task task)
+        {
+            if (TaskType.IsGenericType && TaskType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                var resultProperty = TaskType.GetProperty("Result");
+
+                await task;
+                return resultProperty?.GetValue(task);
+            }
+            return null;
         }
     }
 }

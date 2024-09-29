@@ -13,14 +13,16 @@ namespace BT.Common.OperationTimer.Tests
         {
             _ukHolidaysClient = new UkHolidaysClient();
         }
-        [Fact]
+        [Fact(Timeout =10000)]
         public async Task TimeWithResultAsync_Should_Return_TimeSpan_And_Result_For_Real_Request()
         {
-            var result = await OperationTimerUtils.TimeAsync(_ukHolidaysClient.InvokeAsync);
+            var (timeTaken, result) = await OperationTimerUtils.TimeAsyncWithResults(_ukHolidaysClient.InvokeAsync);
 
 
-            result.Should().BePositive();
+            timeTaken.Should().BePositive();
 
+            result.Should().NotBeNull();
+            result.Should().BeOfType<UkHolidays>();
         }
     }
 }

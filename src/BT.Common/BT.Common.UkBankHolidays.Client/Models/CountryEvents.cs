@@ -8,5 +8,11 @@ namespace BT.Common.UkHoliday.Client.Models
         public string Division { get; init; }
         [JsonPropertyName("events")]
         public IReadOnlyCollection<HolidayEvent> Events { get; init; }
+        [JsonConstructor]
+        internal CountryEvents(string division, IReadOnlyCollection<HolidayEvent> events)
+        {
+            Division = division;
+            Events = events;
+        }
     }
 }
