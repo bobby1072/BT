@@ -7,7 +7,7 @@ namespace BT.Common.OperationTimer.Common
         {
             return x =>
             {
-                action(x);
+                action.Invoke(x);
                 return null;
             };
         }
@@ -15,7 +15,7 @@ namespace BT.Common.OperationTimer.Common
         {
             return x =>
             {
-                action();
+                action.Invoke();
                 return null;
             };
         }
