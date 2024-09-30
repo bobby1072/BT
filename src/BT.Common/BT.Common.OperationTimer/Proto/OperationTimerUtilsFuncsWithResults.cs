@@ -43,7 +43,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             var timedResult = funcToTime.RunWithResult();
-            return (timedResult.TimeTaken, (TReturn)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
@@ -53,7 +53,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
             var timedResult = funcToTime.RunWithResult();
-            return (timedResult.TimeTaken, (IReadOnlyCollection<TReturn>)timedResult.Result);
+            return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
@@ -63,7 +63,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<object, TReturn>(func.ToFuncWithParams(), [null]);
             var timedResult = funcToTime.RunWithResult();
-            return (timedResult.TimeTaken, (TReturn)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
@@ -73,7 +73,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
             var timedResult = funcToTime.RunWithResult();
-            return (timedResult.TimeTaken, (TReturn)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
@@ -83,7 +83,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
             var timedResult = funcToTime.RunWithResult();
-            return (timedResult.TimeTaken, (IReadOnlyCollection<TReturn>)timedResult.Result);
+            return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
@@ -93,7 +93,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<object, Task<TReturn>>(func.ToFuncWithParams(), [null]);
             var timedResult = funcToTime.RunWithResult();
-            return (timedResult.TimeTaken, (TReturn)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
@@ -106,7 +106,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
             var timedResult = await funcToTime.RunWithResultAsync(awaitAllAtOnce);
-            return (timedResult.TimeTaken, (IReadOnlyCollection<TReturn>)timedResult.Result);
+            return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
@@ -116,7 +116,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
             var timedResult = await funcToTime.RunWithResultAsync(false);
-            return (timedResult.TimeTaken, (TReturn)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
@@ -126,7 +126,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<object, Task<TReturn>>(func.ToFuncWithParams(), [null]);
             var timedResult = await funcToTime.RunWithResultAsync(false);
-            return (timedResult.TimeTaken, (TReturn)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
@@ -149,7 +149,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, Task>(func, data);
             var timedResult = await funcToTime.RunWithResultAsync(false);
-            return (timedResult.TimeTaken, (Task)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
@@ -159,7 +159,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<object, Task>(func.ToFuncWithParams(), [null]);
             var timedResult = await funcToTime.RunWithResultAsync(false);
-            return (timedResult.TimeTaken, (Task)timedResult.Result.First());
+            return (timedResult.TimeTaken, timedResult.Result.First());
         }
     }
 }

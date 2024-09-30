@@ -1,12 +1,7 @@
-﻿
-using BT.Common.OperationTimer.Common;
-
-namespace BT.Common.OperationTimer.Models
+﻿namespace BT.Common.OperationTimer.Models
 {
     internal record FuncToTime<TParam, TReturn>
     {
-        public static Type TReturnType = typeof(TReturn);
-        public bool IsReturnTypeTask = TReturnType == FuncToTimeExtensions.TaskType;
         public Func<TParam, TReturn> Func { get; init; }
         public IReadOnlyCollection<TParam> Data { get; init; }
         internal FuncToTime(Func<TParam, TReturn> func, TParam data)
