@@ -9,6 +9,36 @@ namespace BT.Common.OperationTimer.Proto
         /// This method will syncronously run the method and return a timespan for how long it took
         /// </summary>
         /// <returns>The time taken to run the function and results if there are any</returns>
+        public static (TimeSpan, Task) TimeWithResults<TParam>(Func<TParam, Task> func, TParam data)
+        {
+            var funcToTime = new FuncToTime<TParam, Task>(func, data);
+            var timedResult = funcToTime.RunWithResult();
+            return (timedResult.TimeTaken, timedResult.Result.First());
+        }
+        /// <summary>
+        /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static (TimeSpan, IReadOnlyCollection<Task>) TimeWithResults<TParam>(Func<TParam, Task> func, IEnumerable<TParam> data)
+        {
+            var funcToTime = new FuncToTime<TParam, Task>(func, data);
+            var timedResult = funcToTime.RunWithResult();
+            return (timedResult.TimeTaken, timedResult.Result);
+        }
+        /// <summary>
+        /// This method will syncronously run the method and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static (TimeSpan, Task) TimeWithResults(Func<Task> func)
+        {
+            var funcToTime = new FuncToTime<object, Task>(func.ToFuncWithParams(), [null]);
+            var timedResult = funcToTime.RunWithResult();
+            return (timedResult.TimeTaken, timedResult.Result.First());
+        }
+        /// <summary>
+        /// This method will syncronously run the method and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
         public static (TimeSpan, TReturn) TimeWithResults<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
@@ -109,7 +139,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var funcToTime = new FuncToTime<TParam, Task>(func, data);
             var timedResult = await funcToTime.RunWithResultAsync(awaitAllAtOnce);
-            return (timedResult.TimeTaken, (IReadOnlyCollection<Task>)timedResult.Result);
+            return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
         /// This method will asyncronously run the method and return a timespan for how long it took
