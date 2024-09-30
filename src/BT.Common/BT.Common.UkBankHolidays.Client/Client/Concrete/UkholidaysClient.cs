@@ -23,7 +23,7 @@ namespace BT.Common.UkHoliday.Client.Client.Concrete
 
             return content;
         }
-        public async Task<UkHolidays> TryInvokeAsync()
+        public async Task<UkHolidays?> TryInvokeAsync()
         {
             try
             {

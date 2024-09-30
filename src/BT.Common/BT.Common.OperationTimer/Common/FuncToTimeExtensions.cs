@@ -5,98 +5,122 @@ namespace BT.Common.OperationTimer.Common
 {
     internal static class FuncToTimeExtensions
     {
-        internal static (TimeSpan TimeTaken, IReadOnlyCollection<object> Result) RunWithResult<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
+        internal static (TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result) RunWithResult<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime)
         {
             var stopWatch = new Stopwatch();
-            var resultsList = new List<object>();
+            var resultsList = new List<TReturn>();
             foreach (var item in funcToTime.Data)
             {
-                if (funcToTime._isReturnTypeTaskWithResult)
-                {
-                    stopWatch.Start();
-                    var funcWithReturn = (funcToTime.Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result.");
-                    var result = funcWithReturn.GetAwaiter().GetResult();
-                    stopWatch.Stop();
-                    resultsList.Add(result);
-                }
-                else if (funcToTime._isReturnTypeTask)
-                {
-                    stopWatch.Start();
-                    var result = funcToTime.Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam, Task> to return a Task result.");
-                    result.GetAwaiter().GetResult();
-                    stopWatch.Stop();
-                }
-                else
-                {
-                    stopWatch.Start();
-                    var result = funcToTime.Func.Invoke(item);
-                    stopWatch.Stop();
-                    resultsList.Add(result);
-                }
+                stopWatch.Start();
+                var result = funcToTime.Func.Invoke(item).GetAwaiter().GetResult();
+                stopWatch.Stop();
+                resultsList.Add(result);
             }
             var resultsArray = resultsList.ToArray();
-            return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
+            return (stopWatch.Elapsed, resultsArray);
+        }
+        internal static (TimeSpan TimeTaken, IReadOnlyCollection<Task> Result) RunWithResult<TParam>(this FuncToTime<TParam, Task> funcToTime)
+        {
+            var stopWatch = new Stopwatch();
+            foreach (var item in funcToTime.Data)
+            {
+                stopWatch.Start();
+                var result = funcToTime.Func.Invoke(item);
+                result.GetAwaiter().GetResult();
+                stopWatch.Stop();
+            }
+            return (stopWatch.Elapsed, funcToTime.Data.Select(item => Task.CompletedTask).ToArray());
+        }
+        internal static (TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result) RunWithResult<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
+        {
+            var stopWatch = new Stopwatch();
+            var resultsList = new List<TReturn>();
+            foreach (var item in funcToTime.Data)
+            {
+                stopWatch.Start();
+                var result = funcToTime.Func.Invoke(item);
+                stopWatch.Stop();
+                resultsList.Add(result);
+            }
+            var resultsArray = resultsList.ToArray();
+            return (stopWatch.Elapsed, resultsArray);
         }
         internal static TimeSpan Run<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
         {
 
             return funcToTime.RunWithResult().TimeTaken;
         }
-        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<object> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime, bool awaitAllAtOnce = false)
+        internal static TimeSpan Run<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime)
+        {
+
+            return funcToTime.RunWithResult().TimeTaken;
+        }
+        internal static TimeSpan Run<TParam>(this FuncToTime<TParam, Task> funcToTime)
+        {
+
+            return funcToTime.RunWithResult().TimeTaken;
+        }
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime, bool awaitAllAtOnce = false)
         {
             var stopWatch = new Stopwatch();
-            if (funcToTime._isReturnTypeTaskWithResult)
+
+            if (awaitAllAtOnce)
             {
-                if (awaitAllAtOnce)
+                var jobList = new List<Task<TReturn>>();
+                stopWatch.Start();
+                foreach (var item in funcToTime.Data)
                 {
-                    stopWatch.Start();
-                    var jobLists = funcToTime.Data.Select(item => (funcToTime.Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
-                    await Task.WhenAll(jobLists);
-                    stopWatch.Stop();
-                    var resultsArray = jobLists.Select(x => x.Result).ToArray() as object[];
-                    return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
+                    jobList.Add(funcToTime.Func.Invoke(item));
                 }
-                else
-                {
-                    var results = new List<object>();
-                    foreach (var item in funcToTime.Data)
-                    {
-                        stopWatch.Start();
-                        var result = await ((funcToTime.Func.Invoke(item) as Task<TReturn>) ?? throw new InvalidOperationException("Func must be a Func<TParam, Task<TReturn>> to return a Task result."));
-                        stopWatch.Stop();
-                        results.Add(result);
-                    }
-                    var resultsArray = results.ToArray();
-                    return (stopWatch.Elapsed, resultsArray.Length > 0 ? resultsArray : null);
-                }
-            }
-            else if (funcToTime._isReturnTypeTask)
-            {
-                if (awaitAllAtOnce)
-                {
-                    stopWatch.Start();
-                    var jobLists = funcToTime.Data.Select(item => funcToTime.Func.Invoke(item) as Task ?? throw new InvalidOperationException("Func must be a Func<TParam, Task> to return a Task result."));
-                    await Task.WhenAll(jobLists);
-                    stopWatch.Stop();
-                }
-                else
-                {
-                    foreach (var item in funcToTime.Data)
-                    {
-                        stopWatch.Start();
-                        var result = funcToTime.Func.Invoke(item);
-                        stopWatch.Stop();
-                    }
-                }
-                return (stopWatch.Elapsed, null);
+                await Task.WhenAll(jobList);
+                stopWatch.Stop();
+                var resultsArray = jobList.Select(x => x.Result).ToArray();
+                return (stopWatch.Elapsed, resultsArray);
             }
             else
             {
-                return funcToTime.RunWithResult();
+                var results = new List<TReturn>();
+                foreach (var item in funcToTime.Data)
+                {
+                    stopWatch.Start();
+                    var result = await funcToTime.Func.Invoke(item);
+                    stopWatch.Stop();
+                    results.Add(result);
+                }
+                var resultsArray = results.ToArray();
+                return (stopWatch.Elapsed, resultsArray);
             }
-
         }
-        internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime, bool awaitAllAtOnce = false)
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<Task> Result)> RunWithResultAsync<TParam>(this FuncToTime<TParam, Task> funcToTime, bool awaitAllAtOnce = false)
+        {
+            var stopWatch = new Stopwatch();
+            if (awaitAllAtOnce)
+            {
+                var jobList = new List<Task>();
+                stopWatch.Start();
+                foreach (var item in funcToTime.Data)
+                {
+                    jobList.Add(funcToTime.Func.Invoke(item));
+                }
+                await Task.WhenAll(jobList);
+                stopWatch.Stop();
+            }
+            else
+            {
+                foreach (var item in funcToTime.Data)
+                {
+                    stopWatch.Start();
+                    await funcToTime.Func.Invoke(item);
+                    stopWatch.Stop();
+                }
+            }
+            return (stopWatch.Elapsed, funcToTime.Data.Select(item => Task.CompletedTask).ToArray());
+        }
+        internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime, bool awaitAllAtOnce = false)
+        {
+            return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
+        }
+        internal static async Task<TimeSpan> RunAsync<TParam>(this FuncToTime<TParam, Task> funcToTime, bool awaitAllAtOnce = false)
         {
             return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
         }

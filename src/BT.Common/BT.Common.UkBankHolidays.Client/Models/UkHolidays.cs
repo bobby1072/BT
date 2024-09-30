@@ -5,11 +5,11 @@ namespace BT.Common.UkBankHolidays.Client.Models
 {
     public record UkHolidays
     {
-        [JsonPropertyName("englandandwales")]
+        [JsonPropertyName("england-and-wales")]
         public CountryEvents EnglandAndWales { get; init; }
         [JsonPropertyName("scotland")]
         public CountryEvents Scotland { get; init; }
-        [JsonPropertyName("northernireland")]
+        [JsonPropertyName("northern-ireland")]
         public CountryEvents NorthernIreland { get; init; }
     }
 }
