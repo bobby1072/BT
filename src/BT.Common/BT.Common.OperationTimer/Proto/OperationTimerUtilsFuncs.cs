@@ -132,5 +132,53 @@ namespace BT.Common.OperationTimer.Proto
             var funcToTime = new FuncToTime<object, Task>(func.ToFuncWithParams(), [null]);
             return await funcToTime.RunAsync(false);
         }
+        /// <summary>
+        /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
+        /// </summary>
+        public static async Task<TimeSpan> TimeAsync<TParam>(Func<TParam, ValueTask> func, IEnumerable<TParam> data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask>(func, data);
+            return await funcToTime.RunAsync();
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        public static async Task<TimeSpan> TimeAsync<TParam>(Func<TParam, ValueTask> func, TParam data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask>(func, data);
+            return await funcToTime.RunAsync();
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        public static async Task<TimeSpan> TimeAsync(Func<ValueTask> func)
+        {
+            var funcToTime = new FuncToTime<object, ValueTask>(func.ToFuncWithParams(), [null]);
+            return await funcToTime.RunAsync();
+        }
+        /// <summary>
+        /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
+        /// </summary>
+        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, ValueTask<TReturn>> func, IEnumerable<TParam> data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask<TReturn>>(func, data);
+            return await funcToTime.RunAsync();
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        public static async Task<TimeSpan> TimeAsync<TParam, TReturn>(Func<TParam, ValueTask<TReturn>> func, TParam data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask<TReturn>>(func, data);
+            return await funcToTime.RunAsync();
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        public static async Task<TimeSpan> TimeAsync<TReturn>(Func<ValueTask<TReturn>> func)
+        {
+            var funcToTime = new FuncToTime<object, ValueTask<TReturn>>(func.ToFuncWithParams(), [null]);
+            return await funcToTime.RunAsync();
+        }
     }
 }
