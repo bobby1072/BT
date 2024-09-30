@@ -116,6 +116,32 @@ namespace BT.Common.OperationTimer.Common
             }
             return (stopWatch.Elapsed, funcToTime.Data.Select(item => Task.CompletedTask).ToArray());
         }
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, ValueTask<TReturn>> funcToTime)
+        {
+            var stopWatch = new Stopwatch();
+
+            var results = new List<TReturn>();
+            foreach (var item in funcToTime.Data)
+            {
+                stopWatch.Start();
+                var result = await funcToTime.Func.Invoke(item);
+                stopWatch.Stop();
+                results.Add(result);
+            }
+            var resultsArray = results.ToArray();
+            return (stopWatch.Elapsed, resultsArray);
+        }
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<ValueTask> Result)> RunWithResultAsync<TParam>(this FuncToTime<TParam, ValueTask> funcToTime)
+        {
+            var stopWatch = new Stopwatch();
+            foreach (var item in funcToTime.Data)
+            {
+                stopWatch.Start();
+                await funcToTime.Func.Invoke(item);
+                stopWatch.Stop();
+            }
+            return (stopWatch.Elapsed, funcToTime.Data.Select(item => ValueTask.CompletedTask).ToArray());
+        }
         internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime, bool awaitAllAtOnce = false)
         {
             return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
@@ -123,6 +149,14 @@ namespace BT.Common.OperationTimer.Common
         internal static async Task<TimeSpan> RunAsync<TParam>(this FuncToTime<TParam, Task> funcToTime, bool awaitAllAtOnce = false)
         {
             return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
+        }
+        internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, ValueTask<TReturn>> funcToTime)
+        {
+            return (await funcToTime.RunWithResultAsync()).TimeTaken;
+        }
+        internal static async Task<TimeSpan> RunAsync<TParam>(this FuncToTime<TParam, ValueTask> funcToTime)
+        {
+            return (await funcToTime.RunWithResultAsync()).TimeTaken;
         }
     }
 }

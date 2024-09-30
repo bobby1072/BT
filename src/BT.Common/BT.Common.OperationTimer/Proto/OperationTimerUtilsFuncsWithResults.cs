@@ -161,5 +161,65 @@ namespace BT.Common.OperationTimer.Proto
             var timedResult = await funcToTime.RunWithResultAsync(false);
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
+        /// <summary>
+        /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static async Task<(TimeSpan, IReadOnlyCollection<ValueTask>)> TimeWithResultsAsync<TParam>(Func<TParam, ValueTask> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask>(func, data);
+            var timedResult = await funcToTime.RunWithResultAsync();
+            return (timedResult.TimeTaken, timedResult.Result);
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static async Task<(TimeSpan, ValueTask)> TimeWithResultsAsync<TParam>(Func<TParam, ValueTask> func, TParam data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask>(func, data);
+            var timedResult = await funcToTime.RunWithResultAsync();
+            return (timedResult.TimeTaken, timedResult.Result.First());
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static async Task<(TimeSpan, ValueTask)> TimeWithResultsAsync(Func<ValueTask> func)
+        {
+            var funcToTime = new FuncToTime<object, ValueTask>(func.ToFuncWithParams(), [null]);
+            var timedResult = await funcToTime.RunWithResultAsync();
+            return (timedResult.TimeTaken, timedResult.Result.First());
+        }
+        /// <summary>
+        /// This method will asyncronously run the method (against the all params provided) and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static async Task<(TimeSpan, IReadOnlyCollection<TReturn>)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, ValueTask<TReturn>> func, IEnumerable<TParam> data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask<TReturn>>(func, data);
+            var timedResult = await funcToTime.RunWithResultAsync();
+            return (timedResult.TimeTaken, timedResult.Result);
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, ValueTask<TReturn>> func, TParam data)
+        {
+            var funcToTime = new FuncToTime<TParam, ValueTask<TReturn>>(func, data);
+            var timedResult = await funcToTime.RunWithResultAsync();
+            return (timedResult.TimeTaken, timedResult.Result.First());
+        }
+        /// <summary>
+        /// This method will asyncronously run the method and return a timespan for how long it took
+        /// </summary>
+        /// <returns>The time taken to run the function and results if there are any</returns>
+        public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TReturn>(Func<ValueTask<TReturn>> func)
+        {
+            var funcToTime = new FuncToTime<object, ValueTask<TReturn>>(func.ToFuncWithParams(), [null]);
+            var timedResult = await funcToTime.RunWithResultAsync();
+            return (timedResult.TimeTaken, timedResult.Result.First());
+        }
     }
 }
