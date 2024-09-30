@@ -97,7 +97,7 @@ namespace BT.Common.OperationTimer.Common
                     foreach (var item in funcToTime.Data)
                     {
                         stopWatch.Start();
-                        var result = funcToTime.Func.Invoke(item);
+                        funcToTime.Func.Invoke(item);
                         stopWatch.Stop();
                     }
                 }
