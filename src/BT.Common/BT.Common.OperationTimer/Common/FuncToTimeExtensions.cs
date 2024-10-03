@@ -5,7 +5,7 @@ namespace BT.Common.OperationTimer.Common
 {
     internal static class FuncToTimeExtensions
     {
-        internal static (TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result) RunWithResult<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime)
+        internal static (TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result) Execute<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime)
         {
             var stopWatch = new Stopwatch();
             var resultsList = new List<TReturn>();
@@ -19,7 +19,7 @@ namespace BT.Common.OperationTimer.Common
             var resultsArray = resultsList.ToArray();
             return (stopWatch.Elapsed, resultsArray);
         }
-        internal static (TimeSpan TimeTaken, IReadOnlyCollection<Task> Result) RunWithResult<TParam>(this FuncToTime<TParam, Task> funcToTime)
+        internal static (TimeSpan TimeTaken, IReadOnlyCollection<Task> Result) Execute<TParam>(this FuncToTime<TParam, Task> funcToTime)
         {
             var stopWatch = new Stopwatch();
             foreach (var item in funcToTime.Data)
@@ -31,7 +31,7 @@ namespace BT.Common.OperationTimer.Common
             }
             return (stopWatch.Elapsed, funcToTime.Data.Select(item => Task.CompletedTask).ToArray());
         }
-        internal static (TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result) RunWithResult<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
+        internal static (TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result) Execute<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
         {
             var stopWatch = new Stopwatch();
             var resultsList = new List<TReturn>();
@@ -45,22 +45,7 @@ namespace BT.Common.OperationTimer.Common
             var resultsArray = resultsList.ToArray();
             return (stopWatch.Elapsed, resultsArray);
         }
-        internal static TimeSpan Run<TParam, TReturn>(this FuncToTime<TParam, TReturn> funcToTime)
-        {
-
-            return funcToTime.RunWithResult().TimeTaken;
-        }
-        internal static TimeSpan Run<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime)
-        {
-
-            return funcToTime.RunWithResult().TimeTaken;
-        }
-        internal static TimeSpan Run<TParam>(this FuncToTime<TParam, Task> funcToTime)
-        {
-
-            return funcToTime.RunWithResult().TimeTaken;
-        }
-        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime, bool awaitAllAtOnce = false)
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result)> ExecuteAsync<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime, bool awaitAllAtOnce = false)
         {
             var stopWatch = new Stopwatch();
 
@@ -91,7 +76,7 @@ namespace BT.Common.OperationTimer.Common
                 return (stopWatch.Elapsed, resultsArray);
             }
         }
-        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<Task> Result)> RunWithResultAsync<TParam>(this FuncToTime<TParam, Task> funcToTime, bool awaitAllAtOnce = false)
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<Task> Result)> ExecuteAsync<TParam>(this FuncToTime<TParam, Task> funcToTime, bool awaitAllAtOnce = false)
         {
             var stopWatch = new Stopwatch();
             if (awaitAllAtOnce)
@@ -116,7 +101,7 @@ namespace BT.Common.OperationTimer.Common
             }
             return (stopWatch.Elapsed, funcToTime.Data.Select(item => Task.CompletedTask).ToArray());
         }
-        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result)> RunWithResultAsync<TParam, TReturn>(this FuncToTime<TParam, ValueTask<TReturn>> funcToTime)
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<TReturn> Result)> ExecuteAsync<TParam, TReturn>(this FuncToTime<TParam, ValueTask<TReturn>> funcToTime)
         {
             var stopWatch = new Stopwatch();
 
@@ -131,7 +116,7 @@ namespace BT.Common.OperationTimer.Common
             var resultsArray = results.ToArray();
             return (stopWatch.Elapsed, resultsArray);
         }
-        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<ValueTask> Result)> RunWithResultAsync<TParam>(this FuncToTime<TParam, ValueTask> funcToTime)
+        internal static async Task<(TimeSpan TimeTaken, IReadOnlyCollection<ValueTask> Result)> ExecuteAsync<TParam>(this FuncToTime<TParam, ValueTask> funcToTime)
         {
             var stopWatch = new Stopwatch();
             foreach (var item in funcToTime.Data)
@@ -141,22 +126,6 @@ namespace BT.Common.OperationTimer.Common
                 stopWatch.Stop();
             }
             return (stopWatch.Elapsed, funcToTime.Data.Select(item => ValueTask.CompletedTask).ToArray());
-        }
-        internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, Task<TReturn>> funcToTime, bool awaitAllAtOnce = false)
-        {
-            return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
-        }
-        internal static async Task<TimeSpan> RunAsync<TParam>(this FuncToTime<TParam, Task> funcToTime, bool awaitAllAtOnce = false)
-        {
-            return (await funcToTime.RunWithResultAsync(awaitAllAtOnce)).TimeTaken;
-        }
-        internal static async Task<TimeSpan> RunAsync<TParam, TReturn>(this FuncToTime<TParam, ValueTask<TReturn>> funcToTime)
-        {
-            return (await funcToTime.RunWithResultAsync()).TimeTaken;
-        }
-        internal static async Task<TimeSpan> RunAsync<TParam>(this FuncToTime<TParam, ValueTask> funcToTime)
-        {
-            return (await funcToTime.RunWithResultAsync()).TimeTaken;
         }
     }
 }
