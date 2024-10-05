@@ -12,7 +12,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var actionToTime = new FuncToTime<TParam, object>(action.ToFuncWithParams(), data);
 
-            return actionToTime.Run();
+            return actionToTime.Execute().TimeTaken;
         }
         /// <summary>
         /// This method will syncronously run the method (against the all params provided) and return a timespan for how long it took
@@ -21,7 +21,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var actionToTime = new FuncToTime<TParam, object>(action.ToFuncWithParams(), data);
 
-            return actionToTime.Run();
+            return actionToTime.Execute().TimeTaken;
         }
         /// <summary>
         /// This method will syncronously run the method and return a timespan for how long it took
@@ -30,7 +30,7 @@ namespace BT.Common.OperationTimer.Proto
         {
             var actionToTime = new FuncToTime<object, object>(action.ToFuncWithParams(), [null]);
 
-            return actionToTime.Run();
+            return actionToTime.Execute().TimeTaken;
         }
     }
 }

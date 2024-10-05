@@ -12,7 +12,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, Task) TimeWithResults<TParam>(Func<TParam, Task> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, Task>(func, data);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -22,7 +22,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, IReadOnlyCollection<Task>) TimeWithResults<TParam>(Func<TParam, Task> func, IEnumerable<TParam> data)
         {
             var funcToTime = new FuncToTime<TParam, Task>(func, data);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -32,7 +32,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, Task) TimeWithResults(Func<Task> func)
         {
             var funcToTime = new FuncToTime<object, Task>(func.ToFuncWithParams(), [null]);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -42,7 +42,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, TReturn) TimeWithResults<TParam, TReturn>(Func<TParam, TReturn> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -52,7 +52,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, IReadOnlyCollection<TReturn>) TimeWithResults<TParam, TReturn>(Func<TParam, TReturn> func, IEnumerable<TParam> data)
         {
             var funcToTime = new FuncToTime<TParam, TReturn>(func, data);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -62,7 +62,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, TReturn) TimeWithResults<TReturn>(Func<TReturn> func)
         {
             var funcToTime = new FuncToTime<object, TReturn>(func.ToFuncWithParams(), [null]);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -72,7 +72,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, TReturn) TimeWithResults<TParam, TReturn>(Func<TParam, Task<TReturn>> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -82,7 +82,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, IReadOnlyCollection<TReturn>) TimeWithResults<TParam, TReturn>(Func<TParam, Task<TReturn>> func, IEnumerable<TParam> data)
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -92,7 +92,7 @@ namespace BT.Common.OperationTimer.Proto
         public static (TimeSpan, TReturn) TimeWithResults<TReturn>(Func<Task<TReturn>> func)
         {
             var funcToTime = new FuncToTime<object, Task<TReturn>>(func.ToFuncWithParams(), [null]);
-            var timedResult = funcToTime.RunWithResult();
+            var timedResult = funcToTime.Execute();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -105,7 +105,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, IReadOnlyCollection<TReturn>)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, Task<TReturn>> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync(awaitAllAtOnce);
+            var timedResult = await funcToTime.ExecuteAsync(awaitAllAtOnce);
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -115,7 +115,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, Task<TReturn>> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, Task<TReturn>>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync(false);
+            var timedResult = await funcToTime.ExecuteAsync(false);
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -125,7 +125,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TReturn>(Func<Task<TReturn>> func)
         {
             var funcToTime = new FuncToTime<object, Task<TReturn>>(func.ToFuncWithParams(), [null]);
-            var timedResult = await funcToTime.RunWithResultAsync(false);
+            var timedResult = await funcToTime.ExecuteAsync(false);
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -138,7 +138,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, IReadOnlyCollection<Task>)> TimeWithResultsAsync<TParam>(Func<TParam, Task> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
             var funcToTime = new FuncToTime<TParam, Task>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync(awaitAllAtOnce);
+            var timedResult = await funcToTime.ExecuteAsync(awaitAllAtOnce);
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -148,7 +148,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, Task)> TimeWithResultsAsync<TParam>(Func<TParam, Task> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, Task>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync(false);
+            var timedResult = await funcToTime.ExecuteAsync(false);
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -158,7 +158,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, Task)> TimeWithResultsAsync(Func<Task> func)
         {
             var funcToTime = new FuncToTime<object, Task>(func.ToFuncWithParams(), [null]);
-            var timedResult = await funcToTime.RunWithResultAsync(false);
+            var timedResult = await funcToTime.ExecuteAsync(false);
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -168,7 +168,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, IReadOnlyCollection<ValueTask>)> TimeWithResultsAsync<TParam>(Func<TParam, ValueTask> func, IEnumerable<TParam> data, bool awaitAllAtOnce = false)
         {
             var funcToTime = new FuncToTime<TParam, ValueTask>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync();
+            var timedResult = await funcToTime.ExecuteAsync();
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -178,7 +178,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, ValueTask)> TimeWithResultsAsync<TParam>(Func<TParam, ValueTask> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, ValueTask>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync();
+            var timedResult = await funcToTime.ExecuteAsync();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -188,7 +188,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, ValueTask)> TimeWithResultsAsync(Func<ValueTask> func)
         {
             var funcToTime = new FuncToTime<object, ValueTask>(func.ToFuncWithParams(), [null]);
-            var timedResult = await funcToTime.RunWithResultAsync();
+            var timedResult = await funcToTime.ExecuteAsync();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -198,7 +198,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, IReadOnlyCollection<TReturn>)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, ValueTask<TReturn>> func, IEnumerable<TParam> data)
         {
             var funcToTime = new FuncToTime<TParam, ValueTask<TReturn>>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync();
+            var timedResult = await funcToTime.ExecuteAsync();
             return (timedResult.TimeTaken, timedResult.Result);
         }
         /// <summary>
@@ -208,7 +208,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TParam, TReturn>(Func<TParam, ValueTask<TReturn>> func, TParam data)
         {
             var funcToTime = new FuncToTime<TParam, ValueTask<TReturn>>(func, data);
-            var timedResult = await funcToTime.RunWithResultAsync();
+            var timedResult = await funcToTime.ExecuteAsync();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
         /// <summary>
@@ -218,7 +218,7 @@ namespace BT.Common.OperationTimer.Proto
         public static async Task<(TimeSpan, TReturn)> TimeWithResultsAsync<TReturn>(Func<ValueTask<TReturn>> func)
         {
             var funcToTime = new FuncToTime<object, ValueTask<TReturn>>(func.ToFuncWithParams(), [null]);
-            var timedResult = await funcToTime.RunWithResultAsync();
+            var timedResult = await funcToTime.ExecuteAsync();
             return (timedResult.TimeTaken, timedResult.Result.First());
         }
     }
