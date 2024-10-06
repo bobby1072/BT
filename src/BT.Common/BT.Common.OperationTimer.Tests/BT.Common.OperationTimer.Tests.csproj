@@ -33,6 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="TestData\UkHolidays.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BT.Common.OperationTimer\BT.Common.OperationTimer.csproj" />
     <ProjectReference Include="..\BT.Common.UkBankHolidays.Client\BT.Common.UkHoliday.Client.csproj" />
   </ItemGroup>

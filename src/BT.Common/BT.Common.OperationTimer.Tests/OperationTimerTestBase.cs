@@ -1,7 +1,16 @@
+
+using System.Text.Json;
+using BT.Common.UkBankHolidays.Client.Models;
+
 namespace BT.Common.OperationTimer.Tests
 {
     public class OperationTimerTestBase
     {
+        protected static async Task<UkHolidays> GetUkHolidaysFromJson()
+        {
+            var readFile = await File.ReadAllTextAsync(Path.GetFullPath($"TestData{Path.DirectorySeparatorChar}UkHolidays.json"));
+            return JsonSerializer.Deserialize<UkHolidays>(readFile) ?? throw new InvalidDataException("Couldn't find data");
+        }
         protected static class TestFuncsWithData
         {
             public static IDictionary<IReadOnlyCollection<object>, Func<object, object>> BuildTestDataAndFunctions()
