@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.FastArray", "BT.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.OperationTimer.Tests", "BT.Common.OperationTimer.Tests\BT.Common.OperationTimer.Tests.csproj", "{E3B757A8-3ABF-4CE4-A9B5-E4D4936EC446}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.UkHoliday.Client", "BT.Common.UkBankHolidays.Client\BT.Common.UkHoliday.Client.csproj", "{105A15C5-36C8-44C7-BD6D-9158EA5E14C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.UkHoliday.Client", "BT.Common.UkBankHolidays.Client\BT.Common.UkHoliday.Client.csproj", "{105A15C5-36C8-44C7-BD6D-9158EA5E14C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.TestConsoleApp", "BT.Common.TestConsoleApp\BT.Common.TestConsoleApp.csproj", "{D23E5FE7-33A4-4238-9DC9-995518C0EB61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{105A15C5-36C8-44C7-BD6D-9158EA5E14C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{105A15C5-36C8-44C7-BD6D-9158EA5E14C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{105A15C5-36C8-44C7-BD6D-9158EA5E14C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D23E5FE7-33A4-4238-9DC9-995518C0EB61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D23E5FE7-33A4-4238-9DC9-995518C0EB61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D23E5FE7-33A4-4238-9DC9-995518C0EB61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D23E5FE7-33A4-4238-9DC9-995518C0EB61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
