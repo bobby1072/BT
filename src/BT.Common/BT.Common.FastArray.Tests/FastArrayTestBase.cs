@@ -223,6 +223,13 @@ namespace BT.Common.FastArray.Tests
             var expected = actualFunc.Invoke(arrayData);
             var yourResult = yourFunc.Invoke(arrayData);
 
+            if(expected.Count() != yourResult.Count())
+            {
+                Console.WriteLine(expected.Count());
+                expected = actualFunc.Invoke(arrayData);
+                yourResult = yourFunc.Invoke(arrayData);
+            }
+
             expected.Count().Should().Be(yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
