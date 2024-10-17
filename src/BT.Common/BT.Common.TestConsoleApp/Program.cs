@@ -11,6 +11,7 @@ namespace BT.Common.TestConsoleApp
         {
             var holidays = await new UkHolidaysClient().InvokeAsync();
             Console.WriteLine(JsonSerializer.Serialize(holidays));
+
         }
     }
 }
