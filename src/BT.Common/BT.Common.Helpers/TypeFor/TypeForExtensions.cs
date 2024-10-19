@@ -2,9 +2,9 @@
 {
     public static class TypeForExtensions
     {
-        public static TypeFor<T> GetType<T>(this T baseObject)
+        public static TypeFor<T> GetTypeFor<T>(this T value)
         {
-            return new ActualTypeFor<T>(baseObject);
+            return new TypeFor<T>();
         }
     }
 }
