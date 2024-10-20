@@ -1,11 +1,10 @@
 ﻿namespace BT.Common.Helpers.TypeFor
 {
-    public static class TypeForExtensions
+    public static class TypeForUtils
     {
-        public static TypeFor<T> GetTypeFor<T>(this T value)
+        public static TypeFor<T> GetTypeFor<T>()
         {
             return new TypeFor<T>();
         }
-
     }
 }
