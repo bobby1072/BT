@@ -4,5 +4,7 @@ namespace BT.Common.Workflow.Exceptions
     {
         public WorkflowException(string message)
             : base(message) { }
+
+        public WorkflowException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

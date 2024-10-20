@@ -96,8 +96,6 @@ namespace BT.Common.Workflow.Services.Concrete
                 ?? true;
 
 
-            var contextItem = activity.ContextItem;
-            (ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult) finalActivityResult;
             for (int retryCounter = 0; retryCounter < timesToRetry; retryCounter++)
             {
                 try
@@ -106,30 +104,36 @@ namespace BT.Common.Workflow.Services.Concrete
                     {
                         await Task.Delay(secondsBetweenRetries * 1000);
                     }
+                    _logger.LogInformation("Attempting to execute {ActivityName}, {ActivityRunId}. On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
+
 
                     Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>> mainResultFunc = resolvedActivity.ExecuteAsync;
 
                     if (activity.ActivityWrapperFunc is not null)
                     {
-                        mainResultFunc = (TActivityContextItem? x) => activity.ActivityWrapperFunc.Invoke(x, resolvedActivity.ExecuteAsync);
+                        mainResultFunc = (x) => activity.ActivityWrapperFunc.Invoke(x!, resolvedActivity.ExecuteAsync);
                     }
 
-                    var mainResult = await mainResultFunc.Invoke(contextItem);
+                    var (ActivityResult, ActualResult) = await mainResultFunc.Invoke(activity.ContextItem);
 
-                    finalActivityResult = mainResult;
 
-                    if (finalActivityResult.ActivityResult == ActivityResultEnum.Success ||
-                        retryCounter == timesToRetry - 1)
+                    if (ActivityResult == ActivityResultEnum.Success)
                     {
-                        return (finalActivityResult.ActivityResult, finalActivityResult.ActualResult, retryCounter);
+                        _logger.LogInformation("Activity {ActivityName}, {ActivityRunId} executed successfully. On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
+                        return (ActivityResult, ActualResult, retryCounter);
+                    }
+                    _logger.LogWarning("Activity {ActivityName}, {ActivityRunId} failed. On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
+                    if (retryCounter == timesToRetry - 1)
+                    {
+                        return (ActivityResult, ActualResult, retryCounter);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error with message {ExceptionMessage} in activity: {ActivityName}, {ActivityRunId}", ex.Message, resolvedActivity.Name, resolvedActivity.ActivityRunId);
-                    if (retryOnException == false)
+                    _logger.LogError(ex, "Error with message {ExceptionMessage} in activity: {ActivityName}, {ActivityRunId}. On attempt: {AttemptNumber}", ex.Message, resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
+                    if (retryOnException == false || retryCounter == timesToRetry - 1)
                     {
-                        break;
+                        throw new WorkflowException(WorkflowConstants.CouldNotGetResultFromActivity, ex);
                     }
                 }
             }
