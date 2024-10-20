@@ -1,7 +1,7 @@
-using AiTrainer.Web.Workflow.Activities;
 using BT.Common.Helpers.TypeFor;
+using BT.Common.Workflow.Activities;
 
-namespace AiTrainer.Web.Workflow.Models
+namespace BT.Common.Workflow.Models
 {
     public sealed record ActivityToRun<TActivityContextItem>
     {

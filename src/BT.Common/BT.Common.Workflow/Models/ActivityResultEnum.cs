@@ -1,4 +1,4 @@
-﻿namespace AiTrainer.Web.Workflow.Models
+﻿namespace BT.Common.Workflow.Models
 {
     public enum ActivityResultEnum
     {

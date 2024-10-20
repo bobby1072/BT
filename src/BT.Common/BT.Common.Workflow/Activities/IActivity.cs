@@ -1,6 +1,6 @@
-﻿using AiTrainer.Web.Workflow.Models;
+﻿using BT.Common.Workflow.Models;
 
-namespace AiTrainer.Web.Workflow.Activities
+namespace BT.Common.Workflow.Activities
 {
     public interface IActivity<T>
     {

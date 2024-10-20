@@ -1,7 +1,6 @@
-﻿using BT.Common.UkHoliday.Client.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace BT.Common.UkBankHolidays.Client.Models
+namespace BT.Common.UkHoliday.Client.Models
 {
     public record UkHolidays
     {

@@ -1,7 +1,7 @@
-using AiTrainer.Web.Workflow.Contexts;
-using AiTrainer.Web.Workflow.Models;
+using BT.Common.Workflow.Contexts;
+using BT.Common.Workflow.Models;
 
-namespace AiTrainer.Web.Workflow
+namespace BT.Common.Workflow
 {
     public interface IWorkflow<TContext, TReturn, TActivityContextItem>
         where TContext : IWorkflowContext<
@@ -13,9 +13,10 @@ namespace AiTrainer.Web.Workflow
         TContext Context { get; init; }
 
         IReadOnlyCollection<
-            IReadOnlyCollection<ActivityToRun<TActivityContextItem>>
-        > ActivitiesToRun { get; }
+            IReadOnlyCollection<ActivityToRun<object>>
+        > GetActivitiesToRun();
 
+        ValueTask PreWorkflowRunProcess();
         ValueTask PostSuccessfulWorkflowRunProcess();
         ValueTask PostUnSuccessfulWorkflowRunProcess();
     }

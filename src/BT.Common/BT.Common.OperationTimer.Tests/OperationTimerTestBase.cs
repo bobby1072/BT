@@ -1,6 +1,6 @@
 
 using System.Text.Json;
-using BT.Common.UkBankHolidays.Client.Models;
+using BT.Common.UkHoliday.Client.Models;
 
 namespace BT.Common.OperationTimer.Tests
 {

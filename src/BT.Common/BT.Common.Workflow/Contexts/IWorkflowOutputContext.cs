@@ -1,4 +1,4 @@
-﻿namespace AiTrainer.Web.Workflow.Contexts
+﻿namespace BT.Common.Workflow.Contexts
 {
     public interface IWorkflowOutputContext<TReturn>
     {

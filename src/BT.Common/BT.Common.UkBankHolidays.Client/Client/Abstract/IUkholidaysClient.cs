@@ -1,4 +1,4 @@
-﻿using BT.Common.UkBankHolidays.Client.Models;
+﻿using BT.Common.UkHoliday.Client.Models;
 
 namespace BT.Common.UkHoliday.Client.Client.Abstract
 {
