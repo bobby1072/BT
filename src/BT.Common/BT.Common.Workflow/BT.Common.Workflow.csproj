@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Submodules\BT\src\BT.Common\BT.Common.Helpers\BT.Common.Helpers.csproj" />
+    <ProjectReference Include="..\BT.Common.Helpers\BT.Common.Helpers.csproj" />
   </ItemGroup>
 
 </Project>
