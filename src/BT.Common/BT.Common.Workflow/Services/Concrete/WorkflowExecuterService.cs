@@ -1,8 +1,8 @@
-using System.Security.AccessControl;
 using BT.Common.Workflow.Abstract;
 using BT.Common.Workflow.Activities.Abstract;
 using BT.Common.Workflow.Activities.Concrete;
 using BT.Common.Workflow.Common;
+using BT.Common.Workflow.Concrete;
 using BT.Common.Workflow.Contexts;
 using BT.Common.Workflow.Exceptions;
 using BT.Common.Workflow.Services.Abstract;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Workflow.Services.Concrete
 {
-    public class WorkflowExecuterService 
+    public class WorkflowExecuterService
     // : IWorkflowExecuterService
     {
         private readonly IServiceProvider _serviceProvider;
@@ -23,15 +23,27 @@ namespace BT.Common.Workflow.Services.Concrete
             _serviceProvider = serviceProvider;
             _logger = logger;
         }
-        // public async Task<TReturn?> ExecuteAsync<TContext, TReturn>(
+        // public async Task<(CompletedWorkflowActualActivityResult<TContext, TReturn>, TReturn?)> ExecuteAsync<TContext, TReturn>(
         //     IWorkflow<TContext, TReturn> workflowToExecute
         // )
         //     where TContext : IWorkflowContext<
         //             IWorkflowInputContext,
         //             IWorkflowOutputContext<TReturn>,
         //             TReturn
-        //         >{
-        //         }
+        //         >
+        // {
+
+
+
+        // }
+
+
+
+
+
+
+
+
 
 
         private IEnumerable<
@@ -83,10 +95,6 @@ namespace BT.Common.Workflow.Services.Concrete
                 ?? activity.DefaultRetryAttribute?.RetryOnException
                 ?? true;
 
-            var retryOnFailedActivityResult =
-                activity.RetryOnFailedActivityResult
-                ?? activity.DefaultRetryAttribute?.RetryOnFailedActivityResult
-                ?? true;
 
             var contextItem = activity.ContextItem;
             (ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult) finalActivityResult;
@@ -99,20 +107,14 @@ namespace BT.Common.Workflow.Services.Concrete
                         await Task.Delay(secondsBetweenRetries * 1000);
                     }
 
-                    if (activity.PreActivityAction is not null)
+                    Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>> mainResultFunc = resolvedActivity.ExecuteAsync;
+
+                    if (activity.ActivityWrapperFunc is not null)
                     {
-                        contextItem = await activity.PreActivityAction.Invoke(activity.ContextItem);
+                        mainResultFunc = (TActivityContextItem? x) => activity.ActivityWrapperFunc.Invoke(x, resolvedActivity.ExecuteAsync);
                     }
 
-                    var mainResult = await resolvedActivity.ExecuteAsync(contextItem);
-
-                    if (activity.PostActivityAction is not null)
-                    {
-                        mainResult = await activity.PostActivityAction.Invoke(
-                            mainResult.ActivityResult,
-                            mainResult.ActualResult
-                        );
-                    }
+                    var mainResult = await mainResultFunc.Invoke(contextItem);
 
                     finalActivityResult = mainResult;
 
@@ -121,13 +123,10 @@ namespace BT.Common.Workflow.Services.Concrete
                     {
                         return (finalActivityResult.ActivityResult, finalActivityResult.ActualResult, retryCounter);
                     }
-                    else if (retryOnFailedActivityResult == false)
-                    {
-                        return (ActivityResultEnum.Fail, default, retryCounter);
-                    }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error with message {ExceptionMessage} in activity: {ActivityName}, {ActivityRunId}", ex.Message, resolvedActivity.Name, resolvedActivity.ActivityRunId);
                     if (retryOnException == false)
                     {
                         break;

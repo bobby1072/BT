@@ -1,10 +1,8 @@
-﻿using BT.Common.Helpers.TypeFor;
-using BT.Common.Workflow.Activities.Abstract;
-using BT.Common.Workflow.Activities.Concrete;
+﻿using BT.Common.Workflow.Activities.Concrete;
 
 namespace BT.Common.Workflow.Concrete
 {
-    internal sealed record CompletedWorkflowActualActivityResult<
+    public sealed record CompletedWorkflowActualActivityResult<
         TActivityContextItem,
         TActivityReturnItem
     >

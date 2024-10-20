@@ -2,7 +2,7 @@
 
 namespace BT.Common.Workflow.Activities.Concrete
 {
-    internal record ActualActivityToRun<TActivityContextItem, TActivityReturnItem>
+    public sealed record ActualActivityToRun<TActivityContextItem, TActivityReturnItem>
     {
         public IActivity<TActivityContextItem?, TActivityReturnItem?> ActualActivity { get; init; }
         public Func<

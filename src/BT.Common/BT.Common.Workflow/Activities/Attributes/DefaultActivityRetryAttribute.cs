@@ -6,14 +6,12 @@
         public int RetryCount { get; init; }
         public int SecondsBetweenRetries { get; init; }
         public bool RetryOnException { get; init; }
-        public bool RetryOnFailedActivityResult { get; init; }
         public DefaultActivityRetryAttribute(int retryCount, int secondsBetweenRetries,
-            bool retryOnException = true, bool retryOnFailedActivityResult = true)
+            bool retryOnException = true)
         {
             RetryCount = retryCount;
             SecondsBetweenRetries = secondsBetweenRetries;
             RetryOnException = retryOnException;
-            RetryOnFailedActivityResult = retryOnFailedActivityResult;
         }
     }
 }
