@@ -3,7 +3,7 @@ using BT.Common.Workflow.Models;
 
 namespace BT.Common.Workflow
 {
-    public interface IWorkflow<TContext, TReturn, TActivityContextItem>
+    public interface IWorkflow<TContext, TReturn>
         where TContext : IWorkflowContext<
                 IWorkflowInputContext,
                 IWorkflowOutputContext<TReturn>,

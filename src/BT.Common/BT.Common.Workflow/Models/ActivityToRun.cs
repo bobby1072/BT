@@ -6,21 +6,24 @@ namespace BT.Common.Workflow.Models
     public sealed record ActivityToRun<TActivityContextItem>
     {
         public TypeFor<IActivity<TActivityContextItem>> ActivityType { get; init; }
+        public TActivityContextItem ContextItem { get; init; }
         public int RetryCount { get; init; }
         public int SecondsBetweenRetries { get; init; }
-        public Action<TActivityContextItem>? PreActivityAction { get; init; }
-        public Action<TActivityContextItem>? PostActivityAction { get; init; }
+        public Func<TActivityContextItem, Task>? PreActivityAction { get; init; }
+        public Func<TActivityContextItem, Task>? PostActivityAction { get; init; }
 
         public ActivityToRun(
             TypeFor<IActivity<TActivityContextItem>> activityType,
+            TActivityContextItem contextItem,
             int retryCount = 0,
             int secondsBetweenRetries = 0,
-            Action<TActivityContextItem>? preActivityAction = null,
-            Action<TActivityContextItem>? postActivityAction = null
+            Func<TActivityContextItem, Task>? preActivityAction = null,
+            Func<TActivityContextItem, Task>? postActivityAction = null
         )
         {
             ActivityType = activityType;
             RetryCount = retryCount;
+            ContextItem = contextItem;
             SecondsBetweenRetries = secondsBetweenRetries;
             PreActivityAction = preActivityAction;
             PostActivityAction = postActivityAction;

@@ -3,17 +3,17 @@ using BT.Common.Workflow.Activities;
 
 namespace BT.Common.Workflow.Models
 {
-    public sealed record CompletedWorkflowActivityResult<T>
+    public sealed record CompletedWorkflowActivityResult<TActivityContextItem>
     {
         public TimeSpan TimeTaken { get; init; }
         public DateTime CompletedAt { get; init; }
-        public TypeFor<IActivity<T>> ActivityType { get; init; }
+        public TypeFor<IActivity<TActivityContextItem>> ActivityType { get; init; }
         public int NumberOfRetries { get; init; }
 
         public CompletedWorkflowActivityResult(
             TimeSpan timeTaken,
             DateTime completedAt,
-            TypeFor<IActivity<T>> actvityType,
+            TypeFor<IActivity<TActivityContextItem>> actvityType,
             int numberOfRetries
         )
         {
