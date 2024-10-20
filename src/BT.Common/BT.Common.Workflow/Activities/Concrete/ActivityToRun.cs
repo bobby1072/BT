@@ -1,13 +1,14 @@
 using BT.Common.Helpers.TypeFor;
-using BT.Common.Workflow.Activities;
+using BT.Common.Workflow.Activities.Abstract;
 
-namespace BT.Common.Workflow.Models
+namespace BT.Common.Workflow.Activities.Concrete
 {
     public sealed record ActivityToRun<TActivityContextItem, TActivityReturnItem>
     {
         public TypeFor<
             IActivity<TActivityContextItem?, TActivityReturnItem?>
-        > ActivityType { get; init; }
+        > ActivityType
+        { get; init; }
         public TActivityContextItem? ContextItem { get; init; }
         public int RetryCount { get; init; }
         public int SecondsBetweenRetries { get; init; }

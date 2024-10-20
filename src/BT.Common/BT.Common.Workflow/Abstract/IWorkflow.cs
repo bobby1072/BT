@@ -1,5 +1,5 @@
+using BT.Common.Workflow.Activities.Concrete;
 using BT.Common.Workflow.Contexts;
-using BT.Common.Workflow.Models;
 
 namespace BT.Common.Workflow.Abstract
 {
@@ -18,8 +18,8 @@ namespace BT.Common.Workflow.Abstract
             IReadOnlyCollection<ActivityToRun<object?, object?>>
         > ActivitiesToRun { get; }
 
-        Task PreWorkflowRunProcess();
-        Task PostSuccessfulWorkflowRunProcess();
-        Task PostUnSuccessfulWorkflowRunProcess();
+        Task PreWorkflowRoutine();
+        Task PostSuccessfulWorkflowRoutine();
+        Task PostUnsuccessfulWorkflowRoutine();
     }
 }

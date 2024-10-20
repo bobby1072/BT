@@ -1,4 +1,4 @@
-﻿namespace BT.Common.Workflow.Models
+﻿namespace BT.Common.Workflow.Activities.Concrete
 {
     public enum ActivityResultEnum
     {

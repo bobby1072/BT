@@ -1,5 +1,5 @@
+using BT.Common.Workflow.Activities.Concrete;
 using BT.Common.Workflow.Contexts;
-using BT.Common.Workflow.Models;
 
 namespace BT.Common.Workflow.Abstract
 {
@@ -24,10 +24,10 @@ namespace BT.Common.Workflow.Abstract
             Context = context;
         }
 
-        public virtual Task PreWorkflowRunProcess() => Task.CompletedTask;
+        public virtual Task PreWorkflowRoutine() => Task.CompletedTask;
 
-        public virtual Task PostSuccessfulWorkflowRunProcess() => Task.CompletedTask;
+        public virtual Task PostSuccessfulWorkflowRoutine() => Task.CompletedTask;
 
-        public virtual Task PostUnSuccessfulWorkflowRunProcess() => Task.CompletedTask;
+        public virtual Task PostUnsuccessfulWorkflowRoutine() => Task.CompletedTask;
     }
 }
