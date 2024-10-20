@@ -1,23 +1,30 @@
 ﻿using BT.Common.Helpers.TypeFor;
 using BT.Common.Workflow.Activities.Abstract;
+using BT.Common.Workflow.Activities.Concrete;
 
 namespace BT.Common.Workflow.Concrete
 {
-    internal sealed record CompletedWorkflowActivityResult<TActivityContextItem, TActivityReturnItem>
+    internal sealed record CompletedWorkflowActualActivityResult<
+        TActivityContextItem,
+        TActivityReturnItem
+    >
     {
-        public TypeFor<IActivity<TActivityContextItem, TActivityReturnItem>> ActivityType { get; init; }
+        public ActualActivityToRun<
+            TActivityContextItem,
+            TActivityReturnItem
+        > ActualActivity { get; init; }
         public DateTime CompletedAt { get; init; }
         public int NumberOfRetries { get; init; }
         public TimeSpan TimeTaken { get; init; }
 
-        public CompletedWorkflowActivityResult(
-            TypeFor<IActivity<TActivityContextItem, TActivityReturnItem>> actvityType,
+        public CompletedWorkflowActualActivityResult(
+            ActualActivityToRun<TActivityContextItem, TActivityReturnItem> actualActivity,
             DateTime completedAt,
             int numberOfRetries,
             TimeSpan timeTaken
         )
         {
-            ActivityType = actvityType;
+            ActualActivity = actualActivity;
             CompletedAt = completedAt;
             NumberOfRetries = numberOfRetries;
             TimeTaken = timeTaken;
