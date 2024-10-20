@@ -2,10 +2,13 @@
 
 namespace BT.Common.Workflow.Activities
 {
-    public interface IActivity<T>
+    public interface IActivity<TParam, TReturn>
     {
-        public string Name { get; }
-        public string Description { get; }
-        Task<ActivityResultEnum> ExecuteAsync(T workflowContexItem);
+        Guid ActivityRunId { get; }
+        string Name { get; }
+        string Description { get; }
+        Task<(ActivityResultEnum ActivityResult, TReturn? ActualResult)> ExecuteAsync(
+            TParam? workflowContextItem
+        );
     }
 }

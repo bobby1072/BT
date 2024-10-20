@@ -1,7 +1,7 @@
 using BT.Common.Workflow.Contexts;
 using BT.Common.Workflow.Models;
 
-namespace BT.Common.Workflow
+namespace BT.Common.Workflow.Abstract
 {
     public interface IWorkflow<TContext, TReturn>
         where TContext : IWorkflowContext<
@@ -10,14 +10,16 @@ namespace BT.Common.Workflow
                 TReturn
             >
     {
+        Guid WorkflowRunId { get; }
+        string Name { get; }
         TContext Context { get; init; }
 
         IReadOnlyCollection<
-            IReadOnlyCollection<ActivityToRun<object>>
-        > GetActivitiesToRun();
+            IReadOnlyCollection<ActivityToRun<object?, object?>>
+        > ActivitiesToRun { get; }
 
-        ValueTask PreWorkflowRunProcess();
-        ValueTask PostSuccessfulWorkflowRunProcess();
-        ValueTask PostUnSuccessfulWorkflowRunProcess();
+        Task PreWorkflowRunProcess();
+        Task PostSuccessfulWorkflowRunProcess();
+        Task PostUnSuccessfulWorkflowRunProcess();
     }
 }
