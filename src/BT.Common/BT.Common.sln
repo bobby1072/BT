@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.UkHoliday.Client"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.TestConsoleApp", "BT.Common.TestConsoleApp\BT.Common.TestConsoleApp.csproj", "{D23E5FE7-33A4-4238-9DC9-995518C0EB61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Helpers", "BT.Common.Helpers\BT.Common.Helpers.csproj", "{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Helpers", "BT.Common.Helpers\BT.Common.Helpers.csproj", "{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Workflow", "BT.Common.Workflow\BT.Common.Workflow.csproj", "{EF836BFB-F614-40D9-8575-07610FEC9715}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF836BFB-F614-40D9-8575-07610FEC9715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF836BFB-F614-40D9-8575-07610FEC9715}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF836BFB-F614-40D9-8575-07610FEC9715}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF836BFB-F614-40D9-8575-07610FEC9715}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
