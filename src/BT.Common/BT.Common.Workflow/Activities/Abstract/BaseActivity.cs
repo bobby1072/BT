@@ -8,7 +8,6 @@ namespace BT.Common.Workflow.Activities.Abstract
         public string Name =>
             GetType().Name.Replace("Activity", "", StringComparison.CurrentCultureIgnoreCase);
         public abstract string Description { get; }
-
         public abstract Task<(
             ActivityResultEnum ActivityResult,
             TReturn? ActualResult

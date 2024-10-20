@@ -2,7 +2,7 @@
 {
     public enum ActivityResultEnum
     {
-        Success,
-        Fail
+        Fail,
+        Success
     }
 }

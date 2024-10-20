@@ -13,6 +13,7 @@ namespace BT.Common.Workflow.Abstract
         public Guid WorkflowRunId { get; } = Guid.NewGuid();
         public string Name =>
             GetType().Name.Replace("Workflow", "", StringComparison.CurrentCultureIgnoreCase);
+        public abstract string Description { get; }
         public TContext Context { get; init; }
 
         public abstract IReadOnlyCollection<

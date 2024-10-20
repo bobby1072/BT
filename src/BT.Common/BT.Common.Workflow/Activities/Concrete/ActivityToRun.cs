@@ -16,6 +16,8 @@ namespace BT.Common.Workflow.Activities.Concrete
         public TActivityContextItem? ContextItem { get; init; }
         public int? RetryCount { get; init; }
         public int? SecondsBetweenRetries { get; init; }
+        public bool? RetryOnException { get; init; }
+        public bool? RetryOnFailedActivityResult { get; init; }
         public Func<
             TActivityContextItem?,
             Task<TActivityContextItem?>
@@ -31,6 +33,8 @@ namespace BT.Common.Workflow.Activities.Concrete
             TActivityContextItem contextItem,
             int? retryCount = null,
             int? secondsBetweenRetries = null,
+            bool? retryOnException = null,
+            bool? retryOnFailedActivityResult = null,
             Func<TActivityContextItem?, Task<TActivityContextItem?>>? preActivityAction = null,
             Func<
                 ActivityResultEnum,
@@ -40,13 +44,14 @@ namespace BT.Common.Workflow.Activities.Concrete
         )
         {
             ActivityType = activityType;
-            RetryCount = retryCount;
             ContextItem = contextItem;
+            RetryCount = retryCount;
             SecondsBetweenRetries = secondsBetweenRetries;
+            RetryOnException = retryOnException;
+            RetryOnFailedActivityResult = retryOnFailedActivityResult;
             PreActivityAction = preActivityAction;
             PostActivityAction = postActivityAction;
         }
-
         public ActivityToRun(
             TypeFor<IActivity<TActivityContextItem?, TActivityReturnItem?>> activityType,
             TActivityContextItem contextItem,
@@ -57,15 +62,19 @@ namespace BT.Common.Workflow.Activities.Concrete
                 Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>
             >? postActivityAction = null,
             int? retryCount = null,
-            int? secondsBetweenRetries = null
+            int? secondsBetweenRetries = null,
+            bool? retryOnException = null,
+            bool? retryOnFailedActivityResult = null
         )
         {
+            ContextItem = contextItem;
+            PreActivityAction = preActivityAction;
             ActivityType = activityType;
             RetryCount = retryCount;
-            ContextItem = contextItem;
             SecondsBetweenRetries = secondsBetweenRetries;
-            PreActivityAction = preActivityAction;
             PostActivityAction = postActivityAction;
+            RetryOnException = retryOnException;
+            RetryOnFailedActivityResult = retryOnFailedActivityResult;
         }
 
         public ActivityToRun(
@@ -78,7 +87,9 @@ namespace BT.Common.Workflow.Activities.Concrete
                 Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>
             >? postActivityAction = null,
             int? retryCount = null,
-            int? secondsBetweenRetries = null
+            int? secondsBetweenRetries = null,
+            bool? retryOnException = null,
+            bool? retryOnFailedActivityResult = null
         )
         {
             ActivityType = activityType;
@@ -87,6 +98,8 @@ namespace BT.Common.Workflow.Activities.Concrete
             SecondsBetweenRetries = secondsBetweenRetries;
             PreActivityAction = preActivityAction;
             PostActivityAction = postActivityAction;
+            RetryOnException = retryOnException;
+            RetryOnFailedActivityResult = retryOnFailedActivityResult;
         }
     }
 }

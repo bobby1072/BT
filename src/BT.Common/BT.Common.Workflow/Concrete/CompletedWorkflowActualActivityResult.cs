@@ -13,8 +13,8 @@ namespace BT.Common.Workflow.Concrete
             TActivityContextItem,
             TActivityReturnItem
         > ActualActivity { get; init; }
-        public DateTime CompletedAt { get; init; }
         public int NumberOfRetries { get; init; }
+        public DateTime CompletedAt { get; init; }
         public TimeSpan TimeTaken { get; init; }
 
         public CompletedWorkflowActualActivityResult(

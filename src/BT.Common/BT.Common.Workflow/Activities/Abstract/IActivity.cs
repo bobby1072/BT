@@ -7,6 +7,7 @@ namespace BT.Common.Workflow.Activities.Abstract
         Guid ActivityRunId { get; }
         string Name { get; }
         string Description { get; }
+
         Task<(ActivityResultEnum ActivityResult, TReturn? ActualResult)> ExecuteAsync(
             TParam? workflowContextItem
         );

@@ -12,6 +12,7 @@ namespace BT.Common.Workflow.Abstract
     {
         Guid WorkflowRunId { get; }
         string Name { get; }
+        string Description { get; }
         TContext Context { get; init; }
 
         IReadOnlyCollection<

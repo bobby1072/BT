@@ -1,7 +1,5 @@
 ﻿using BT.Common.UkHoliday.Client.Client.Concrete;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 
 namespace BT.Common.TestConsoleApp
 {
