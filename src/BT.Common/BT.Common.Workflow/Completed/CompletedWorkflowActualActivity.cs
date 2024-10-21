@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
+using BT.Common.Workflow.Activities.Abstract;
 using BT.Common.Workflow.Activities.Concrete;
 
-namespace BT.Common.Workflow.Concrete
+namespace BT.Common.Workflow.Completed
 {
     public sealed record CompletedWorkflowActualActivity<
         TActivityContextItem,
@@ -9,34 +10,31 @@ namespace BT.Common.Workflow.Concrete
     >
     {
         [JsonIgnore]
-        private ActualActivityToRun<
-            TActivityContextItem,
-            TActivityReturnItem
-        > _actualActivity
+        private IActivity<TActivityContextItem?, TActivityReturnItem?> _activity
         { get; init; }
-        public Guid ActivityId => _actualActivity.ActualActivity.ActivityRunId;
-        public string ActivityName => _actualActivity.ActualActivity.Name;
+        public Guid ActivityId => _activity.ActivityRunId;
+        public string ActivityName => _activity.Name;
         [JsonIgnore]
         private ActivityResultEnum ActivityResult { get; init; }
         [JsonPropertyName("FinalActivityState")]
         public string FinalActivityStateString => ActivityResult.ToString();
-        public int NumberOfRetries { get; init; }
+        public int NumberOfRetriesTaken { get; init; }
         public DateTime CompletedAt { get; init; }
         [JsonIgnore]
         public TimeSpan TotalTimeTaken { get; init; }
         public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
 
         public CompletedWorkflowActualActivity(
-            ActualActivityToRun<TActivityContextItem, TActivityReturnItem> actualActivity,
+           IActivity<TActivityContextItem?, TActivityReturnItem?> actualActivity,
             DateTime completedAt,
             int numberOfRetries,
             TimeSpan timeTaken,
             ActivityResultEnum activityResult
         )
         {
-            _actualActivity = actualActivity;
+            _activity = actualActivity;
             CompletedAt = completedAt;
-            NumberOfRetries = numberOfRetries;
+            NumberOfRetriesTaken = numberOfRetries;
             TotalTimeTaken = timeTaken;
             ActivityResult = activityResult;
         }

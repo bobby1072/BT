@@ -1,12 +1,7 @@
 using BT.Common.OperationTimer.Proto;
-using BT.Common.Workflow.Abstract;
 using BT.Common.Workflow.Activities.Abstract;
 using BT.Common.Workflow.Activities.Concrete;
-using BT.Common.Workflow.Common;
-using BT.Common.Workflow.Concrete;
-using BT.Common.Workflow.Contexts;
 using BT.Common.Workflow.Exceptions;
-using BT.Common.Workflow.Services.Abstract;
 using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Workflow.Services.Concrete
@@ -46,7 +41,9 @@ namespace BT.Common.Workflow.Services.Concrete
 
 
         private IEnumerable<
-            ActualActivityToRun<TActivityContextItem, TActivityReturnItem>
+            (IActivity<TActivityContextItem?, TActivityReturnItem?> ActualActivity, Func<
+            Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult, int TimesRetried)>
+        > ActualExecuteAsync)
         > ToActualActivityToRun<TActivityContextItem, TActivityReturnItem>(
             IEnumerable<ActivityToRun<TActivityContextItem, TActivityReturnItem>> activity
         )
@@ -57,16 +54,15 @@ namespace BT.Common.Workflow.Services.Concrete
             }
         }
 
-        private ActualActivityToRun<
-            TActivityContextItem,
-            TActivityReturnItem
-        > ToActualActivityToRun<TActivityContextItem, TActivityReturnItem>(
+        private (IActivity<TActivityContextItem?, TActivityReturnItem?> ActualActivity, Func<
+            Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult, int TimesRetried)>
+        > ActualExecuteAsync) ToActualActivityToRun<TActivityContextItem, TActivityReturnItem>(
             ActivityToRun<TActivityContextItem, TActivityReturnItem> activity
         )
         {
             var resolvedActivity = ResolveActivity(activity);
 
-            return new ActualActivityToRun<TActivityContextItem, TActivityReturnItem>(
+            return new(
                 resolvedActivity,
                 () => ActualFunc(activity, resolvedActivity)
             );
@@ -82,15 +78,15 @@ namespace BT.Common.Workflow.Services.Concrete
         )
         {
             var timesToRetry =
-                activity.RetryCount ?? activity.DefaultRetryAttribute?.RetryCount ?? 1;
+                activity.OverrideRetryCount ?? activity.DefaultRetryAttribute?.RetryCount ?? 1;
 
             var secondsBetweenRetries =
-                activity.SecondsBetweenRetries
+                activity.OverrideSecondsBetweenRetries
                 ?? activity.DefaultRetryAttribute?.SecondsBetweenRetries
                 ?? 0;
 
             var retryOnException =
-                activity.RetryOnException
+                activity.OverrideRetryOnException
                 ?? activity.DefaultRetryAttribute?.RetryOnException
                 ?? true;
 
@@ -110,7 +106,7 @@ namespace BT.Common.Workflow.Services.Concrete
 
                     if (activity.ActivityWrapperFunc is not null)
                     {
-                        mainResultFunc = (x) => activity.ActivityWrapperFunc.Invoke(x!, resolvedActivity.ExecuteAsync);
+                        mainResultFunc = (x) => activity.ActivityWrapperFunc.Invoke(x, mainResultFunc);
                     }
 
                     var (timeTakenForAttempt, (ActivityResult, ActualResult)) = await OperationTimerUtils.TimeWithResultsAsync(() => mainResultFunc.Invoke(activity.ContextItem));

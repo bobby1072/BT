@@ -14,10 +14,8 @@ namespace BT.Common.Workflow.Abstract
         string Name { get; }
         string Description { get; }
         TContext Context { get; init; }
+        IReadOnlyCollection<ActivityBlockToRun> ActivitiesToRun { get; }
 
-        IReadOnlyCollection<
-            IReadOnlyCollection<ActivityToRun<object?, object?>>
-        > ActivitiesToRun { get; }
 
         Task PreWorkflowRoutine();
         Task PostSuccessfulWorkflowRoutine();

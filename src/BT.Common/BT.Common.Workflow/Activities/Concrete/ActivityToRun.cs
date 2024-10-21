@@ -12,13 +12,19 @@ namespace BT.Common.Workflow.Activities.Concrete
         > ActivityType
         { get; init; }
 
+        public TActivityContextItem? ContextItem { get; init; }
+        public Func<TActivityContextItem?, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? ActivityWrapperFunc { get; init; }
+
+        
+        
         public DefaultActivityRetryAttribute? DefaultRetryAttribute =>
             ActivityType.ActualType.GetCustomAttribute<DefaultActivityRetryAttribute>();
-        public TActivityContextItem? ContextItem { get; init; }
-        public int? RetryCount { get; init; }
-        public int? SecondsBetweenRetries { get; init; }
-        public bool? RetryOnException { get; init; }
-        public Func<TActivityContextItem, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? ActivityWrapperFunc { get; init; }
+        public int? OverrideRetryCount { get; init; }
+        public int? OverrideSecondsBetweenRetries { get; init; }
+        public bool? OverrideRetryOnException { get; init; }
+
+
+
 
         public ActivityToRun(
             TypeFor<IActivity<TActivityContextItem?, TActivityReturnItem?>> activityType,
@@ -31,9 +37,9 @@ namespace BT.Common.Workflow.Activities.Concrete
         {
             ActivityType = activityType;
             ContextItem = contextItem;
-            RetryCount = retryCount;
-            SecondsBetweenRetries = secondsBetweenRetries;
-            RetryOnException = retryOnException;
+            OverrideRetryCount = retryCount;
+            OverrideSecondsBetweenRetries = secondsBetweenRetries;
+            OverrideRetryOnException = retryOnException;
             ActivityWrapperFunc = activityWrapperFunc;
         }
 
@@ -48,9 +54,9 @@ namespace BT.Common.Workflow.Activities.Concrete
         {
             ActivityType = activityType;
             ContextItem = contextItem;
-            RetryCount = retryCount;
-            SecondsBetweenRetries = secondsBetweenRetries;
-            RetryOnException = retryOnException;
+            OverrideRetryCount = retryCount;
+            OverrideSecondsBetweenRetries = secondsBetweenRetries;
+            OverrideRetryOnException = retryOnException;
             ActivityWrapperFunc = activityWrapperFunc;
         }
     }

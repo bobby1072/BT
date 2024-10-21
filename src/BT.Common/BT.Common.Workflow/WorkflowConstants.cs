@@ -1,4 +1,4 @@
-namespace BT.Common.Workflow.Common
+namespace BT.Common.Workflow
 {
     internal static class WorkflowConstants
     {
