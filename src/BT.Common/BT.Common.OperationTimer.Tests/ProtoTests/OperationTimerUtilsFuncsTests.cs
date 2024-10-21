@@ -1,12 +1,11 @@
 using BT.Common.UkHoliday.Client.Client.Concrete;
 using BT.Common.OperationTimer.Proto;
 using FluentAssertions;
-using BT.Common.UkBankHolidays.Client.Models;
 using System.Security;
 using BT.Common.UkHoliday.Client.Models;
 using System.Globalization;
 
-namespace BT.Common.OperationTimer.Tests
+namespace BT.Common.OperationTimer.Tests.ProtoTests
 {
     public class OperationTimerUtilsFuncsTests : OperationTimerTestBase
     {
