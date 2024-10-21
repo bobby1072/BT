@@ -4,7 +4,7 @@ using BT.Common.Workflow.Activities.Concrete;
 
 namespace BT.Common.Workflow.Completed
 {
-    public sealed record CompletedWorkflowActualActivity<
+    public sealed record CompletedWorkflowActivity<
         TActivityContextItem,
         TActivityReturnItem
     >
@@ -19,21 +19,18 @@ namespace BT.Common.Workflow.Completed
         [JsonPropertyName("FinalActivityState")]
         public string FinalActivityStateString => ActivityResult.ToString();
         public int NumberOfRetriesTaken { get; init; }
-        public DateTime CompletedAt { get; init; }
         [JsonIgnore]
         public TimeSpan TotalTimeTaken { get; init; }
         public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
 
-        public CompletedWorkflowActualActivity(
+        public CompletedWorkflowActivity(
            IActivity<TActivityContextItem?, TActivityReturnItem?> actualActivity,
-            DateTime completedAt,
             int numberOfRetries,
             TimeSpan timeTaken,
             ActivityResultEnum activityResult
         )
         {
             _activity = actualActivity;
-            CompletedAt = completedAt;
             NumberOfRetriesTaken = numberOfRetries;
             TotalTimeTaken = timeTaken;
             ActivityResult = activityResult;

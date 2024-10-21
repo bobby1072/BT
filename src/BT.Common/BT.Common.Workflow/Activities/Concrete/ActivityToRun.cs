@@ -15,6 +15,7 @@ namespace BT.Common.Workflow.Activities.Concrete
         public TActivityContextItem? ContextItem { get; init; }
         public Func<TActivityContextItem?, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? ActivityWrapperFunc { get; init; }
 
+
         
         
         public DefaultActivityRetryAttribute? DefaultRetryAttribute =>
@@ -28,11 +29,11 @@ namespace BT.Common.Workflow.Activities.Concrete
 
         public ActivityToRun(
             TypeFor<IActivity<TActivityContextItem?, TActivityReturnItem?>> activityType,
-            TActivityContextItem contextItem,
+            TActivityContextItem? contextItem,
             int? retryCount = null,
             int? secondsBetweenRetries = null,
             bool? retryOnException = null,
-            Func<TActivityContextItem, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? activityWrapperFunc = null
+            Func<TActivityContextItem?, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? activityWrapperFunc = null
         )
         {
             ActivityType = activityType;
@@ -45,8 +46,8 @@ namespace BT.Common.Workflow.Activities.Concrete
 
         public ActivityToRun(
             TypeFor<IActivity<TActivityContextItem?, TActivityReturnItem?>> activityType,
-            TActivityContextItem contextItem,
-            Func<TActivityContextItem, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? activityWrapperFunc = null,
+            TActivityContextItem? contextItem,
+            Func<TActivityContextItem?, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? activityWrapperFunc = null,
             int? retryCount = null,
             int? secondsBetweenRetries = null,
             bool? retryOnException = null

@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BT.Common.FastArray\BT.Common.FastArray.csproj" />
     <ProjectReference Include="..\BT.Common.Helpers\BT.Common.Helpers.csproj" />
     <ProjectReference Include="..\BT.Common.OperationTimer\BT.Common.OperationTimer.csproj" />
   </ItemGroup>

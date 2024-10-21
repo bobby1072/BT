@@ -17,20 +17,23 @@ namespace BT.Common.Workflow.Completed
         public string WorkflowName => _actualWorkflow.Name;
         [JsonIgnore]
         public TReturn? WorkflowOutput => _actualWorkflow.Context.Output.ReturnObject;
+        public DateTime StartedAt { get; init; }
         public DateTime CompletedAt { get; init; }
         [JsonIgnore]
         public TimeSpan TotalTimeTaken { get; init; }
         public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
-        public IReadOnlyCollection<CompletedWorkflowActualActivity<object?, object?>> CompletedActivities { get; init; }
+        public IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> CompletedActivities { get; init; }
         public CompletedWorkflow(
             IWorkflow<TContext, TReturn> actualWorkflow,
+            DateTime startedAt,
             DateTime completedAt,
             TimeSpan timeTaken,
-            IReadOnlyCollection<CompletedWorkflowActualActivity<object?, object?>> completedActivities
+            IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> completedActivities
         )
         {
             _actualWorkflow = actualWorkflow;
             CompletedAt = completedAt;
+            StartedAt = startedAt;
             TotalTimeTaken = timeTaken;
             CompletedActivities = completedActivities;
         }
