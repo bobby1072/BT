@@ -1,3 +1,4 @@
+using BT.Common.OperationTimer.Proto;
 using BT.Common.Workflow.Abstract;
 using BT.Common.Workflow.Activities.Abstract;
 using BT.Common.Workflow.Activities.Concrete;
@@ -23,7 +24,7 @@ namespace BT.Common.Workflow.Services.Concrete
             _serviceProvider = serviceProvider;
             _logger = logger;
         }
-        // public async Task<(CompletedWorkflowActualActivityResult<TContext, TReturn>, TReturn?)> ExecuteAsync<TContext, TReturn>(
+        // public Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
         //     IWorkflow<TContext, TReturn> workflowToExecute
         // )
         //     where TContext : IWorkflowContext<
@@ -32,8 +33,6 @@ namespace BT.Common.Workflow.Services.Concrete
         //             TReturn
         //         >
         // {
-
-
 
         // }
 
@@ -114,15 +113,15 @@ namespace BT.Common.Workflow.Services.Concrete
                         mainResultFunc = (x) => activity.ActivityWrapperFunc.Invoke(x!, resolvedActivity.ExecuteAsync);
                     }
 
-                    var (ActivityResult, ActualResult) = await mainResultFunc.Invoke(activity.ContextItem);
+                    var (timeTakenForAttempt, (ActivityResult, ActualResult)) = await OperationTimerUtils.TimeWithResultsAsync(() => mainResultFunc.Invoke(activity.ContextItem));
 
 
                     if (ActivityResult == ActivityResultEnum.Success)
                     {
-                        _logger.LogInformation("Activity {ActivityName}, {ActivityRunId} executed successfully. On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
+                        _logger.LogInformation("Activity {ActivityName}, {ActivityRunId} executed successfully and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, timeTakenForAttempt.Milliseconds, retryCounter + 1);
                         return (ActivityResult, ActualResult, retryCounter);
                     }
-                    _logger.LogWarning("Activity {ActivityName}, {ActivityRunId} failed. On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
+                    _logger.LogWarning("Activity {ActivityName}, {ActivityRunId} failed and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, timeTakenForAttempt.Milliseconds, retryCounter + 1);
                     if (retryCounter == timesToRetry - 1)
                     {
                         return (ActivityResult, ActualResult, retryCounter);

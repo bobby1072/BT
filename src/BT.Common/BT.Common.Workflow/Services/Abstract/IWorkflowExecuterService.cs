@@ -1,12 +1,12 @@
 ﻿using BT.Common.Workflow.Abstract;
-using BT.Common.Workflow.Concrete;
+using BT.Common.Workflow.Common;
 using BT.Common.Workflow.Contexts;
 
 namespace BT.Common.Workflow.Services.Abstract
 {
     public interface IWorkflowExecuterService
     {
-        Task<(IReadOnlyCollection<CompletedWorkflowActualActivity<TContext, TReturn>>, TReturn?)> ExecuteAsync<TContext, TReturn>(
+        Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
             IWorkflow<TContext, TReturn> workflowToExecute
         )
             where TContext : IWorkflowContext<

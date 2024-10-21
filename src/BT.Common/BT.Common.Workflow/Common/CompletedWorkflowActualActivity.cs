@@ -14,8 +14,8 @@ namespace BT.Common.Workflow.Concrete
             TActivityReturnItem
         > ActualActivity
         { get; init; }
-        public Guid RanActivityId => ActualActivity.ActualActivity.ActivityRunId;
-        public string RanActivityName => ActualActivity.ActualActivity.Name;
+        public Guid ActivityId => ActualActivity.ActualActivity.ActivityRunId;
+        public string ActivityName => ActualActivity.ActualActivity.Name;
         public int NumberOfRetries { get; init; }
         public DateTime CompletedAt { get; init; }
         [JsonIgnore]
