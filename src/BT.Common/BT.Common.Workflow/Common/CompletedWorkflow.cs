@@ -13,11 +13,11 @@ namespace BT.Common.Workflow.Common
             >
     {
         [JsonIgnore]
-        private IWorkflow<TContext, TReturn> ActualWorkflow { get; init; }
-        public Guid WorkflowId => ActualWorkflow.WorkflowRunId;
-        public string WorkflowName => ActualWorkflow.Name;
+        private IWorkflow<TContext, TReturn> _actualWorkflow { get; init; }
+        public Guid WorkflowId => _actualWorkflow.WorkflowRunId;
+        public string WorkflowName => _actualWorkflow.Name;
         [JsonIgnore]
-        public TReturn? WorkflowOutput => ActualWorkflow.Context.Output.ReturnObject;
+        public TReturn? WorkflowOutput => _actualWorkflow.Context.Output.ReturnObject;
         public DateTime CompletedAt { get; init; }
         [JsonIgnore]
         public TimeSpan TotalTimeTaken { get; init; }
@@ -30,7 +30,7 @@ namespace BT.Common.Workflow.Common
             IReadOnlyCollection<CompletedWorkflowActualActivity<object?, object?>> completedActivities
         )
         {
-            ActualWorkflow = actualWorkflow;
+            _actualWorkflow = actualWorkflow;
             CompletedAt = completedAt;
             TotalTimeTaken = timeTaken;
             CompletedActivities = completedActivities;

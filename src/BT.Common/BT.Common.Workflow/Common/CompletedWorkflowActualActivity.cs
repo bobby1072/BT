@@ -12,10 +12,13 @@ namespace BT.Common.Workflow.Concrete
         private ActualActivityToRun<
             TActivityContextItem,
             TActivityReturnItem
-        > ActualActivity
+        > _actualActivity
         { get; init; }
-        public Guid ActivityId => ActualActivity.ActualActivity.ActivityRunId;
-        public string ActivityName => ActualActivity.ActualActivity.Name;
+        public Guid ActivityId => _actualActivity.ActualActivity.ActivityRunId;
+        public string ActivityName => _actualActivity.ActualActivity.Name;
+        [JsonIgnore]
+        private ActivityResultEnum ActivityResult { get; init; }
+        public string FinalActivityState => ActivityResult.ToString();
         public int NumberOfRetries { get; init; }
         public DateTime CompletedAt { get; init; }
         [JsonIgnore]
@@ -26,13 +29,15 @@ namespace BT.Common.Workflow.Concrete
             ActualActivityToRun<TActivityContextItem, TActivityReturnItem> actualActivity,
             DateTime completedAt,
             int numberOfRetries,
-            TimeSpan timeTaken
+            TimeSpan timeTaken,
+            ActivityResultEnum activityResult
         )
         {
-            ActualActivity = actualActivity;
+            _actualActivity = actualActivity;
             CompletedAt = completedAt;
             NumberOfRetries = numberOfRetries;
             TotalTimeTaken = timeTaken;
+            ActivityResult = activityResult;
         }
     }
 }
