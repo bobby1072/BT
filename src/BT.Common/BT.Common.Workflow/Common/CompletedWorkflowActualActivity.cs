@@ -18,7 +18,8 @@ namespace BT.Common.Workflow.Concrete
         public string ActivityName => _actualActivity.ActualActivity.Name;
         [JsonIgnore]
         private ActivityResultEnum ActivityResult { get; init; }
-        public string FinalActivityState => ActivityResult.ToString();
+        [JsonPropertyName("FinalActivityState")]
+        public string FinalActivityStateString => ActivityResult.ToString();
         public int NumberOfRetries { get; init; }
         public DateTime CompletedAt { get; init; }
         [JsonIgnore]
