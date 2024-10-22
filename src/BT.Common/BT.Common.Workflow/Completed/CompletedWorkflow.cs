@@ -4,7 +4,7 @@ using BT.Common.Workflow.Contexts;
 
 namespace BT.Common.Workflow.Completed
 {
-    public sealed record CompletedWorkflow<TContext, TReturn>
+    public record CompletedWorkflow<TContext, TReturn>
         where TContext : IWorkflowContext<
                 IWorkflowInputContext,
                 IWorkflowOutputContext<TReturn>,

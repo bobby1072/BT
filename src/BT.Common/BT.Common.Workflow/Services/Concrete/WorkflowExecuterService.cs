@@ -105,10 +105,6 @@ namespace BT.Common.Workflow.Services.Concrete
                             workflowActivityList.AddRange(completedActivities);
                         }
                     }
-                    else
-                    {
-                        throw new WorkflowException(WorkflowConstants.CouldNotResolveWorkflow);
-                    }
 
                     completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?>(workflowActivityList, exeType));
                 }
@@ -127,6 +123,18 @@ namespace BT.Common.Workflow.Services.Concrete
             {
                 _logger.LogInformation("----------Exiting workflow execution: {WorkflowName} {WorkflowId}-----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
             }
+
+
+            var finalActivityResult = completedActivityBlockList.LastOrDefault()?.CompletedWorkflowActivities.LastOrDefault()?.ActivityResult;
+            if (finalActivityResult == ActivityResultEnum.Success)
+            {
+                await foundWorkflow.PostSuccessfulWorkflowRoutine();
+            }
+            else if (finalActivityResult == ActivityResultEnum.Fail)
+            {
+                await foundWorkflow.PostUnsuccessfulWorkflowRoutine();
+            }
+
             return (completedActivityBlockList, foundWorkflow);
         }
 

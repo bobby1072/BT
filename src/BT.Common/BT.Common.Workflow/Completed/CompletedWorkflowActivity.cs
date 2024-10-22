@@ -15,7 +15,7 @@ namespace BT.Common.Workflow.Completed
         public Guid ActivityId => _activity.ActivityRunId;
         public string ActivityName => _activity.Name;
         [JsonIgnore]
-        private ActivityResultEnum ActivityResult { get; init; }
+        public ActivityResultEnum ActivityResult { get; init; }
         [JsonPropertyName("FinalActivityState")]
         public string FinalActivityStateString => ActivityResult.ToString();
         public int NumberOfRetriesTaken { get; init; }

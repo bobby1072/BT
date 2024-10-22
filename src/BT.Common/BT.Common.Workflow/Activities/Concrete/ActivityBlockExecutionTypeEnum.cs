@@ -3,7 +3,6 @@
     public enum ActivityBlockExecutionTypeEnum
     {
         Sync,
-        Async,
-        AsyncParrallel
+        Async
     }
 }
