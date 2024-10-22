@@ -27,7 +27,7 @@ namespace BT.Common.Workflow.Services.Concrete
             _logger = logger;
         }
 
-        public Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
+        public async Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
             TypeFor<IWorkflow<TContext, TReturn>> workflowToExecute
            )
     where TContext : IWorkflowContext<
@@ -36,33 +36,15 @@ namespace BT.Common.Workflow.Services.Concrete
             TReturn
         >
         {
-            var foundWorkflow = (_serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TReturn>) ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
-
-            return ExecuteAsync(foundWorkflow);
-        }
-
-        public async Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
-            IWorkflow<TContext, TReturn> workflowToExecute
-        )
-            where TContext : IWorkflowContext<
-                    IWorkflowInputContext,
-                    IWorkflowOutputContext<TReturn>,
-                    TReturn
-                >
-        {
             var workflowStartTime = DateTime.UtcNow;
-
-            var (timeTaken,executedActivityBlocks) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteAsyncInner(workflowToExecute));
-
-            var completedWorkflow = new CompletedWorkflow<TContext, TReturn>(workflowToExecute, workflowStartTime, DateTime.UtcNow, timeTaken, executedActivityBlocks);
-
-            
+            var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute));
+            var completedWorkflow = new CompletedWorkflow<TContext, TReturn>(foundWorkflow, workflowStartTime, DateTime.UtcNow, timeTaken, executedActivityBlocks);
             _logger.LogInformation("----------   Workflow finished: {SerialisedWorkflow}   ----------", JsonSerializer.Serialize(completedWorkflow));
 
             return completedWorkflow;
         }
-        private async Task<IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>> ExecuteAsyncInner<TContext, TReturn>(
-            IWorkflow<TContext, TReturn> workflowToExecute
+        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TReturn>)> ExecuteInnerAsync<TContext, TReturn>(
+            TypeFor<IWorkflow<TContext, TReturn>> workflowToExecute
         )
             where TContext : IWorkflowContext<
                     IWorkflowInputContext,
@@ -70,55 +52,82 @@ namespace BT.Common.Workflow.Services.Concrete
                     TReturn
                 >
         {
-            _logger.LogInformation("----------  Entering workflow execution: {WorkflowName} {WorkflowId}  ----------", workflowToExecute.Name, workflowToExecute.WorkflowRunId);
+
+            var foundWorkflow = (_serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TReturn>) ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
+            var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
+
             try
             {
-                await workflowToExecute.PreWorkflowRoutine();
+                _logger.LogInformation("----------  Entering workflow execution: {WorkflowName} {WorkflowId}  ----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
 
-                var allActivityBlocksToRun = workflowToExecute.ActivitiesToRun.FastArraySelect(x => (x.ExecutionType, x.ActivitesToRun.FastArraySelect(x => ToActualActivityToRun(x))));
+                await foundWorkflow.PreWorkflowRoutine();
 
-                var completedActivitiesList = new List<CompletedActivityBlockToRun<object?, object?>>();
+                var allActivityBlocksToRun = foundWorkflow.ActivitiesToRun.FastArraySelect(x => (x.ExecutionType, x.ActivitesToRun.FastArraySelect(x => ToActualActivityToRun(x))));
 
                 foreach (var singleActivityBlock in allActivityBlocksToRun)
                 {
                     var workflowActivityList = new List<CompletedWorkflowActivity<object?, object?>>();
                     var (exeType, funcsAndActivities) = singleActivityBlock;
-                    if(exeType == ActivityBlockExecutionTypeEnum.Sync)
+                    var funcAndActivityCount = funcsAndActivities.Count();
+                    if (funcAndActivityCount == 0)
                     {
-                        foreach(var funcAndActivity in funcsAndActivities)
+                        continue;
+                    }
+
+                    if (exeType == ActivityBlockExecutionTypeEnum.Sync)
+                    {
+                        foreach (var funcAndActivity in funcsAndActivities)
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcAndActivity;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = OperationTimerUtils.TimeWithResults(singleFuncAndActualActivity);
                             workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?>(singleActivity, timesRetried, timeTakenForActivity, activityResult));
                         }
-                    } else if (exeType == ActivityBlockExecutionTypeEnum.Async){
-                        if(funcsAndActivities.Count() == 1)
+                    }
+                    else if (exeType == ActivityBlockExecutionTypeEnum.Async)
+                    {
+                        if (funcAndActivityCount == 1)
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcsAndActivities.FirstOrDefault()!;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = await OperationTimerUtils.TimeWithResultsAsync(singleFuncAndActualActivity);
                             workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?>(singleActivity, timesRetried, timeTakenForActivity, activityResult));
                             continue;
                         }
+                        else
+                        {
+                            var tasks = funcsAndActivities.FastArraySelect(async x =>
+                            {
+                                var (singleFuncAndActualActivity, singleActivity) = x;
+                                var (timeTakenForActivity, (activityResult, timesRetried)) = await OperationTimerUtils.TimeWithResultsAsync(singleFuncAndActualActivity);
+                                return new CompletedWorkflowActivity<object?, object?>(singleActivity, timesRetried, timeTakenForActivity, activityResult);
+                            });
+
+                            var completedActivities = await Task.WhenAll(tasks);
+                            workflowActivityList.AddRange(completedActivities);
+                        }
                     }
+                    else
+                    {
+                        throw new WorkflowException(WorkflowConstants.CouldNotResolveWorkflow);
+                    }
+
+                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?>(workflowActivityList, exeType));
                 }
-                
-                
-                
-                _logger.LogInformation("----------  Exiting workflow execution: {WorkflowName} {WorkflowId}  -----------", workflowToExecute.Name, workflowToExecute.WorkflowRunId);
             }
             catch (WorkflowException e)
             {
-                _logger.LogError(e, "Uncaught exception occoured during execution of workflow: {WorkflowName} {WorkflowId}", workflowToExecute.Name, workflowToExecute.WorkflowRunId);
-                _logger.LogInformation("----------  Exiting workflow execution: {WorkflowName} {WorkflowId}  -----------", workflowToExecute.Name, workflowToExecute.WorkflowRunId);
+                _logger.LogError(e, "Uncaught workflow exception occurred during execution of workflow: {WorkflowName} {WorkflowId}", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
+                _logger.LogInformation("----------Exiting workflow execution: {WorkflowName} {WorkflowId}-----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
                 throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Uncaught exception occoured during execution of workflow: {WorkflowName} {WorkflowId}", workflowToExecute.Name, workflowToExecute.WorkflowRunId);
-                _logger.LogInformation("----------Exiting workflow execution: {WorkflowName} {WorkflowId}-----------", workflowToExecute.Name, workflowToExecute.WorkflowRunId);
-                throw new WorkflowException($"Failed to execute {e.Message}", e);
+                _logger.LogError(e, "Uncaught exception occurred during execution of workflow: {WorkflowName} {WorkflowId}", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
             }
-            //throw new NotImplementedException();
+            finally
+            {
+                _logger.LogInformation("----------Exiting workflow execution: {WorkflowName} {WorkflowId}-----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
+            }
+            return (completedActivityBlockList, foundWorkflow);
         }
 
 
@@ -130,7 +139,7 @@ namespace BT.Common.Workflow.Services.Concrete
 
 
 
-        private 
+        private
              (Func<
             Task<(ActivityResultEnum ActivityResult, int TimesRetried)>
         >, IActivity<TActivityContextItem?, TActivityReturnItem?>)
@@ -193,24 +202,21 @@ namespace BT.Common.Workflow.Services.Concrete
                     if (ActivityResult == ActivityResultEnum.Success)
                     {
                         _logger.LogInformation("Activity {ActivityName}, {ActivityRunId} executed successfully and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, timeTakenForAttempt.Milliseconds, retryCounter + 1);
-                        return (ActivityResult, retryCounter);
+                        return (ActivityResult, retryCounter + 1);
                     }
                     _logger.LogWarning("Activity {ActivityName}, {ActivityRunId} failed and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, timeTakenForAttempt.Milliseconds, retryCounter + 1);
                     if (retryCounter == timesToRetry - 1)
                     {
-                        return (ActivityResult, retryCounter);
+                        return (ActivityResult, retryCounter + 1);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error with message {ExceptionMessage} in activity: {ActivityName}, {ActivityRunId}. On attempt: {AttemptNumber}", ex.Message, resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
-                    if (retryOnException == false || retryCounter == timesToRetry - 1)
-                    {
-                        throw new WorkflowException(WorkflowConstants.CouldNotGetResultFromActivity, ex);
-                    }
+                    _logger.LogError(ex, "Uncaught exception with message {ExceptionMessage} in activity: {ActivityName}, {ActivityRunId}. On attempt: {AttemptNumber}", ex.Message, resolvedActivity.Name, resolvedActivity.ActivityRunId, retryCounter + 1);
                 }
             }
-            throw new WorkflowException(WorkflowConstants.CouldNotGetResultFromActivity);
-        }   
+
+            return (ActivityResultEnum.Fail, timesToRetry);
+        }
     }
 }

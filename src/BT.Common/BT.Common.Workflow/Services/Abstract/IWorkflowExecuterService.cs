@@ -15,13 +15,5 @@ namespace BT.Common.Workflow.Services.Abstract
                     IWorkflowOutputContext<TReturn>,
                     TReturn
                 >;
-        Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
-    IWorkflow<TContext, TReturn> workflowToExecute
-)
-    where TContext : IWorkflowContext<
-            IWorkflowInputContext,
-            IWorkflowOutputContext<TReturn>,
-            TReturn
-        >;
     }
 }
