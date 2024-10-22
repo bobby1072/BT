@@ -1,5 +1,5 @@
-﻿using BT.Common.UkBankHolidays.Client.Models;
-using BT.Common.UkHoliday.Client.Client.Abstract;
+﻿using BT.Common.UkHoliday.Client.Client.Abstract;
+using BT.Common.UkHoliday.Client.Models;
 using System.Net.Http.Json;
 
 namespace BT.Common.UkHoliday.Client.Client.Concrete

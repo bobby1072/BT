@@ -1,7 +1,12 @@
 ﻿namespace BT.Common.Helpers.TypeFor
 {
-    public class TypeFor<T> 
+    public sealed class TypeFor<T>
     {
-        public readonly Type ActualType = typeof(T);
+        public Type ActualType { get; } = typeof(T);
+
+        public static TypeFor<T> GetTypeFor()
+        {
+            return new TypeFor<T>();
+        }
     }
 }
