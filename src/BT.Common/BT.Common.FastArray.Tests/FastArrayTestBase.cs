@@ -233,8 +233,13 @@ namespace BT.Common.FastArray.Tests
         }
         protected static async Task FunctionalityTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<Task<T>>> actualFunc, Func<IEnumerable<T>, IEnumerable<Task<T>>> yourFunc)
         {
-            var expected = await ResolveAsyncListItems(actualFunc.Invoke(arrayData));
-            var yourResult = await ResolveAsyncListItems(yourFunc.Invoke(arrayData));
+            var expectedJob = ResolveAsyncListItems(actualFunc.Invoke(arrayData));
+            var yourResultJob = ResolveAsyncListItems(yourFunc.Invoke(arrayData));
+
+            await Task.WhenAll(expectedJob, yourResultJob);
+
+            var expected = await expectedJob;
+            var yourResult = await yourResultJob;
 
 
             expected.Count().Should().Be(yourResult.Count());
