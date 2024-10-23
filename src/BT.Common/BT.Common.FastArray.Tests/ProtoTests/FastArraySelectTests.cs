@@ -21,10 +21,14 @@ namespace BT.Common.FastArray.Tests.ProtoTests
         {
             public FastArraySelectAsyncTests_Functionality_Class_Data()
             {
-                Add(new List<object> { 1, 2, 3 }, x => x.Select(async y => y), x => x.FastArraySelect(async y => y));
+                Add(new List<object> { 1, 2, 3 }, x => x.Select(y => Task.FromResult(y)), x => x.FastArraySelect(y => Task.FromResult(y)));
 
                 foreach (var arrayData in _basicArraysToTestFunctionality)
                 {
+                    Add(arrayData, x => x.Select(y => Task.FromResult(y)), x => x.FastArraySelect(y => Task.FromResult(y)));
+
+                    Add(arrayData, x => x.Select(async y => y), x => x.FastArraySelect(async y => y));
+
                     Add(arrayData, x => x.Select(async y => {
                         await Task.Delay(1);
                         return y;
