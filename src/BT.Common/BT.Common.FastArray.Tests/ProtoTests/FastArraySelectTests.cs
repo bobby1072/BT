@@ -17,11 +17,37 @@ namespace BT.Common.FastArray.Tests.ProtoTests
                 }
             }
         }
+        private class FastArraySelectAsyncTests_Functionality_Class_Data : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<Task<object>>>, Func<IEnumerable<object>, IEnumerable<Task<object>>>>
+        {
+            public FastArraySelectAsyncTests_Functionality_Class_Data()
+            {
+                Add(new List<object> { 1, 2, 3 }, x => x.Select(async y => y), x => x.FastArraySelect(async y => y));
+
+                foreach (var arrayData in _basicArraysToTestFunctionality)
+                {
+                    Add(arrayData, x => x.Select(async y => {
+                        await Task.Delay(1);
+                        return y;
+                    }), x => x.FastArraySelect(async y => {
+                        await Task.Delay(1);
+                        return y;
+                    }));
+                }
+            }
+        }
         [Theory]
         [ClassData(typeof(FastArraySelectTests_Functionality_Class_Data))]
         public void FastArraySelectTests_Functionality(IReadOnlyCollection<object> arrayData, Func<IEnumerable<object>, IEnumerable<object>> actualFunc, Func<IEnumerable<object>, IEnumerable<object>> yourFunc)
         {
+
             FunctionalityTestRunner(arrayData, actualFunc, yourFunc);
+        }
+        [Theory]
+        [ClassData(typeof(FastArraySelectAsyncTests_Functionality_Class_Data))]
+        public async Task FastArraySelectAsyncTests_Functionality(IReadOnlyCollection<object> arrayData, Func<IEnumerable<object>, IEnumerable<Task<object>>> actualFunc, Func<IEnumerable<object>, IEnumerable<Task<object>>> yourFunc)
+        {
+
+            await FunctionalityTestRunner(arrayData, actualFunc, yourFunc);
         }
         private class FastArraySelectWhereTests_Functionality_Class_Data : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<object>>, Func<IEnumerable<object>, IEnumerable<object>>>
         {

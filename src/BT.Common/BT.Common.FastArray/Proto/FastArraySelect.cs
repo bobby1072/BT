@@ -9,6 +9,16 @@
                 yield return transformFunc.Invoke(value);
             }
         }
+        //public static IEnumerable<Task<TNew>> FastArraySelect<TOriginal, TNew>(this IEnumerable<TOriginal> values, Func<TOriginal, Task<TNew>> transformFunc)
+        //{
+        //    var newTaskList = new List<Task<TNew>>();
+        //    foreach (var value in values)
+        //    {
+        //        newTaskList.Add(transformFunc.Invoke(value));
+        //    }
+
+        //    return newTaskList;
+        //}
         public static IEnumerable<TNew> FastArraySelectWhere<TOriginal, TNew>(this IEnumerable<TOriginal> values, Func<TOriginal, bool> predicate, Func<TOriginal, TNew> transformFunc)
         {
             foreach (var value in values)

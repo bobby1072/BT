@@ -223,17 +223,24 @@ namespace BT.Common.FastArray.Tests
             var expected = actualFunc.Invoke(arrayData);
             var yourResult = yourFunc.Invoke(arrayData);
 
-            if(expected.Count() != yourResult.Count())
-            {
-                Console.WriteLine(expected.Count());
-                expected = actualFunc.Invoke(arrayData);
-                yourResult = yourFunc.Invoke(arrayData);
-            }
 
             expected.Count().Should().Be(yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
-                yourResult.ElementAt(i)?.Should().BeOfType(expected.ElementAt(i)?.GetType());
+                yourResult.ElementAt(i)?.Should().BeAssignableTo(expected.ElementAt(i)?.GetType());
+                yourResult.ElementAt(i)?.Should().Be(expected.ElementAt(i));
+            }
+        }
+        protected static async Task FunctionalityTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<Task<T>>> actualFunc, Func<IEnumerable<T>, IEnumerable<Task<T>>> yourFunc)
+        {
+            var expected = await ResolveAsyncListItems(actualFunc.Invoke(arrayData));
+            var yourResult = await ResolveAsyncListItems(yourFunc.Invoke(arrayData));
+
+
+            expected.Count().Should().Be(yourResult.Count());
+            for (int i = 0; i < expected.Count(); i++)
+            {
+                yourResult.ElementAt(i)?.Should().BeAssignableTo(expected.ElementAt(i)?.GetType());
                 yourResult.ElementAt(i)?.Should().Be(expected.ElementAt(i));
             }
         }
@@ -244,5 +251,16 @@ namespace BT.Common.FastArray.Tests
 
             yourTime.Should().BeLessThanOrEqualTo(actualTime);
         }
+
+        private static async Task<IEnumerable<T>> ResolveAsyncListItems<T>(IEnumerable<Task<T>> data)
+        {
+            var list = new List<T>();
+            foreach (var item in data) 
+            { 
+                list.Add(await item);
+            }
+
+            return list;
+        } 
     }
 }
