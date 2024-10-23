@@ -30,7 +30,7 @@ namespace BT.Common.Workflow
             return serviceCollection;
         }
 
-        public static IServiceCollection AddWorkflowExecuterService(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddWorkflowServices(this IServiceCollection serviceCollection)
         {
             serviceCollection
                 .AddTransient<IWorkflowExecuterService, WorkflowExecuterService>();

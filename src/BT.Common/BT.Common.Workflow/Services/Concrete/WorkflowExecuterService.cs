@@ -13,7 +13,7 @@ using System.Text.Json;
 
 namespace BT.Common.Workflow.Services.Concrete
 {
-    public class WorkflowExecuterService
+    internal class WorkflowExecuterService
      : IWorkflowExecuterService
     {
         private readonly IServiceProvider _serviceProvider;
