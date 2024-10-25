@@ -1,7 +1,6 @@
 using BT.Common.UkHoliday.Client.Client.Concrete;
 using BT.Common.OperationTimer.Proto;
 using FluentAssertions;
-using System.Security;
 using BT.Common.UkHoliday.Client.Models;
 using System.Globalization;
 
