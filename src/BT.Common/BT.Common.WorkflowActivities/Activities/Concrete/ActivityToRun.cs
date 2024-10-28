@@ -1,9 +1,9 @@
 using System.Reflection;
 using BT.Common.Helpers.TypeFor;
-using BT.Common.Workflow.Activities.Abstract;
-using BT.Common.Workflow.Activities.Attributes;
+using BT.Common.WorkflowActivities.Activities.Abstract;
+using BT.Common.WorkflowActivities.Activities.Attributes;
 
-namespace BT.Common.Workflow.Activities.Concrete
+namespace BT.Common.WorkflowActivities.Activities.Concrete
 {
     public sealed record ActivityToRun<TActivityContextItem, TActivityReturnItem>
     {
@@ -16,8 +16,8 @@ namespace BT.Common.Workflow.Activities.Concrete
         public Func<TActivityContextItem?, Func<TActivityContextItem?, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>, Task<(ActivityResultEnum ActivityResult, TActivityReturnItem? ActualResult)>>? ActivityWrapperFunc { get; init; }
 
 
-        
-        
+
+
         public DefaultActivityRetryAttribute? DefaultRetryAttribute =>
             ActivityType.ActualType.GetCustomAttribute<DefaultActivityRetryAttribute>();
         public int? OverrideRetryCount { get; init; }

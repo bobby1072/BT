@@ -1,9 +1,9 @@
 ﻿using BT.Common.Helpers.TypeFor;
-using BT.Common.Workflow.Abstract;
-using BT.Common.Workflow.Completed;
-using BT.Common.Workflow.Contexts;
+using BT.Common.WorkflowActivities.Abstract;
+using BT.Common.WorkflowActivities.Completed;
+using BT.Common.WorkflowActivities.Contexts;
 
-namespace BT.Common.Workflow.Services.Abstract
+namespace BT.Common.WorkflowActivities.Services.Abstract
 {
     public interface IWorkflowExecuterService
     {

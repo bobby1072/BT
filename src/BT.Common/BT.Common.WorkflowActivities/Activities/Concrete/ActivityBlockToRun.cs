@@ -1,4 +1,4 @@
-﻿namespace BT.Common.Workflow.Activities.Concrete
+﻿namespace BT.Common.WorkflowActivities.Activities.Concrete
 {
     public sealed class ActivityBlockToRun
     {

@@ -1,4 +1,4 @@
-﻿namespace BT.Common.Workflow.Contexts
+﻿namespace BT.Common.WorkflowActivities.Contexts
 {
     public interface IWorkflowOutputContext<TReturn>
     {

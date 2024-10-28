@@ -1,4 +1,4 @@
-namespace BT.Common.Workflow.Exceptions
+namespace BT.Common.WorkflowActivities.Exceptions
 {
     public class WorkflowException : Exception
     {

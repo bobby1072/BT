@@ -1,7 +1,7 @@
-using BT.Common.Workflow.Activities.Concrete;
-using BT.Common.Workflow.Contexts;
+using BT.Common.WorkflowActivities.Activities.Concrete;
+using BT.Common.WorkflowActivities.Contexts;
 
-namespace BT.Common.Workflow.Abstract
+namespace BT.Common.WorkflowActivities.Abstract
 {
     public abstract class BaseWorkflow<TContext, TReturn> : IWorkflow<TContext, TReturn>
         where TContext : IWorkflowContext<

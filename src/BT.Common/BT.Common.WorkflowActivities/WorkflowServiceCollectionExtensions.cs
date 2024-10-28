@@ -1,11 +1,11 @@
-﻿using BT.Common.Workflow.Abstract;
-using BT.Common.Workflow.Activities.Abstract;
-using BT.Common.Workflow.Contexts;
-using BT.Common.Workflow.Services.Abstract;
-using BT.Common.Workflow.Services.Concrete;
+﻿using BT.Common.WorkflowActivities.Abstract;
+using BT.Common.WorkflowActivities.Activities.Abstract;
+using BT.Common.WorkflowActivities.Contexts;
+using BT.Common.WorkflowActivities.Services.Abstract;
+using BT.Common.WorkflowActivities.Services.Concrete;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BT.Common.Workflow
+namespace BT.Common.WorkflowActivities
 {
     public static class WorkflowServiceCollectionExtensions
     {
