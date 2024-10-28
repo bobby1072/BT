@@ -1,4 +1,4 @@
-﻿namespace BT.Common.Workflow.Activities.Attributes
+﻿namespace BT.Common.WorkflowActivities.Activities.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class DefaultActivityRetryAttribute : Attribute

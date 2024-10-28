@@ -1,17 +1,18 @@
 using BT.Common.FastArray.Proto;
 using BT.Common.Helpers.TypeFor;
 using BT.Common.OperationTimer.Proto;
-using BT.Common.Workflow.Abstract;
-using BT.Common.Workflow.Activities.Abstract;
-using BT.Common.Workflow.Activities.Concrete;
-using BT.Common.Workflow.Completed;
-using BT.Common.Workflow.Contexts;
-using BT.Common.Workflow.Exceptions;
-using BT.Common.Workflow.Services.Abstract;
+using BT.Common.WorkflowActivities;
+using BT.Common.WorkflowActivities.Abstract;
+using BT.Common.WorkflowActivities.Activities.Abstract;
+using BT.Common.WorkflowActivities.Activities.Concrete;
+using BT.Common.WorkflowActivities.Completed;
+using BT.Common.WorkflowActivities.Contexts;
+using BT.Common.WorkflowActivities.Exceptions;
+using BT.Common.WorkflowActivities.Services.Abstract;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace BT.Common.Workflow.Services.Concrete
+namespace BT.Common.WorkflowActivities.Services.Concrete
 {
     internal class WorkflowExecuterService
      : IWorkflowExecuterService
@@ -53,7 +54,7 @@ namespace BT.Common.Workflow.Services.Concrete
                 >
         {
 
-            var foundWorkflow = (_serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TReturn>) ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
+            var foundWorkflow = _serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TReturn> ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
             var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
 
             try
@@ -155,10 +156,10 @@ namespace BT.Common.Workflow.Services.Concrete
             ActivityToRun<TActivityContextItem, TActivityReturnItem> activity
         )
         {
-            var resolvedActivity = (
+            var resolvedActivity =
                 _serviceProvider.GetService(activity.ActivityType.ActualType)
                 as IActivity<TActivityContextItem?, TActivityReturnItem?>
-            ) ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
+             ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
 
 
             return (() => ActualFunc(activity, resolvedActivity), resolvedActivity);

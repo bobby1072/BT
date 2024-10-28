@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using BT.Common.Workflow.Abstract;
-using BT.Common.Workflow.Contexts;
+using BT.Common.WorkflowActivities.Abstract;
+using BT.Common.WorkflowActivities.Contexts;
 
-namespace BT.Common.Workflow.Completed
+namespace BT.Common.WorkflowActivities.Completed
 {
     public sealed record CompletedWorkflow<TContext, TReturn>
         where TContext : IWorkflowContext<

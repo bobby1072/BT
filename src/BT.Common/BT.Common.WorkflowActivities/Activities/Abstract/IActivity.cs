@@ -1,6 +1,6 @@
-﻿using BT.Common.Workflow.Activities.Concrete;
+﻿using BT.Common.WorkflowActivities.Activities.Concrete;
 
-namespace BT.Common.Workflow.Activities.Abstract
+namespace BT.Common.WorkflowActivities.Activities.Abstract
 {
     public interface IActivity<TParam, TReturn>
     {
