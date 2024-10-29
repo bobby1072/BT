@@ -1,6 +1,6 @@
 ﻿namespace BT.Common.WorkflowActivities.Activities.Concrete
 {
-    public sealed class ActivityBlockToRun
+    public class ActivityBlockToRun
     {
         public IReadOnlyCollection<ActivityToRun<object?, object?>> ActivitesToRun { get; init; }
         public ActivityBlockExecutionTypeEnum ExecutionType { get; init; }

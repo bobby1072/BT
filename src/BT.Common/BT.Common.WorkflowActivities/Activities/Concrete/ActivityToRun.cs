@@ -5,7 +5,7 @@ using BT.Common.WorkflowActivities.Activities.Attributes;
 
 namespace BT.Common.WorkflowActivities.Activities.Concrete
 {
-    public sealed record ActivityToRun<TActivityContextItem, TActivityReturnItem>
+    public class ActivityToRun<TActivityContextItem, TActivityReturnItem>
     {
         public TypeFor<
             IActivity<TActivityContextItem?, TActivityReturnItem?>
