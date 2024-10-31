@@ -9,23 +9,20 @@ namespace BT.Common.WorkflowActivities
 {
     public static class WorkflowServiceCollectionExtensions
     {
-        public static IServiceCollection AddActivity<TActivityInterface, TActivityActual>(this IServiceCollection serviceCollection)
-             where TActivityInterface : class, IActivity<object?, object?>
-             where TActivityActual : class, TActivityInterface
+        public static IServiceCollection AddActivity<TActivityActual, TParam, TReturn>(this IServiceCollection serviceCollection)
+            where TActivityActual:class,  IActivity<TParam?, TReturn?>
         {
-
             serviceCollection
-                .AddTransient<TActivityInterface, TActivityActual>();
+                .AddTransient<IActivity<TParam?, TReturn?>,TActivityActual>();
 
             return serviceCollection;
         }
 
-        public static IServiceCollection AddWorkflow<TWorkflowInterface, TWorkflowActual>(this IServiceCollection serviceCollection)
-            where TWorkflowInterface : class, IWorkflow<IWorkflowContext<IWorkflowInputContext, IWorkflowOutputContext<object?>, object?>, object?>
-            where TWorkflowActual : class, TWorkflowInterface
+        public static IServiceCollection AddWorkflow<TWorkflowActual, TReturn>(this IServiceCollection serviceCollection)
+            where TWorkflowActual : class, IWorkflow<IWorkflowContext<IWorkflowInputContext, IWorkflowOutputContext<TReturn?>, TReturn?>, TReturn?>
         {
             serviceCollection
-                .AddTransient<TWorkflowInterface, TWorkflowActual>();
+                .AddTransient<IWorkflow<IWorkflowContext<IWorkflowInputContext, IWorkflowOutputContext<TReturn?>, TReturn?>, TReturn?>, TWorkflowActual>();
 
             return serviceCollection;
         }
