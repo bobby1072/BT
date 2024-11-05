@@ -3,12 +3,14 @@ using BT.Common.WorkflowActivities.Contexts;
 
 namespace BT.Common.WorkflowActivities.Abstract
 {
-    public interface IWorkflow<TContext, TReturn>
+    public interface IWorkflow<TContext, TInputContext, TOutputContext, TReturn>
         where TContext : IWorkflowContext<
-                IWorkflowInputContext,
-                IWorkflowOutputContext<TReturn>,
+                TInputContext,
+                TOutputContext,
                 TReturn
             >
+        where TInputContext : IWorkflowInputContext
+        where TOutputContext : IWorkflowOutputContext<TReturn>
     {
         Guid WorkflowRunId { get; }
         string Name { get; }
