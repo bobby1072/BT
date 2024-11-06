@@ -1,7 +1,6 @@
 using BT.Common.FastArray.Proto;
 using BT.Common.Helpers.TypeFor;
 using BT.Common.OperationTimer.Proto;
-using BT.Common.WorkflowActivities;
 using BT.Common.WorkflowActivities.Abstract;
 using BT.Common.WorkflowActivities.Activities.Abstract;
 using BT.Common.WorkflowActivities.Activities.Concrete;
@@ -28,33 +27,37 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
             _logger = logger;
         }
 
-        public async Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
-            TypeFor<IWorkflow<TContext, TReturn>> workflowToExecute
+        public async Task<CompletedWorkflow<TContext,TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
+            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
            )
-    where TContext : IWorkflowContext<
-            IWorkflowInputContext,
-            IWorkflowOutputContext<TReturn>,
-            TReturn
-        >
+            where TContext : IWorkflowContext<
+                    TInputContext,
+                    TOutputContext,
+                    TReturn
+                >
+            where TInputContext : IWorkflowInputContext
+            where TOutputContext : IWorkflowOutputContext<TReturn>
         {
             var workflowStartTime = DateTime.UtcNow;
             var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute));
-            var completedWorkflow = new CompletedWorkflow<TContext, TReturn>(foundWorkflow, workflowStartTime, DateTime.UtcNow, timeTaken, executedActivityBlocks);
+            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>(foundWorkflow, workflowStartTime, DateTime.UtcNow, timeTaken, executedActivityBlocks);
             _logger.LogInformation("----------   Workflow finished: {SerialisedWorkflow}   ----------", JsonSerializer.Serialize(completedWorkflow));
 
             return completedWorkflow;
         }
-        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TReturn>)> ExecuteInnerAsync<TContext, TReturn>(
-            TypeFor<IWorkflow<TContext, TReturn>> workflowToExecute
+        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
+            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
         )
             where TContext : IWorkflowContext<
-                    IWorkflowInputContext,
-                    IWorkflowOutputContext<TReturn>,
+                    TInputContext,
+                    TOutputContext,
                     TReturn
                 >
+            where TInputContext : IWorkflowInputContext
+            where TOutputContext : IWorkflowOutputContext<TReturn>
         {
 
-            var foundWorkflow = _serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TReturn> ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
+            var foundWorkflow = _serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TInputContext, TOutputContext, TReturn> ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
             var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
 
             try

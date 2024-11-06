@@ -3,6 +3,7 @@
     public enum ActivityResultEnum
     {
         Fail,
-        Success
+        Success,
+        Skip
     }
 }

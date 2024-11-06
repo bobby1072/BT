@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace BT.Common.FastArray.Proto
 {
     public static partial class FastArray
