@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
-using BT.Common.WorkflowActivities.Activities.Abstract;
+﻿using BT.Common.WorkflowActivities.Activities.Abstract;
 using BT.Common.WorkflowActivities.Activities.Concrete;
+using System.Text.Json.Serialization;
 
 namespace BT.Common.WorkflowActivities.Completed
 {

@@ -1,18 +1,20 @@
-using System.Text.Json.Serialization;
 using BT.Common.WorkflowActivities.Abstract;
 using BT.Common.WorkflowActivities.Contexts;
+using System.Text.Json.Serialization;
 
 namespace BT.Common.WorkflowActivities.Completed
 {
-    public sealed record CompletedWorkflow<TContext, TReturn>
+    public sealed record CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>
         where TContext : IWorkflowContext<
-                IWorkflowInputContext,
-                IWorkflowOutputContext<TReturn>,
+                TInputContext,
+                TOutputContext,
                 TReturn
             >
+        where TInputContext : IWorkflowInputContext
+        where TOutputContext : IWorkflowOutputContext<TReturn>
     {
         [JsonIgnore]
-        private IWorkflow<TContext, TReturn> _actualWorkflow { get; init; }
+        private IWorkflow<TContext, TInputContext, TOutputContext, TReturn> _actualWorkflow { get; init; }
         public Guid WorkflowId => _actualWorkflow.WorkflowRunId;
         public string WorkflowName => _actualWorkflow.Name;
         [JsonIgnore]
@@ -24,7 +26,7 @@ namespace BT.Common.WorkflowActivities.Completed
         public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
         public IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> CompletedActivities { get; init; }
         public CompletedWorkflow(
-            IWorkflow<TContext, TReturn> actualWorkflow,
+            IWorkflow<TContext, TInputContext, TOutputContext, TReturn> actualWorkflow,
             DateTime startedAt,
             DateTime completedAt,
             TimeSpan timeTaken,

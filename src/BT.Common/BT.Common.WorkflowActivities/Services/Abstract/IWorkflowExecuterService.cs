@@ -7,13 +7,15 @@ namespace BT.Common.WorkflowActivities.Services.Abstract
 {
     public interface IWorkflowExecuterService
     {
-        Task<CompletedWorkflow<TContext, TReturn>> ExecuteAsync<TContext, TReturn>(
-            TypeFor<IWorkflow<TContext, TReturn>> workflowToExecute
+        Task<CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
+            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
         )
-            where TContext : IWorkflowContext<
-                    IWorkflowInputContext,
-                    IWorkflowOutputContext<TReturn>,
-                    TReturn
-                >;
+        where TContext : IWorkflowContext<
+                TInputContext,
+                TOutputContext,
+                TReturn
+            >
+        where TInputContext : IWorkflowInputContext
+        where TOutputContext : IWorkflowOutputContext<TReturn>;
     }
 }

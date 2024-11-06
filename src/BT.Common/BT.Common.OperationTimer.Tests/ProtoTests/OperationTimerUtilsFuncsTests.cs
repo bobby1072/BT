@@ -1,7 +1,7 @@
-using BT.Common.UkHoliday.Client.Client.Concrete;
 using BT.Common.OperationTimer.Proto;
-using FluentAssertions;
+using BT.Common.UkHoliday.Client.Client.Concrete;
 using BT.Common.UkHoliday.Client.Models;
+using FluentAssertions;
 using System.Globalization;
 
 namespace BT.Common.OperationTimer.Tests.ProtoTests

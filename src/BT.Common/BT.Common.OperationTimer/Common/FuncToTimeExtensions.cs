@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using BT.Common.OperationTimer.Models;
+using System.Diagnostics;
 
 namespace BT.Common.OperationTimer.Common
 {
