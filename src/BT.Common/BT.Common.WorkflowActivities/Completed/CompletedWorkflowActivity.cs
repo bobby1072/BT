@@ -10,30 +10,18 @@ namespace BT.Common.WorkflowActivities.Completed
     >
     {
         [JsonIgnore]
-        private IActivity<TActivityContextItem?, TActivityReturnItem?> _activity
+        public required IActivity<TActivityContextItem?, TActivityReturnItem?> Activity
         { get; init; }
-        public Guid ActivityId => _activity.ActivityRunId;
-        public string ActivityName => _activity.Name;
+        public Guid ActivityId => Activity.ActivityRunId;
+        public string ActivityName => Activity.Name;
+        public string ActivityDescription => Activity.Description;
         [JsonIgnore]
-        public ActivityResultEnum ActivityResult { get; init; }
+        public required ActivityResultEnum ActivityResult { get; init; }
         [JsonPropertyName("FinalActivityState")]
         public string FinalActivityStateString => ActivityResult.ToString();
-        public int NumberOfRetriesTaken { get; init; }
+        public required int NumberOfRetriesTaken { get; init; }
         [JsonIgnore]
-        public TimeSpan TotalTimeTaken { get; init; }
+        public required TimeSpan TotalTimeTaken { get; init; }
         public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
-
-        public CompletedWorkflowActivity(
-           IActivity<TActivityContextItem?, TActivityReturnItem?> actualActivity,
-            int numberOfRetries,
-            TimeSpan timeTaken,
-            ActivityResultEnum activityResult
-        )
-        {
-            _activity = actualActivity;
-            NumberOfRetriesTaken = numberOfRetries;
-            TotalTimeTaken = timeTaken;
-            ActivityResult = activityResult;
-        }
     }
 }

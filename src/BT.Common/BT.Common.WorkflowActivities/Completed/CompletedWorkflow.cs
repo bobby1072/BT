@@ -14,30 +14,16 @@ namespace BT.Common.WorkflowActivities.Completed
         where TOutputContext : IWorkflowOutputContext<TReturn>
     {
         [JsonIgnore]
-        private IWorkflow<TContext, TInputContext, TOutputContext, TReturn> _actualWorkflow { get; init; }
-        public Guid WorkflowId => _actualWorkflow.WorkflowRunId;
-        public string WorkflowName => _actualWorkflow.Name;
+        public required IWorkflow<TContext, TInputContext, TOutputContext, TReturn> ActualWorkflow { get; init; }
+        public Guid WorkflowId => ActualWorkflow.WorkflowRunId;
+        public string WorkflowName => ActualWorkflow.Name;
         [JsonIgnore]
-        public TReturn? WorkflowOutput => _actualWorkflow.Context.Output.ReturnObject;
-        public DateTime StartedAt { get; init; }
-        public DateTime CompletedAt { get; init; }
+        public TReturn? WorkflowOutput => ActualWorkflow.Context.Output.ReturnObject;
+        public required DateTime StartedAt { get; init; }
+        public required DateTime CompletedAt { get; init; }
         [JsonIgnore]
-        public TimeSpan TotalTimeTaken { get; init; }
+        public required TimeSpan TotalTimeTaken { get; init; }
         public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
-        public IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> CompletedActivities { get; init; }
-        public CompletedWorkflow(
-            IWorkflow<TContext, TInputContext, TOutputContext, TReturn> actualWorkflow,
-            DateTime startedAt,
-            DateTime completedAt,
-            TimeSpan timeTaken,
-            IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> completedActivities
-        )
-        {
-            _actualWorkflow = actualWorkflow;
-            CompletedAt = completedAt;
-            StartedAt = startedAt;
-            TotalTimeTaken = timeTaken;
-            CompletedActivities = completedActivities;
-        }
+        public required IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> CompletedActivities { get; init; }
     }
 }
