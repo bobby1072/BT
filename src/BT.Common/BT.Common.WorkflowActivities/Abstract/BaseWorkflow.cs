@@ -4,13 +4,13 @@ using BT.Common.WorkflowActivities.Contexts;
 namespace BT.Common.WorkflowActivities.Abstract
 {
     public abstract class BaseWorkflow<TContext, TInputContext, TOutputContext, TReturn> : IWorkflow<TContext, TInputContext, TOutputContext, TReturn>
-        where TContext : IWorkflowContext<
+        where TContext : WorkflowContext<
                 TInputContext,
                 TOutputContext,
                 TReturn
             >
-        where TInputContext : IWorkflowInputContext
-        where TOutputContext : IWorkflowOutputContext<TReturn>
+        where TInputContext : WorkflowInputContext
+        where TOutputContext : WorkflowOutputContext<TReturn>
     {
         public Guid WorkflowRunId { get; } = Guid.NewGuid();
         public string Name =>
