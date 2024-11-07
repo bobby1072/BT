@@ -39,13 +39,13 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
             where TOutputContext : WorkflowOutputContext<TReturn>
         {
             var workflowStartTime = DateTime.UtcNow;
-            var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute, context));
-            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>{ActualWorkflow = foundWorkflow, StartedAt = workflowStartTime, CompletedAt = DateTime.UtcNow, TotalTimeTaken = timeTaken, CompletedActivities = executedActivityBlocks };
+            var (timeTaken, (executedActivityBlocks, foundWorkflow, workflowResult)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute, context));
+            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>{ActualWorkflow = foundWorkflow, StartedAt = workflowStartTime, CompletedAt = DateTime.UtcNow, TotalTimeTaken = timeTaken, CompletedActivities = executedActivityBlocks, WorkflowResult = workflowResult };
             _logger.LogInformation("----------   Workflow finished: {SerialisedWorkflow}   ----------", JsonSerializer.Serialize(completedWorkflow));
 
             return completedWorkflow;
         }
-        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
+        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>, WorkflowResultEnum)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
             TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute, TContext context
         )
             where TContext : WorkflowContext<
@@ -131,17 +131,20 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                 _logger.LogInformation("----------Exiting workflow execution: {WorkflowName} {WorkflowId}-----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
             }
 
+            var finalActivityResult = completedActivityBlockList.LastOrDefault()?.CompletedWorkflowActivities.LastOrDefault()?.ActivityResult;
+            var workflowResult = finalActivityResult == ActivityResultEnum.Fail ? WorkflowResultEnum.Failed : WorkflowResultEnum.Succeeded;
 
-            if (foundWorkflow.Context.Output.WorkflowResultEnum == WorkflowResultEnum.Succeeded)
+
+            if (workflowResult == WorkflowResultEnum.Succeeded)
             {
                 await foundWorkflow.PostSuccessfulWorkflowRoutine();
             }
-            else if (foundWorkflow.Context.Output.WorkflowResultEnum == WorkflowResultEnum.Failed)
+            else if (workflowResult == WorkflowResultEnum.Failed)
             {
                 await foundWorkflow.PostUnsuccessfulWorkflowRoutine();
             }
 
-            return (completedActivityBlockList, foundWorkflow);
+            return (completedActivityBlockList, foundWorkflow, workflowResult);
         }
 
 
@@ -213,9 +216,9 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                     var (timeTakenForAttempt, (ActivityResult, ActualResult)) = await OperationTimerUtils.TimeWithResultsAsync(() => mainResultFunc.Invoke(activity.ContextItem));
 
 
-                    if (ActivityResult == ActivityResultEnum.Success)
+                    if (ActivityResult == ActivityResultEnum.Success || ActivityResult == ActivityResultEnum.Skip)
                     {
-                        _logger.LogInformation("Activity {ActivityName}, {ActivityRunId} executed successfully and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, timeTakenForAttempt.Milliseconds, retryCounter + 1);
+                        _logger.LogInformation("Activity {ActivityName}, {ActivityRunId} executed with result {Result} and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, ActivityResult.ToString(), timeTakenForAttempt.Milliseconds, retryCounter + 1);
                         return (ActivityResult, retryCounter + 1);
                     }
                     _logger.LogWarning("Activity {ActivityName}, {ActivityRunId} failed and took {TimeTaken}ms . On attempt: {AttemptNumber}", resolvedActivity.Name, resolvedActivity.ActivityRunId, timeTakenForAttempt.Milliseconds, retryCounter + 1);

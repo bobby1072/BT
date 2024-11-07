@@ -20,7 +20,7 @@ namespace BT.Common.WorkflowActivities.Completed
         [JsonIgnore]
         public TReturn? WorkflowOutput => ActualWorkflow.Context.Output.ReturnObject;
         [JsonIgnore]
-        public WorkflowResultEnum WorkflowResult => ActualWorkflow.Context.Output.WorkflowResultEnum;
+        public required WorkflowResultEnum WorkflowResult {  get; init; }
         public string WorkflowResultString => WorkflowResult.ToString();
         public required DateTime StartedAt { get; init; }
         public required DateTime CompletedAt { get; init; }
