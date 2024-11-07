@@ -15,7 +15,7 @@ namespace BT.Common.WorkflowActivities.Abstract
         Guid WorkflowRunId { get; }
         string Name { get; }
         string Description { get; }
-        TContext Context { get; init; }
+        TContext Context { get; set; }
         IReadOnlyCollection<ActivityBlockToRun> ActivitiesToRun { get; }
 
 

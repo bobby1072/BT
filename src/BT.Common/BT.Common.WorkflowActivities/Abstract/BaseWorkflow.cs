@@ -13,10 +13,10 @@ namespace BT.Common.WorkflowActivities.Abstract
         where TOutputContext : WorkflowOutputContext<TReturn>
     {
         public Guid WorkflowRunId { get; } = Guid.NewGuid();
-        public string Name =>
+        public virtual string Name =>
             GetType().Name.Replace("Workflow", "", StringComparison.CurrentCultureIgnoreCase);
         public abstract string Description { get; }
-        public required TContext Context { get; init; }
+        public TContext Context { get; set; }
         public abstract IReadOnlyCollection<ActivityBlockToRun> ActivitiesToRun { get; }
         public virtual Task PreWorkflowRoutine() => Task.CompletedTask;
         public virtual Task PostSuccessfulWorkflowRoutine() => Task.CompletedTask;

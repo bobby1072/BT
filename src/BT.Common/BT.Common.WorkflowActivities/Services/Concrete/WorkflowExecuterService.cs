@@ -28,7 +28,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         }
 
         public async Task<CompletedWorkflow<TContext,TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
-            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
+            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute, TContext context
            )
             where TContext : WorkflowContext<
                     TInputContext,
@@ -39,14 +39,14 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
             where TOutputContext : WorkflowOutputContext<TReturn>
         {
             var workflowStartTime = DateTime.UtcNow;
-            var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute));
+            var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute, context));
             var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>{ActualWorkflow = foundWorkflow, StartedAt = workflowStartTime, CompletedAt = DateTime.UtcNow, TotalTimeTaken = timeTaken, CompletedActivities = executedActivityBlocks };
             _logger.LogInformation("----------   Workflow finished: {SerialisedWorkflow}   ----------", JsonSerializer.Serialize(completedWorkflow));
 
             return completedWorkflow;
         }
         private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
-            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
+            TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute, TContext context
         )
             where TContext : WorkflowContext<
                     TInputContext,
@@ -58,6 +58,9 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         {
 
             var foundWorkflow = _serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TInputContext, TOutputContext, TReturn> ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
+            
+            foundWorkflow.Context = context;
+            
             var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
 
             try
@@ -129,12 +132,11 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
             }
 
 
-            var finalActivityResult = completedActivityBlockList.LastOrDefault()?.CompletedWorkflowActivities.LastOrDefault()?.ActivityResult;
-            if (finalActivityResult == ActivityResultEnum.Success)
+            if (foundWorkflow.Context.Output.WorkflowResultEnum == WorkflowResultEnum.Succeeded)
             {
                 await foundWorkflow.PostSuccessfulWorkflowRoutine();
             }
-            else if (finalActivityResult == ActivityResultEnum.Fail)
+            else if (foundWorkflow.Context.Output.WorkflowResultEnum == WorkflowResultEnum.Failed)
             {
                 await foundWorkflow.PostUnsuccessfulWorkflowRoutine();
             }

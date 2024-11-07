@@ -19,11 +19,14 @@ namespace BT.Common.WorkflowActivities.Completed
         public string WorkflowName => ActualWorkflow.Name;
         [JsonIgnore]
         public TReturn? WorkflowOutput => ActualWorkflow.Context.Output.ReturnObject;
+        [JsonIgnore]
+        public WorkflowResultEnum WorkflowResult => ActualWorkflow.Context.Output.WorkflowResultEnum;
+        public string WorkflowResultString => WorkflowResult.ToString();
         public required DateTime StartedAt { get; init; }
         public required DateTime CompletedAt { get; init; }
         [JsonIgnore]
         public required TimeSpan TotalTimeTaken { get; init; }
-        public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
+        public string TotalTimeTakenMilliSeconds => $"{TotalTimeTaken.TotalMilliseconds}ms";
         public required IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> CompletedActivities { get; init; }
     }
 }

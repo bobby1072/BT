@@ -22,6 +22,6 @@ namespace BT.Common.WorkflowActivities.Completed
         public required int NumberOfRetriesTaken { get; init; }
         [JsonIgnore]
         public required TimeSpan TotalTimeTaken { get; init; }
-        public double TotalTimeTakenMilliSeconds => TotalTimeTaken.TotalMilliseconds;
+        public string TotalTimeTakenMilliSeconds => $"{TotalTimeTaken.TotalMilliseconds}ms";
     }
 }
