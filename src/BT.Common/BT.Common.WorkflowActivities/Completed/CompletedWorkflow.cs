@@ -5,13 +5,13 @@ using System.Text.Json.Serialization;
 namespace BT.Common.WorkflowActivities.Completed
 {
     public sealed record CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>
-        where TContext : IWorkflowContext<
+        where TContext : WorkflowContext<
                 TInputContext,
                 TOutputContext,
                 TReturn
             >
-        where TInputContext : IWorkflowInputContext
-        where TOutputContext : IWorkflowOutputContext<TReturn>
+        where TInputContext : WorkflowInputContext
+        where TOutputContext : WorkflowOutputContext<TReturn>
     {
         [JsonIgnore]
         public required IWorkflow<TContext, TInputContext, TOutputContext, TReturn> ActualWorkflow { get; init; }

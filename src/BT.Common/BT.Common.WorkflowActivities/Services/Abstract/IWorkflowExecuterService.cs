@@ -10,12 +10,12 @@ namespace BT.Common.WorkflowActivities.Services.Abstract
         Task<CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
             TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
         )
-        where TContext : IWorkflowContext<
+        where TContext : WorkflowContext<
                 TInputContext,
                 TOutputContext,
                 TReturn
             >
-        where TInputContext : IWorkflowInputContext
-        where TOutputContext : IWorkflowOutputContext<TReturn>;
+        where TInputContext : WorkflowInputContext
+        where TOutputContext : WorkflowOutputContext<TReturn>;
     }
 }

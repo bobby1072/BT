@@ -30,13 +30,13 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         public async Task<CompletedWorkflow<TContext,TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
             TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
            )
-            where TContext : IWorkflowContext<
+            where TContext : WorkflowContext<
                     TInputContext,
                     TOutputContext,
                     TReturn
                 >
-            where TInputContext : IWorkflowInputContext
-            where TOutputContext : IWorkflowOutputContext<TReturn>
+            where TInputContext : WorkflowInputContext
+            where TOutputContext : WorkflowOutputContext<TReturn>
         {
             var workflowStartTime = DateTime.UtcNow;
             var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute));
@@ -48,13 +48,13 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
             TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute
         )
-            where TContext : IWorkflowContext<
+            where TContext : WorkflowContext<
                     TInputContext,
                     TOutputContext,
                     TReturn
                 >
-            where TInputContext : IWorkflowInputContext
-            where TOutputContext : IWorkflowOutputContext<TReturn>
+            where TInputContext : WorkflowInputContext
+            where TOutputContext : WorkflowOutputContext<TReturn>
         {
 
             var foundWorkflow = _serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TInputContext, TOutputContext, TReturn> ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);

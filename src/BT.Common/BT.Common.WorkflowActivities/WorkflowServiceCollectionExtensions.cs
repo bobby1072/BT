@@ -20,13 +20,13 @@ namespace BT.Common.WorkflowActivities
 
         public static IServiceCollection AddWorkflow<TWorkflowActual, TContext, TInputContext, TOutputContext, TReturn>(this IServiceCollection serviceCollection)
             where TWorkflowActual : class, IWorkflow<TContext,TInputContext, TOutputContext, TReturn>
-            where TContext : IWorkflowContext<
+            where TContext : WorkflowContext<
                 TInputContext,
                 TOutputContext,
                 TReturn
             >
-            where TInputContext : IWorkflowInputContext
-            where TOutputContext : IWorkflowOutputContext<TReturn>
+            where TInputContext : WorkflowInputContext
+            where TOutputContext : WorkflowOutputContext<TReturn>
         {
             serviceCollection
                 .AddTransient<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>, TWorkflowActual>();
