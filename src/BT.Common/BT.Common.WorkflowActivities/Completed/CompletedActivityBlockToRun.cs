@@ -8,20 +8,11 @@ namespace BT.Common.WorkflowActivities.Completed
         TActivityReturnItem
     >
     {
-        public IReadOnlyCollection<CompletedWorkflowActivity<TActivityContextItem, TActivityReturnItem>> CompletedWorkflowActivities { get; init; }
+        public required IReadOnlyCollection<CompletedWorkflowActivity<TActivityContextItem, TActivityReturnItem>> CompletedWorkflowActivities { get; init; }
         [JsonIgnore]
-        public ActivityBlockExecutionTypeEnum ExecutionType { get; init; }
+        public required ActivityBlockExecutionTypeEnum ExecutionType { get; init; }
         [JsonPropertyName("ExecutionType")]
         public string ExecutionTypeString => ExecutionTypeString.ToString();
-
-        public CompletedActivityBlockToRun(
-            IReadOnlyCollection<CompletedWorkflowActivity<TActivityContextItem, TActivityReturnItem>> completedWorkflowActivities,
-            ActivityBlockExecutionTypeEnum executionType
-            )
-        {
-            CompletedWorkflowActivities = completedWorkflowActivities;
-            ExecutionType = executionType;
-        }
 
     }
 }

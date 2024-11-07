@@ -40,7 +40,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         {
             var workflowStartTime = DateTime.UtcNow;
             var (timeTaken, (executedActivityBlocks, foundWorkflow)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute));
-            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>(foundWorkflow, workflowStartTime, DateTime.UtcNow, timeTaken, executedActivityBlocks);
+            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>{ActualWorkflow = foundWorkflow, StartedAt = workflowStartTime, CompletedAt = DateTime.UtcNow, TotalTimeTaken = timeTaken, CompletedActivities = executedActivityBlocks };
             _logger.LogInformation("----------   Workflow finished: {SerialisedWorkflow}   ----------", JsonSerializer.Serialize(completedWorkflow));
 
             return completedWorkflow;
@@ -84,7 +84,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcAndActivity;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = OperationTimerUtils.TimeWithResults(singleFuncAndActualActivity);
-                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?>(singleActivity, timesRetried, timeTakenForActivity, activityResult));
+                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?>{Activity = singleActivity, NumberOfRetriesTaken= timesRetried, TotalTimeTaken =timeTakenForActivity, ActivityResult = activityResult });
                         }
                     }
                     else if (exeType == ActivityBlockExecutionTypeEnum.Async)
@@ -93,7 +93,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcsAndActivities.FirstOrDefault()!;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = await OperationTimerUtils.TimeWithResultsAsync(singleFuncAndActualActivity);
-                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?>(singleActivity, timesRetried, timeTakenForActivity, activityResult));
+                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult });
                             continue;
                         }
                         else
@@ -102,7 +102,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                             {
                                 var (singleFuncAndActualActivity, singleActivity) = x;
                                 var (timeTakenForActivity, (activityResult, timesRetried)) = await OperationTimerUtils.TimeWithResultsAsync(singleFuncAndActualActivity);
-                                return new CompletedWorkflowActivity<object?, object?>(singleActivity, timesRetried, timeTakenForActivity, activityResult);
+                                return new CompletedWorkflowActivity<object?, object?> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult };
                             });
 
                             var completedActivities = await Task.WhenAll(tasks);
@@ -110,7 +110,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         }
                     }
 
-                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?>(workflowActivityList, exeType));
+                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?>{ CompletedWorkflowActivities = workflowActivityList, ExecutionType = exeType });
                 }
             }
             catch (WorkflowException e)

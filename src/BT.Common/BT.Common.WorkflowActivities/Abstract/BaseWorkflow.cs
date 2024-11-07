@@ -16,12 +16,8 @@ namespace BT.Common.WorkflowActivities.Abstract
         public string Name =>
             GetType().Name.Replace("Workflow", "", StringComparison.CurrentCultureIgnoreCase);
         public abstract string Description { get; }
-        public TContext Context { get; init; }
+        public required TContext Context { get; init; }
         public abstract IReadOnlyCollection<ActivityBlockToRun> ActivitiesToRun { get; }
-        public BaseWorkflow(TContext context)
-        {
-            Context = context;
-        }
         public virtual Task PreWorkflowRoutine() => Task.CompletedTask;
         public virtual Task PostSuccessfulWorkflowRoutine() => Task.CompletedTask;
         public virtual Task PostUnsuccessfulWorkflowRoutine() => Task.CompletedTask;
