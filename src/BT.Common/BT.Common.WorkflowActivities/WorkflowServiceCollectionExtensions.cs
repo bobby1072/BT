@@ -10,10 +10,12 @@ namespace BT.Common.WorkflowActivities
     public static class WorkflowServiceCollectionExtensions
     {
         public static IServiceCollection AddActivity<TActivityActual, TParam, TReturn>(this IServiceCollection serviceCollection)
-            where TActivityActual:class,  IActivity<TParam?, TReturn?>
+            where TParam : ActivityContextItem 
+            where TReturn : ActivityReturnItem 
+            where TActivityActual : class,  IActivity<TParam, TReturn>
         {
             serviceCollection
-                .AddTransient<IActivity<TParam?, TReturn?>,TActivityActual>();
+                .AddTransient<IActivity<TParam, TReturn>,TActivityActual>();
 
             return serviceCollection;
         }
