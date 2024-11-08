@@ -1,4 +1,4 @@
 ﻿namespace BT.Common.WorkflowActivities.Contexts
 {
-    public abstract record WorkflowInputContext { }
+    public abstract record ActivityReturnItem { }
 }

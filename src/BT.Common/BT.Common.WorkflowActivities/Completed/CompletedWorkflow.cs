@@ -27,6 +27,6 @@ namespace BT.Common.WorkflowActivities.Completed
         [JsonIgnore]
         public required TimeSpan TotalTimeTaken { get; init; }
         public string TotalTimeTakenMilliSeconds => $"{TotalTimeTaken.TotalMilliseconds}ms";
-        public required IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>> CompletedActivities { get; init; }
+        public required IReadOnlyCollection<CompletedActivityBlockToRun<ActivityContextItem, ActivityReturnItem>> CompletedActivities { get; init; }
     }
 }

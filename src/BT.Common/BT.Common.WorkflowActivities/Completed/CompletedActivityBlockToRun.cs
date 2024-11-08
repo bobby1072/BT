@@ -1,4 +1,5 @@
 ﻿using BT.Common.WorkflowActivities.Activities.Concrete;
+using BT.Common.WorkflowActivities.Contexts;
 using System.Text.Json.Serialization;
 
 namespace BT.Common.WorkflowActivities.Completed
@@ -7,6 +8,8 @@ namespace BT.Common.WorkflowActivities.Completed
         TActivityContextItem,
         TActivityReturnItem
     >
+        where TActivityContextItem : ActivityContextItem
+        where TActivityReturnItem : ActivityReturnItem
     {
         public required IReadOnlyCollection<CompletedWorkflowActivity<TActivityContextItem, TActivityReturnItem>> CompletedWorkflowActivities { get; init; }
         [JsonIgnore]

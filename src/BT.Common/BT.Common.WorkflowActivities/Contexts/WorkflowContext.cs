@@ -1,6 +1,6 @@
 ﻿namespace BT.Common.WorkflowActivities.Contexts
 {
-    public abstract class WorkflowContext<TInputContext, TOutputContext, TReturn>
+    public abstract record WorkflowContext<TInputContext, TOutputContext, TReturn>
         where TInputContext : WorkflowInputContext
         where TOutputContext : WorkflowOutputContext<TReturn>
     {

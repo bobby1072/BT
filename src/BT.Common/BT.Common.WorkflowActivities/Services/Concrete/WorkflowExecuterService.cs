@@ -45,7 +45,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
 
             return completedWorkflow;
         }
-        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<object?, object?>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>, WorkflowResultEnum)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
+        private async Task<(IReadOnlyCollection<CompletedActivityBlockToRun<ActivityContextItem, ActivityReturnItem>>, IWorkflow<TContext, TInputContext, TOutputContext, TReturn>, WorkflowResultEnum)> ExecuteInnerAsync<TContext, TInputContext, TOutputContext, TReturn>(
             TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute, TContext context
         )
             where TContext : WorkflowContext<
@@ -61,7 +61,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
 
             foundWorkflow.Context = context;
 
-            var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
+            var completedActivityBlockList = new List<CompletedActivityBlockToRun<ActivityContextItem, ActivityReturnItem>>();
             bool anActivityFailed = false;
             try
             {
@@ -73,7 +73,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
 
                 foreach (var singleActivityBlock in allActivityBlocksToRun)
                 {
-                    var workflowActivityList = new List<CompletedWorkflowActivity<object?, object?>>();
+                    var workflowActivityList = new List<CompletedWorkflowActivity<ActivityContextItem, ActivityReturnItem>>();
                     var (exeType, funcsAndActivities) = singleActivityBlock;
                     var funcAndActivityCount = funcsAndActivities.Count();
                     if (funcAndActivityCount == 0)
@@ -87,7 +87,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcAndActivity;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = OperationTimerUtils.TimeWithResults(singleFuncAndActualActivity);
-                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult });
+                            workflowActivityList.Add(new CompletedWorkflowActivity<ActivityContextItem, ActivityReturnItem> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult });
                         }
                     }
                     else if (exeType == ActivityBlockExecutionTypeEnum.Async)
@@ -96,7 +96,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcsAndActivities.FirstOrDefault()!;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = await OperationTimerUtils.TimeWithResultsAsync(singleFuncAndActualActivity);
-                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult });
+                            workflowActivityList.Add(new CompletedWorkflowActivity<ActivityContextItem, ActivityReturnItem> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult });
                             continue;
                         }
                         else
@@ -105,7 +105,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                             {
                                 var (singleFuncAndActualActivity, singleActivity) = x;
                                 var (timeTakenForActivity, (activityResult, timesRetried)) = await OperationTimerUtils.TimeWithResultsAsync(singleFuncAndActualActivity);
-                                return new CompletedWorkflowActivity<object?, object?> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult };
+                                return new CompletedWorkflowActivity<ActivityContextItem, ActivityReturnItem> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult };
                             });
 
                             var completedActivities = await Task.WhenAll(tasks);
@@ -113,7 +113,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         }
                     }
 
-                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?> { CompletedWorkflowActivities = workflowActivityList, ExecutionType = exeType });
+                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<ActivityContextItem, ActivityReturnItem> { CompletedWorkflowActivities = workflowActivityList, ExecutionType = exeType });
                     anActivityFailed = completedActivityBlockList.LastOrDefault()?.CompletedWorkflowActivities.Any(x => x.ActivityResult == ActivityResultEnum.Fail) == true;
                     if (anActivityFailed)
                     {
@@ -162,14 +162,16 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         private
              (Func<
             Task<(ActivityResultEnum ActivityResult, int TimesRetried)>
-        >, IActivity<TActivityContextItem?, TActivityReturnItem?>)
+        >, IActivity<TActivityContextItem, TActivityReturnItem>)
          ToActualActivityToRun<TActivityContextItem, TActivityReturnItem>(
             ActivityToRun<TActivityContextItem, TActivityReturnItem> activity
         )
+        where TActivityContextItem : ActivityContextItem
+        where TActivityReturnItem : ActivityReturnItem
         {
             var resolvedActivity =
                 _serviceProvider.GetService(activity.ActivityType.ActualType)
-                as IActivity<TActivityContextItem?, TActivityReturnItem?>
+                as IActivity<TActivityContextItem, TActivityReturnItem>
              ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
 
 
@@ -181,8 +183,10 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
             int TimesRetried
         )> ActualFunc<TActivityContextItem, TActivityReturnItem>(
             ActivityToRun<TActivityContextItem, TActivityReturnItem> activity,
-            IActivity<TActivityContextItem?, TActivityReturnItem?> resolvedActivity
+            IActivity<TActivityContextItem, TActivityReturnItem> resolvedActivity
         )
+        where TActivityContextItem : ActivityContextItem
+        where TActivityReturnItem : ActivityReturnItem
         {
             var timesToRetry =
                 activity.OverrideRetryCount ?? activity.DefaultRetryAttribute?.RetryCount ?? 1;
