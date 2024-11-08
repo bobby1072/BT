@@ -27,7 +27,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
             _logger = logger;
         }
 
-        public async Task<CompletedWorkflow<TContext,TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
+        public async Task<CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>> ExecuteAsync<TContext, TInputContext, TOutputContext, TReturn>(
             TypeFor<IWorkflow<TContext, TInputContext, TOutputContext, TReturn>> workflowToExecute, TContext context
            )
             where TContext : WorkflowContext<
@@ -40,7 +40,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         {
             var workflowStartTime = DateTime.UtcNow;
             var (timeTaken, (executedActivityBlocks, foundWorkflow, workflowResult)) = await OperationTimerUtils.TimeWithResultsAsync(() => ExecuteInnerAsync(workflowToExecute, context));
-            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn>{ActualWorkflow = foundWorkflow, StartedAt = workflowStartTime, CompletedAt = DateTime.UtcNow, TotalTimeTaken = timeTaken, CompletedActivities = executedActivityBlocks, WorkflowResult = workflowResult };
+            var completedWorkflow = new CompletedWorkflow<TContext, TInputContext, TOutputContext, TReturn> { ActualWorkflow = foundWorkflow, StartedAt = workflowStartTime, CompletedAt = DateTime.UtcNow, TotalTimeTaken = timeTaken, CompletedActivities = executedActivityBlocks, WorkflowResult = workflowResult };
             _logger.LogInformation("----------   Workflow finished: {SerialisedWorkflow}   ----------", JsonSerializer.Serialize(completedWorkflow));
 
             return completedWorkflow;
@@ -58,18 +58,18 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
         {
 
             var foundWorkflow = _serviceProvider.GetService(workflowToExecute.ActualType) as IWorkflow<TContext, TInputContext, TOutputContext, TReturn> ?? throw new WorkflowException(WorkflowConstants.CouldNotResolveActivity);
-            
-            foundWorkflow.Context = context;
-            
-            var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
 
+            foundWorkflow.Context = context;
+
+            var completedActivityBlockList = new List<CompletedActivityBlockToRun<object?, object?>>();
+            bool anActivityFailed = false;
             try
             {
                 _logger.LogInformation("----------  Entering workflow execution: {WorkflowName} {WorkflowId}  ----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
 
                 await foundWorkflow.PreWorkflowRoutine();
 
-                var allActivityBlocksToRun = foundWorkflow.ActivitiesToRun.FastArraySelect(x => (x.ExecutionType, x.ActivitesToRun.FastArraySelect(x => ToActualActivityToRun(x))));
+                var allActivityBlocksToRun = foundWorkflow.ActivitiesToRun.FastArraySelect(x => (x.ExecutionType, x.ActivitesToRun.FastArraySelect(x => ToActualActivityToRun(x)))).ToArray();
 
                 foreach (var singleActivityBlock in allActivityBlocksToRun)
                 {
@@ -87,7 +87,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         {
                             var (singleFuncAndActualActivity, singleActivity) = funcAndActivity;
                             var (timeTakenForActivity, (activityResult, timesRetried)) = OperationTimerUtils.TimeWithResults(singleFuncAndActualActivity);
-                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?>{Activity = singleActivity, NumberOfRetriesTaken= timesRetried, TotalTimeTaken =timeTakenForActivity, ActivityResult = activityResult });
+                            workflowActivityList.Add(new CompletedWorkflowActivity<object?, object?> { Activity = singleActivity, NumberOfRetriesTaken = timesRetried, TotalTimeTaken = timeTakenForActivity, ActivityResult = activityResult });
                         }
                     }
                     else if (exeType == ActivityBlockExecutionTypeEnum.Async)
@@ -113,7 +113,12 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                         }
                     }
 
-                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?>{ CompletedWorkflowActivities = workflowActivityList, ExecutionType = exeType });
+                    completedActivityBlockList.Add(new CompletedActivityBlockToRun<object?, object?> { CompletedWorkflowActivities = workflowActivityList, ExecutionType = exeType });
+                    anActivityFailed = completedActivityBlockList.LastOrDefault()?.CompletedWorkflowActivities.Any(x => x.ActivityResult == ActivityResultEnum.Fail) == true;
+                    if (anActivityFailed)
+                    {
+                        break;
+                    }
                 }
             }
             catch (WorkflowException e)
@@ -131,9 +136,7 @@ namespace BT.Common.WorkflowActivities.Services.Concrete
                 _logger.LogInformation("----------Exiting workflow execution: {WorkflowName} {WorkflowId}-----------", foundWorkflow.Name, foundWorkflow.WorkflowRunId);
             }
 
-            var finalActivityResult = completedActivityBlockList.LastOrDefault()?.CompletedWorkflowActivities.LastOrDefault()?.ActivityResult;
-            var workflowResult = finalActivityResult == ActivityResultEnum.Fail ? WorkflowResultEnum.Failed : WorkflowResultEnum.Succeeded;
-
+            var workflowResult = anActivityFailed ? WorkflowResultEnum.Failed : WorkflowResultEnum.Succeeded;
 
             if (workflowResult == WorkflowResultEnum.Succeeded)
             {
