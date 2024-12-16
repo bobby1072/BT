@@ -260,6 +260,37 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return set;
         }
 
+        protected async Task TimeAndLogDbTransaction(params Func<IQueryable<TEnt>, Task>[] actions)
+        {
+            if (actions.Length < 1)
+            {
+                return;
+            }
+            
+            await using var dbContext = await _contextFactory.CreateDbContextAsync();
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var dbSet = dbContext.Set<TEnt>();
+                foreach (var action in actions)
+                {
+                    await TimeAndLogDbOperation<bool>(async () =>
+                    {
+                        await action.Invoke(dbSet);
+                        await dbContext.SaveChangesAsync();
+                        return true;
+                    }, nameof(TimeAndLogDbTransaction), _entityType.Name);
+                    
+                    await dbContext.SaveChangesAsync();
+                }
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
         protected async Task<T> TimeAndLogDbOperation<T>(
             Func<Task<T>> func,
             string operationName,
