@@ -5,13 +5,13 @@ namespace BT.Common.FastArray.Tests.ProtoTests
 {
     public class FastArrayWhereTests : FastArrayTestBase
     {
-        private class FastArrayWhereTests_Functionality_Class_Data : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<object>>, Func<IEnumerable<object>, IEnumerable<object>>>
+        private class FastArrayWhereTestsFunctionalityClassData : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<object>>, Func<IEnumerable<object>, IEnumerable<object>>>
         {
-            public FastArrayWhereTests_Functionality_Class_Data()
+            public FastArrayWhereTestsFunctionalityClassData()
             {
                 Add(new List<object> { 1, 2, 3 }, x => x.Where(y => y is int), x => x.FastArrayWhere(y => y is int));
 
-                foreach (var arrayData in _basicArraysToTestFunctionality)
+                foreach (var arrayData in BasicArraysToTestFunctionality)
                 {
                     Add(arrayData, x => x.Where(y => y is not null), x => x.FastArrayWhere(y => y is not null));
                     Add(arrayData, x => x.Where(y => y is true), x => x.FastArrayWhere(y => y is true));
@@ -27,14 +27,14 @@ namespace BT.Common.FastArray.Tests.ProtoTests
             }
         }
         [Theory]
-        [ClassData(typeof(FastArrayWhereTests_Functionality_Class_Data))]
+        [ClassData(typeof(FastArrayWhereTestsFunctionalityClassData))]
         public void FastArrayWhereTests_Functionality(IReadOnlyCollection<object> arrayData, Func<IEnumerable<object>, IEnumerable<object>> actualFunc, Func<IEnumerable<object>, IEnumerable<object>> yourFunc)
         {
             FunctionalityTestRunner(arrayData, actualFunc, yourFunc);
         }
-        private class FastArrayWhereTests_Performance_Class_Data : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<object>>, Func<IEnumerable<object>, IEnumerable<object>>>
+        private class FastArrayWhereTestsPerformanceClassData : TheoryData<IReadOnlyCollection<object>, Func<IEnumerable<object>, IEnumerable<object>>, Func<IEnumerable<object>, IEnumerable<object>>>
         {
-            public FastArrayWhereTests_Performance_Class_Data()
+            public FastArrayWhereTestsPerformanceClassData()
             {
                 var allArrays = CreateLargeArraysForPerformanceTestAllTypes(4000, 35);
                 foreach (var arrayData in allArrays)
@@ -53,7 +53,7 @@ namespace BT.Common.FastArray.Tests.ProtoTests
             }
         }
         [Theory(Skip = "Performance Test")]
-        [ClassData(typeof(FastArrayWhereTests_Performance_Class_Data))]
+        [ClassData(typeof(FastArrayWhereTestsPerformanceClassData))]
         public void FastArrayWhereTests_Performance(IReadOnlyCollection<object> arrayData, Func<IEnumerable<object>, IEnumerable<object>> actualFunc, Func<IEnumerable<object>, IEnumerable<object>> yourFunc)
         {
             PerformanceTestRunner(arrayData, actualFunc, yourFunc);
