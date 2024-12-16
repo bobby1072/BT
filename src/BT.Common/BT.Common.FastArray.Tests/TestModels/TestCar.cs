@@ -2,9 +2,9 @@ namespace BT.Common.FastArray.Tests.TestModels
 {
     internal enum DriveSystems
     {
-        FOURWD,
-        AWD,
-        FWD,
+        Fourwd,
+        Awd,
+        Fwd,
     }
     internal class TestCar : TestVehicle
     {

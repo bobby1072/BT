@@ -7,16 +7,16 @@ namespace BT.Common.FastArray.Tests
     public abstract class FastArrayTestBase
     {
 
-        protected static readonly IReadOnlyCollection<IReadOnlyCollection<object>> _basicArraysToTestFunctionality =
+        protected static readonly IReadOnlyCollection<IReadOnlyCollection<object>> BasicArraysToTestFunctionality =
         [
             [
                 new TestPlane {Color = "Red", Make = "Boeing", Model = "747", Year = 1990, NumberOfEngines = 4, NumberOfWings = 2},
-                new TestCar {Color = "Blue", Make = "Toyota", Model = "Camry", Year = 2020, NumberOfDoors = 4, DriveSystem = DriveSystems.AWD},
-                new TestCar {Color = "Green", Make = "Toyota", Model = "Gy86", Year = 2010, NumberOfDoors = 3, DriveSystem = DriveSystems.FOURWD},
+                new TestCar {Color = "Blue", Make = "Toyota", Model = "Camry", Year = 2020, NumberOfDoors = 4, DriveSystem = DriveSystems.Awd},
+                new TestCar {Color = "Green", Make = "Toyota", Model = "Gy86", Year = 2010, NumberOfDoors = 3, DriveSystem = DriveSystems.Fourwd},
                 new TestPlane {Color = "White", Make = "Airbus", Model = "A320", Year = 2018, NumberOfEngines = 2, NumberOfWings = 2},
-                new TestCar {Color = "Black", Make = "Tesla", Model = "Model S", Year = 2022, NumberOfDoors = 4, DriveSystem = DriveSystems.AWD},
+                new TestCar {Color = "Black", Make = "Tesla", Model = "Model S", Year = 2022, NumberOfDoors = 4, DriveSystem = DriveSystems.Awd},
                 new TestPlane {Color = "Yellow", Make = "Cessna", Model = "172", Year = 2005, NumberOfEngines = 1, NumberOfWings = 2},
-                new TestCar {Color = "Red", Make = "Ford", Model = "Mustang", Year = 2015, NumberOfDoors = 2, DriveSystem = DriveSystems.FOURWD}
+                new TestCar {Color = "Red", Make = "Ford", Model = "Mustang", Year = 2015, NumberOfDoors = 2, DriveSystem = DriveSystems.Fourwd}
             ],
 
             [
