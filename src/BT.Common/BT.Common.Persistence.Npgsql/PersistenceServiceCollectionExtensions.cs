@@ -31,12 +31,12 @@ namespace BT.Common.Persistence.Npgsql
 
             if (!string.IsNullOrEmpty(migrationStartLocation) && string.IsNullOrEmpty(migrationStartVersion))
             {
-                throw new InvalidDataException("Missing migration start version.");
+                throw new InvalidDataException("Missing migration start version");
             }
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
 
 
-            if (migrationStartVersion != null)
+            if (!string.IsNullOrEmpty(migrationStartLocation))
             {
                 services.AddSingleton<IMigrator, DatabaseMigrations>(sp => new DatabaseMigrations(
                     sp.GetRequiredService<ILoggerFactory>().CreateLogger<DatabaseMigrations>(),

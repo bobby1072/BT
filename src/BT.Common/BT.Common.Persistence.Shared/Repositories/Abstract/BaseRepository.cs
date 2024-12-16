@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Persistence.Shared.Repositories.Abstract
 {
-    internal abstract class BaseRepository<TEnt, TEntId, TModel, TDbContext> : IRepository<TEnt, TEntId, TModel>
+    public abstract class BaseRepository<TEnt, TEntId, TModel, TDbContext> : IRepository<TEnt, TEntId, TModel>
         where TEnt : BaseEntity<TEntId, TModel>
         where TModel : class
         where TDbContext : DbContext
@@ -68,15 +68,15 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             );
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetMany(params TEntId[] entityIds)
+        public virtual async Task<DbGetManyResult<TModel>> GetMany(IReadOnlyCollection<TEntId> entityIds, params string[] relations)
         {
-            if (entityIds.Length > 1)
+            if (entityIds.Count < 1)
             {
                 return new DbGetManyResult<TModel>();
             }
 
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
-            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
 
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.Where(x => entityIds.Contains(x.Id!)).ToArrayAsync(),
@@ -113,7 +113,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         )
         {
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
-            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.FirstOrDefaultAsync(x => x.Id!.Equals(entityId)),
                 nameof(GetOne),
@@ -194,8 +194,13 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
+        public Task<DbSaveResult<TModel>> Create(TModel entObj) => Create([entObj]);
         public virtual async Task<DbDeleteResult<TModel>> Delete(IReadOnlyCollection<TModel> entObj)
         {
+            if (entObj.Count < 1)
+            {
+                return new DbDeleteResult<TModel>();
+            }
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
             var set = dbContext.Set<TEnt>();
             async Task<TModel?> Operation()
@@ -227,6 +232,8 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbDeleteResult<TEntId>(entIds);
         }
 
+        public Task<DbDeleteResult<TModel>> Delete(TModel entObj) => Delete([entObj]);
+
         public virtual async Task<DbSaveResult<TModel>> Update(IReadOnlyCollection<TModel> entObj)
         {
             if (entObj.Count < 1)
@@ -246,6 +253,8 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var runtimeObjs = set.Local.FastArraySelect(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
+
+        public Task<DbSaveResult<TModel>> Update(TModel entObj) => Update([entObj]);
 
         protected IQueryable<TEnt> AddRelationsToSet(
             IQueryable<TEnt> set,
