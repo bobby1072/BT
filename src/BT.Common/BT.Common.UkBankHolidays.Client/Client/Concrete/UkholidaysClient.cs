@@ -9,7 +9,7 @@ namespace BT.Common.UkHoliday.Client.Client.Concrete
         private const string UkHolidaysEndpoint = "https://www.gov.uk/bank-holidays.json";
         public async Task<UkHolidays> InvokeAsync()
         {
-            using var request = new HttpRequestMessage
+            var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(UkHolidaysEndpoint),
