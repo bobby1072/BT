@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Persistence.Share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Persistence.Npgsql", "BT.Common.Persistence.Npgsql\BT.Common.Persistence.Npgsql.csproj", "{A63CBF19-D979-4B86-A5A1-01BA0250B3A0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A65805A-D862-4113-9369-8E937FAF2DFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.HttpClient", "BT.Common.HttpClient\BT.Common.HttpClient.csproj", "{735566D8-A02D-49CA-99AC-18B9ADD05765}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,11 +67,19 @@ Global
 		{A63CBF19-D979-4B86-A5A1-01BA0250B3A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A63CBF19-D979-4B86-A5A1-01BA0250B3A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A63CBF19-D979-4B86-A5A1-01BA0250B3A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{735566D8-A02D-49CA-99AC-18B9ADD05765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{735566D8-A02D-49CA-99AC-18B9ADD05765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{735566D8-A02D-49CA-99AC-18B9ADD05765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{735566D8-A02D-49CA-99AC-18B9ADD05765}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {897634C1-E327-4527-9516-0484F3D0DC96}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3} = {7A65805A-D862-4113-9369-8E937FAF2DFB}
+		{E3B757A8-3ABF-4CE4-A9B5-E4D4936EC446} = {7A65805A-D862-4113-9369-8E937FAF2DFB}
 	EndGlobalSection
 EndGlobal

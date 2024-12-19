@@ -14,11 +14,11 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         where TModel : class
         where TDbContext : DbContext
     {
-        protected readonly IDbContextFactory<TDbContext> ContextFactory;
-        private readonly ILogger<BaseRepository<TEnt, TEntId, TModel, TDbContext>> _logger;
         protected static readonly Type EntityType = typeof(TEnt);
         protected static readonly IReadOnlyCollection<PropertyInfo> EntityProperties =
             EntityType.GetProperties();
+        protected readonly IDbContextFactory<TDbContext> ContextFactory;
+        private readonly ILogger<BaseRepository<TEnt, TEntId, TModel, TDbContext>> _logger;
 
         protected BaseRepository(
             IDbContextFactory<TDbContext> dbContextFactory,
@@ -194,7 +194,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
-        public Task<DbSaveResult<TModel>> Create(TModel entObj) => Create([entObj]);
+        public virtual Task<DbSaveResult<TModel>> Create(TModel entObj) => Create([entObj]);
         public virtual async Task<DbDeleteResult<TModel>> Delete(IReadOnlyCollection<TModel> entObj)
         {
             if (entObj.Count < 1)
@@ -232,7 +232,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbDeleteResult<TEntId>(entIds);
         }
 
-        public Task<DbDeleteResult<TModel>> Delete(TModel entObj) => Delete([entObj]);
+        public virtual Task<DbDeleteResult<TModel>> Delete(TModel entObj) => Delete([entObj]);
 
         public virtual async Task<DbSaveResult<TModel>> Update(IReadOnlyCollection<TModel> entObj)
         {
@@ -254,7 +254,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
-        public Task<DbSaveResult<TModel>> Update(TModel entObj) => Update([entObj]);
+        public virtual Task<DbSaveResult<TModel>> Update(TModel entObj) => Update([entObj]);
 
         protected IQueryable<TEnt> AddRelationsToSet(
             IQueryable<TEnt> set,
