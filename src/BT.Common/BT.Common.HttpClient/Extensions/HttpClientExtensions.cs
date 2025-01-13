@@ -1,4 +1,5 @@
-﻿using BT.Common.HttpClient.Models;
+﻿using BT.Common.Polly.Extensions;
+using BT.Common.Polly.Models.Abstract;
 
 namespace BT.Common.HttpClient.Extensions;
 
@@ -7,7 +8,7 @@ public static class HttpClientExtensions
     public static async Task<HttpResponseMessage> SendAsync(
         this System.Net.Http.HttpClient client,
         HttpRequestMessage request,
-        PollyRetrySettings retrySettings,
+        IPollyRetrySettings retrySettings,
         CancellationToken cancellationToken = default
     )
     {
