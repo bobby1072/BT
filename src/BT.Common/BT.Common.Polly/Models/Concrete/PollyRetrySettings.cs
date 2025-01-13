@@ -1,6 +1,8 @@
-﻿namespace BT.Common.HttpClient.Models;
+﻿using BT.Common.Polly.Models.Abstract;
 
-public record PollyRetrySettings
+namespace BT.Common.Polly.Models.Concrete;
+
+public record PollyRetrySettings : IPollyRetrySettings
 {
     public int? TimeoutInSeconds { get; init; }
     public int? TotalAttempts { get; init; }

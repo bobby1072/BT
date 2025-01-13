@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Polly.Core" Version="8.5.0" />
+      <ProjectReference Include="..\BT.Common.Polly\BT.Common.Polly.csproj" />
     </ItemGroup>
 
 </Project>
