@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Flurl.Http" Version="4.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\BT.Common.Polly\BT.Common.Polly.csproj" />
     </ItemGroup>
 

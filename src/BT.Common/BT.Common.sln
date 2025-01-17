@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.HttpClient", "BT.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Polly", "BT.Common.Polly\BT.Common.Polly.csproj", "{3BCB8C16-8BA3-4F30-AA32-4E890EEC7058}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Helpers.Tests", "BT.Common.Helpers.Tests\BT.Common.Helpers.Tests.csproj", "{9DF33ECC-CA9B-4404-AF4D-118B046D4365}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{3BCB8C16-8BA3-4F30-AA32-4E890EEC7058}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BCB8C16-8BA3-4F30-AA32-4E890EEC7058}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BCB8C16-8BA3-4F30-AA32-4E890EEC7058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DF33ECC-CA9B-4404-AF4D-118B046D4365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DF33ECC-CA9B-4404-AF4D-118B046D4365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DF33ECC-CA9B-4404-AF4D-118B046D4365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DF33ECC-CA9B-4404-AF4D-118B046D4365}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +90,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3} = {7A65805A-D862-4113-9369-8E937FAF2DFB}
 		{E3B757A8-3ABF-4CE4-A9B5-E4D4936EC446} = {7A65805A-D862-4113-9369-8E937FAF2DFB}
+		{9DF33ECC-CA9B-4404-AF4D-118B046D4365} = {7A65805A-D862-4113-9369-8E937FAF2DFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {897634C1-E327-4527-9516-0484F3D0DC96}
