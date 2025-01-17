@@ -4,7 +4,7 @@ using Flurl.Http;
 
 namespace BT.Common.HttpClient.Extensions;
 
-public static class FlurlRequestExtensions
+public static class FlurlExtensions
 {
     public static Task<TReturn> GetJsonAsync<TReturn>(this FlurlRequest request,
         IPollyRetrySettings pollyRetrySettings,
