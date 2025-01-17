@@ -6,13 +6,13 @@ namespace BT.Common.HttpClient.Extensions;
 
 public static class FlurlExtensions
 {
-    public static Task<TReturn> GetJsonAsync<TReturn>(this FlurlRequest request,
+    public static Task<TReturn> GetJsonAsync<TReturn>(this IFlurlRequest request,
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)
     {
         return RetryRequest(() => request.GetJsonAsync<TReturn>(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
     }
-    public static Task<IFlurlResponse> GetAsync<TReturn>(this FlurlRequest request,
+    public static Task<IFlurlResponse> GetAsync<TReturn>(this IFlurlRequest request,
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)
     {
