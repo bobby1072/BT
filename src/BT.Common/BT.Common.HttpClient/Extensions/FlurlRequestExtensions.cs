@@ -10,20 +10,17 @@ public static class FlurlRequestExtensions
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)
     {
-        return RetryRequest(() => request.GetJsonAsync<TReturn>(), pollyRetrySettings, cancellationToken);
-    }
-    public static Task<IFlurlResponse> PostJsonAsync<TBody>(this FlurlRequest request,
-        TBody requestBody,
-        IPollyRetrySettings pollyRetrySettings,
-        CancellationToken cancellationToken = default)
-    {
-        return RetryRequest<IFlurlResponse>(() => request.PostJsonAsync(requestBody, cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
+        return RetryRequest(() => request.GetJsonAsync<TReturn>(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
     }
     public static Task<IFlurlResponse> GetAsync<TReturn>(this FlurlRequest request,
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)
     {
-        return RetryRequest(() => request.GetAsync(), pollyRetrySettings, cancellationToken);
+        return RetryRequest(() => request.GetAsync(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
+    }
+    public static Task<TReturn> ReceiveJsonAsync<TReturn>(this Task<IFlurlResponse> response, IPollyRetrySettings pollyRetrySettings, CancellationToken cancellationToken = default)
+    {
+        return RetryRequest(response.ReceiveJson<TReturn>, pollyRetrySettings, cancellationToken);
     }
     private static async Task<TReturn> RetryRequest<TReturn>(this Func<Task<TReturn>> flurlRequest, IPollyRetrySettings retrySettings, CancellationToken cancellationToken = default)
     {
