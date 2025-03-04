@@ -17,13 +17,19 @@ public static class FlurlExtensions
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)
     {
-        return RetryRequest(() => request.GetJsonAsync<TReturn>(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
+        var originalRequest = pollyRetrySettings.TimeoutInSeconds is null ? request: request
+            .WithTimeout(TimeSpan.FromSeconds((double)pollyRetrySettings.TimeoutInSeconds!));
+
+        return RetryRequest(() => originalRequest.GetJsonAsync<TReturn>(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
     }
     public static Task<IFlurlResponse> GetAsync(this IFlurlRequest request,
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)
     {
-        return RetryRequest(() => request.GetAsync(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
+        var originalRequest = pollyRetrySettings.TimeoutInSeconds is null ? request : request
+            .WithTimeout(TimeSpan.FromSeconds((double)pollyRetrySettings.TimeoutInSeconds!));
+
+        return RetryRequest(() => originalRequest.GetAsync(cancellationToken: cancellationToken), pollyRetrySettings, cancellationToken);
     }
     public static Task<TReturn> ReceiveJsonAsync<TReturn>(this Task<IFlurlResponse> response, IPollyRetrySettings pollyRetrySettings, CancellationToken cancellationToken = default)
     {
