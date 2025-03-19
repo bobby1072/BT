@@ -1,7 +1,7 @@
 ﻿using BT.Common.Polly.Extensions;
 using BT.Common.Polly.Models.Abstract;
 
-namespace BT.Common.HttpClient.Extensions;
+namespace BT.Common.Http.Extensions;
 
 public static class HttpClientExtensions
 {

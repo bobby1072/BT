@@ -2,11 +2,21 @@ using BT.Common.Polly.Extensions;
 using BT.Common.Polly.Models.Abstract;
 using Flurl;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 
-namespace BT.Common.HttpClient.Extensions;
+namespace BT.Common.Http.Extensions;
 
 public static class FlurlExtensions
 {
+    public static IFlurlRequest WithSerializer(this Uri uri, ISerializer serializer)
+    {
+        return uri.WithSettings(x=> { x.JsonSerializer = serializer; });
+    }
+    public static IFlurlRequest WithSerializer(this IFlurlRequest uri, ISerializer serializer)
+    {
+        return uri.WithSettings(x=> { x.JsonSerializer = serializer; });
+    }
+    
     public static Task<TReturn> GetJsonAsync<TReturn>(this Url request,
         IPollyRetrySettings pollyRetrySettings,
         CancellationToken cancellationToken = default)

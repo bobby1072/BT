@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Persistence.Npgsq
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A65805A-D862-4113-9369-8E937FAF2DFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.HttpClient", "BT.Common.HttpClient\BT.Common.HttpClient.csproj", "{735566D8-A02D-49CA-99AC-18B9ADD05765}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Http", "BT.Common.Http\BT.Common.Http.csproj", "{735566D8-A02D-49CA-99AC-18B9ADD05765}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Polly", "BT.Common.Polly\BT.Common.Polly.csproj", "{3BCB8C16-8BA3-4F30-AA32-4E890EEC7058}"
 EndProject
