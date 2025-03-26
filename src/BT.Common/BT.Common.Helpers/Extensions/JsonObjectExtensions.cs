@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Npm.Renovator.Common.Extensions;
+namespace BT.Common.Helpers.Extensions;
 
 public static class JsonObjectExtensions
 {
@@ -17,7 +17,7 @@ public static class JsonObjectExtensions
 
             jsonObject[propertyName] = JsonNode.Parse(JsonSerializer.Serialize(property.GetValue(objectToUpdateWith), options), jsonNodeOptions);
         }
-            
+
         return jsonObject;
     }
 

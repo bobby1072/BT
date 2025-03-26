@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Npm.Renovator.Common.Helpers
+namespace BT.Common.Helpers
 {
     public static class ProcessHelper
     {
@@ -34,7 +34,7 @@ namespace Npm.Renovator.Common.Helpers
             int commandIndex = -1;
             string? prefixLine = null;
 
-            for (int i = 1; i < lines.Length; i++) 
+            for (int i = 1; i < lines.Length; i++)
             {
                 if (lines[i].Contains(commandToSplitOn))
                 {
@@ -50,7 +50,7 @@ namespace Npm.Renovator.Common.Helpers
             string result = "";
             for (int i = commandIndex + 1; i < lines.Length; i++)
             {
-                if (lines[i].Trim().EndsWith(">") || lines[i].Trim().EndsWith("$")) 
+                if (lines[i].Trim().EndsWith(">") || lines[i].Trim().EndsWith("$"))
                     break;
                 result += lines[i] + Environment.NewLine;
             }
