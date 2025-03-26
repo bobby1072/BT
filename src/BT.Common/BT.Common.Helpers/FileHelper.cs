@@ -1,4 +1,4 @@
-﻿namespace Npm.Renovator.Common.Helpers
+﻿namespace BT.Common.Helpers
 {
     public static class FileHelper
     {
