@@ -1,10 +1,24 @@
-﻿namespace BT.Common.Helpers.Extensions;
+﻿using System.Text.Json;
+
+namespace BT.Common.Helpers.Extensions;
 
 public static class DictionaryExtensions
 {
-    public static bool IsStringSequenceEqual(this Dictionary<string, string> dict, Dictionary<string, string> otherDict)
+    public static string? SerialiseToJson<TKey, TValue>(this Dictionary<TKey, TValue>? dictionary,
+        JsonSerializerOptions? options = null)
     {
-        if (dict.Count != otherDict.Count) return false;
+        return dictionary == null ? null : JsonSerializer.Serialize(dictionary, options);
+    }
+    
+    
+    public static bool IsStringSequenceEqual(this Dictionary<string, string>? dict, Dictionary<string, string>? otherDict)
+    {
+        if (dict == null || otherDict == null)
+        {
+            if(dict == null && otherDict == null) return true;
+            return false;
+        }
+        if (dict?.Count != otherDict?.Count) return false;
         foreach (var mainObj in dict)
         {
             if (!otherDict.TryGetValue(mainObj.Key, out var value)) return false;
