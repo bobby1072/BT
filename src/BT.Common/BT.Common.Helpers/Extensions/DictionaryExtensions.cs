@@ -5,7 +5,7 @@ namespace BT.Common.Helpers.Extensions;
 public static class DictionaryExtensions
 {
     public static string? SerialiseToJson<TKey, TValue>(this Dictionary<TKey, TValue>? dictionary,
-        JsonSerializerOptions? options = null)
+        JsonSerializerOptions? options = null) where TKey : notnull
     {
         return dictionary == null ? null : JsonSerializer.Serialize(dictionary, options);
     }
@@ -19,10 +19,10 @@ public static class DictionaryExtensions
             return false;
         }
         if (dict?.Count != otherDict?.Count) return false;
-        foreach (var mainObj in dict)
+        foreach (var mainObj in dict ?? [])
         {
-            if (!otherDict.TryGetValue(mainObj.Key, out var value)) return false;
-            if (!value.Equals(mainObj.Value)) return false;
+            if (otherDict?.TryGetValue(mainObj.Key, out var value) != true) return false;
+            if (value?.Equals(mainObj.Value) != true) return false;
         }
 
         return true;
