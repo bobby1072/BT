@@ -6,7 +6,7 @@ namespace BT.Common.Http.Extensions;
 public static class HttpClientExtensions
 {
     public static async Task<HttpResponseMessage> SendAsync(
-        this System.Net.Http.HttpClient client,
+        this HttpClient client,
         HttpRequestMessage request,
         IPollyRetrySettings retrySettings,
         CancellationToken cancellationToken = default
@@ -15,7 +15,7 @@ public static class HttpClientExtensions
         var pipeline = retrySettings.ToPipeline();
 
         return await pipeline.ExecuteAsync(async ct =>
-            await client.SendAsync(request, cancellationToken)
-        );
+            await client.SendAsync(request, ct)
+        ,cancellationToken);
     }
 }
