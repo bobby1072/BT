@@ -1,10 +1,24 @@
 using System.Net.Mail;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace BT.Common.Helpers.Extensions
 {
     public static partial class StringExtensions
     {
+        public static bool IsValidJson(this string json)
+        {
+            try
+            {
+                JsonDocument.Parse(json);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        
         public static string Join(this IEnumerable<string> values, string separator)
         {
             return string.Join(separator, values);
