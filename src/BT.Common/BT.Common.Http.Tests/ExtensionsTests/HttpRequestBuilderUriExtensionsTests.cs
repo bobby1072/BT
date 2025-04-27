@@ -1,4 +1,5 @@
 ﻿
+using System.Net;
 using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
 
@@ -6,7 +7,42 @@ namespace BT.Common.Http.Tests.ExtensionsTests;
 
 public class HttpRequestBuilderUriExtensionsTests
 {
-
+    [Fact]
+    public void String_WithAuthorizationHeader_Should_Add_Authorization_Header_Correctly()
+    {
+        //Arrange
+        var testBaseUrl = "http://localhost:5000";
+        
+        //Act
+        var requestBuilder = testBaseUrl.WithAuthorizationHeader("test");
+        
+        //Assert
+        Assert.Contains(requestBuilder.Headers, x => x.Key == HttpRequestHeader.Authorization.ToString() && x.Value == "test");
+    }
+    [Fact]
+    public void RequestBuilder_WithAuthorizationHeader_Should_Add_Authorization_Header_Correctly()
+    {
+        //Arrange
+        var testBaseUrl = "http://localhost:5000".ToUri().ToHttpRequestBuilder();
+        
+        //Act
+        var requestBuilder = testBaseUrl.WithAuthorizationHeader("test");
+        
+        //Assert
+        Assert.Contains(requestBuilder.Headers, x => x.Key == HttpRequestHeader.Authorization.ToString() && x.Value == "test");
+    }
+    [Fact]
+    public void Uri_WithAuthorizationHeader_Should_Add_Authorization_Header_Correctly()
+    {
+        //Arrange
+        var testBaseUrl = "http://localhost:5000".ToUri();
+        
+        //Act
+        var requestBuilder = testBaseUrl.WithAuthorizationHeader("test");
+        
+        //Assert
+        Assert.Contains(requestBuilder.Headers, x => x.Key == HttpRequestHeader.Authorization.ToString() && x.Value == "test");
+    }
     [Theory]
     [ClassData(typeof(HttpRequestBuilderUriExtensionsTests_Endpoints_Class_Data))]
     public void String_AppendPathSegment_Should_Build_Uris_Correctly(IReadOnlyCollection<string> splitPath,
@@ -14,15 +50,26 @@ public class HttpRequestBuilderUriExtensionsTests
     {
         var startingBaseUrlString = splitPath.First();
         HttpRequestBuilder? requestBuilder = null;
-        foreach (var segment in splitPath)
+        for (int i = 0; i < splitPath.Count; i++)
         {
-            if (startingBaseUrlString == segment)
+            var segment = splitPath.ElementAt(i);            
+            if (i == 0)
             {
-                requestBuilder = startingBaseUrlString.ToUri().ToHttpRequestBuilder();
                 continue;
             }
-            requestBuilder = requestBuilder?.AppendPathSegment(segment);
-            
+            else if (i == 1)
+            {
+                requestBuilder = startingBaseUrlString?.AppendPathSegment(segment);
+            }
+            else
+            {
+                requestBuilder = requestBuilder?.AppendPathSegment(segment);
+            }
+        }
+
+        if (requestBuilder == null)
+        {
+            requestBuilder = startingBaseUrlString?.ToUri().ToHttpRequestBuilder();
         }
         Assert.True(requestBuilder?.RequestUri.AbsoluteUri == expectedPath || requestBuilder?.RequestUri.AbsoluteUri == (expectedPath + "/"));
     }
@@ -33,24 +80,221 @@ public class HttpRequestBuilderUriExtensionsTests
     {
         var startingBaseUrlUri = new Uri(splitPath.First());
         HttpRequestBuilder? requestBuilder = null;
-        foreach (var segment in splitPath)
+        for (int i = 0; i < splitPath.Count; i++)
         {
-            if (startingBaseUrlUri.AbsoluteUri == segment || startingBaseUrlUri.AbsoluteUri == segment + "/")
+            var segment = splitPath.ElementAt(i);            
+            if (i == 0)
             {
-                requestBuilder = startingBaseUrlUri.ToHttpRequestBuilder();
                 continue;
+            }else if (i == 1)
+            {
+                requestBuilder = startingBaseUrlUri?.AppendPathSegment(segment);
             }
-            requestBuilder = requestBuilder?.AppendPathSegment(segment);
+            else
+            {
+                requestBuilder = requestBuilder?.AppendPathSegment(segment);
+            }
         }
-        if (!(requestBuilder?.RequestUri.AbsoluteUri == expectedPath ||
-             requestBuilder?.RequestUri.AbsoluteUri == (expectedPath + "/")))
+        if (requestBuilder == null)
         {
-            Console.WriteLine(requestBuilder?.RequestUri.AbsoluteUri + " != " + requestBuilder?.RequestUri.AbsoluteUri);
+            requestBuilder = startingBaseUrlUri?.ToHttpRequestBuilder();
         }
         Assert.True(requestBuilder?.RequestUri.AbsoluteUri == expectedPath || requestBuilder?.RequestUri.AbsoluteUri == (expectedPath + "/"));
     }
-    
-    private class HttpRequestBuilderUriExtensionsTests_Endpoints_Class_Data : TheoryData<IReadOnlyCollection<string>, string>
+
+    [Theory]
+    [ClassData(typeof(HttpRequestBuilderUriExtensionsTests_Headers_Class_Data))]
+    public void String_WithHeader_Should_Add_Headers_Correctly(IReadOnlyCollection<KeyValuePair<string, string>> headersToAdd,
+        Dictionary<string, string> expectedHeaders)
+    {
+        //Arrange
+        var testBaseUrl = "http://localhost:5000";
+        HttpRequestBuilder? requestBuilder = null;
+        
+        //Act
+        for (int i = 0; i < headersToAdd.Count; i++)
+        {
+            var header = headersToAdd.ElementAt(i);
+            if (i == 0)
+            {
+                requestBuilder = testBaseUrl.WithHeader(header.Key, header.Value);
+                continue;
+            } 
+            requestBuilder = requestBuilder?.WithHeader(header.Key, header.Value);
+        }     
+        //Assert
+        Assert.Equal(expectedHeaders, requestBuilder?.Headers ?? []);
+    }
+    [Theory]
+    [ClassData(typeof(HttpRequestBuilderUriExtensionsTests_Headers_Class_Data))]
+    public void Uri_WithHeader_Should_Add_Headers_Correctly(IReadOnlyCollection<KeyValuePair<string, string>> headersToAdd,
+        Dictionary<string, string> expectedHeaders)
+    {
+        //Arrange
+        var testBaseUrl = "http://localhost:5000".ToUri();
+        HttpRequestBuilder? requestBuilder = null;
+        
+        //Act
+        for (int i = 0; i < headersToAdd.Count; i++)
+        {
+            var header = headersToAdd.ElementAt(i);
+            if (i == 0)
+            {
+                requestBuilder = testBaseUrl.WithHeader(header.Key, header.Value);
+                continue;
+            } 
+            requestBuilder = requestBuilder?.WithHeader(header.Key, header.Value);
+        }     
+        //Assert
+        Assert.Equal(expectedHeaders, requestBuilder?.Headers ?? []);
+    }
+    private sealed class HttpRequestBuilderUriExtensionsTests_Headers_Class_Data : TheoryData<IReadOnlyCollection<KeyValuePair<string, string>>,
+        Dictionary<string, string>>
+    {
+        public HttpRequestBuilderUriExtensionsTests_Headers_Class_Data()
+        {
+            Add(
+                new Dictionary<string, string> { { "Authorization", "Bearer token123" } },
+                new Dictionary<string, string> { { "Authorization", "Bearer token123" } }
+            );
+
+            Add(
+                new Dictionary<string, string>
+                {
+                    { "Authorization", "Bearer token123" },
+                    { "Accept", "application/json" }
+                },
+                new Dictionary<string, string>
+                {
+                    { "Authorization", "Bearer token123" },
+                    { "Accept", "application/json" }
+                }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "authorization", "Bearer token123" } },
+                new Dictionary<string, string> { { "authorization", "Bearer token123" } }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "X-Empty-Header", "" } },
+                new Dictionary<string, string> { { "X-Empty-Header", "" } }
+            );
+
+            Add(
+                new Dictionary<string, string>
+                {
+                    { "Header1", "Value1" },
+                    { "Header2", "" }
+                },
+                new Dictionary<string, string>
+                {
+                    { "Header1", "Value1" },
+                    { "Header2", "" }
+                }
+            );
+
+            Add(
+                new Dictionary<string, string> { { " X-Whitespace ", "  Some Value  " } },
+                new Dictionary<string, string> { { " X-Whitespace ", "  Some Value  " } }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "X-Null-Header", null! } },
+                new Dictionary<string, string> { { "X-Null-Header", null! } }
+            );
+
+            Add(
+                new Dictionary<string, string>(),
+                new Dictionary<string, string>()
+            );
+
+            Add(
+                new Dictionary<string, string>
+                {
+                    { "X-Special-Header", "✓ à la mode" },
+                    { "Emoji-Header", "🔥" }
+                },
+                new Dictionary<string, string>
+                {
+                    { "X-Special-Header", "✓ à la mode" },
+                    { "Emoji-Header", "🔥" }
+                }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "X-Number", "1234567890" } },
+                new Dictionary<string, string> { { "X-Number", "1234567890" } }
+            );
+
+            Add(
+                new List<KeyValuePair<string, string>>
+                {
+                    new ("Authorization", "OldToken"),
+                    new ("Authorization", "NewToken"),
+                },
+                new Dictionary<string, string>
+                {
+                    { "Authorization", "NewToken" }
+                }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "Path", "/api/v1/" } },
+                new Dictionary<string, string> { { "Path", "/api/v1/" } }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "X-Custom_@-Header", "SomeValue" } },
+                new Dictionary<string, string> { { "X-Custom_@-Header", "SomeValue" } }
+            );
+
+            Add(
+                new Dictionary<string, string>
+                {
+                    { "Accept-Language", "en-US,en;q=0.5" },
+                    { "Content-Type", "application/json" },
+                    { "X-Empty", "" },
+                    { "Emoji", "😎" }
+                },
+                new Dictionary<string, string>
+                {
+                    { "Accept-Language", "en-US,en;q=0.5" },
+                    { "Content-Type", "application/json" },
+                    { "X-Empty", "" },
+                    { "Emoji", "😎" }
+                }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "X-Long-Header", new string('a', 1000) } },
+                new Dictionary<string, string> { { "X-Long-Header", new string('a', 1000) } }
+            );
+
+            Add(
+                new Dictionary<string, string> { { "X-Null-String", "null" } },
+                new Dictionary<string, string> { { "X-Null-String", "null" } }
+            );
+
+            Add(
+                new Dictionary<string, string> { { " ", "WhitespaceKey" } },
+                new Dictionary<string, string> { { " ", "WhitespaceKey" } }
+            );
+
+            Add(
+                new List<KeyValuePair<string, string>>
+                {
+                    new ("Duplicate", "firstvalue"),
+                    new ("Duplicate", "SecondValue"),
+                },
+                new Dictionary<string, string>
+                {
+                    { "Duplicate", "SecondValue" }
+                }
+            );
+        }
+    }
+    private sealed class HttpRequestBuilderUriExtensionsTests_Endpoints_Class_Data : TheoryData<IReadOnlyCollection<string>, string>
     {
         public HttpRequestBuilderUriExtensionsTests_Endpoints_Class_Data()
         {
