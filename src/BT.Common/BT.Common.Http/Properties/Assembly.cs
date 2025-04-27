@@ -1,6 +1,5 @@
-﻿namespace BT.Common.Http.Properties;
+﻿
 
-public class Assembly
-{
-    
-}
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("BT.Common.Http.Tests")]
