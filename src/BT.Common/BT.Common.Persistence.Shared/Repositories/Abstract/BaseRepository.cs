@@ -57,7 +57,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOne = await TimeAndLogDbOperation(
                 () =>
                     foundOneQuerySet
-                        .Where(x => EF.Property<T>(x, propertyName).Equals(value))
+                        .Where(x => EF.Property<T>(x, propertyName)!.Equals(value))
                         .ToArrayAsync(),
                 nameof(GetMany),
                 EntityType.Name
@@ -146,7 +146,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
             var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
             var foundOne = await TimeAndLogDbOperation(
-                () => foundOneQuerySet.AnyAsync(x => EF.Property<T>(x, propertyName).Equals(value)),
+                () => foundOneQuerySet.AnyAsync(x => EF.Property<T>(x, propertyName)!.Equals(value)),
                 nameof(Exists),
                 EntityType.Name
             );
@@ -166,7 +166,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOne = await TimeAndLogDbOperation(
                 () =>
                     foundOneQuerySet.FirstOrDefaultAsync(x =>
-                        EF.Property<T>(x, propertyName).Equals(value)
+                        EF.Property<T>(x, propertyName)!.Equals(value)
                     ),
                 nameof(GetOne),
                 EntityType.Name
@@ -294,7 +294,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 }
                 await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
                 throw;
