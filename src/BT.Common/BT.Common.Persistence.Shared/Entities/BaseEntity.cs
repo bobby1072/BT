@@ -5,8 +5,10 @@ namespace BT.Common.Persistence.Shared.Entities
     public abstract record BaseEntity<TId, TRuntime>
         where TRuntime : class
     {
+        #nullable disable
         [Key]
         public virtual TId Id { get; set; }
+        #nullable enable
         public abstract TRuntime ToModel();
     }
 }
