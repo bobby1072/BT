@@ -50,17 +50,17 @@ public static partial class HttpRequestBuilderExtensions
     }
     public static HttpRequestBuilder AppendPathSegment(this string baseUrl, string path)
     {
-        return new HttpRequestBuilder(new Uri(baseUrl.TrimPath() + "/" + path.TrimPath())); 
+        return new HttpRequestBuilder(new Uri((baseUrl.TrimPath() + "/" + path.TrimPath()).TrimPath())); 
     }
     
     public static HttpRequestBuilder AppendPathSegment(this Uri baseUrl, string path)
     {
-        return new HttpRequestBuilder(new Uri(baseUrl.AbsoluteUri.TrimPath() + "/" + path.TrimPath()));
+        return new HttpRequestBuilder(new Uri((baseUrl.AbsoluteUri.TrimPath() + "/" + path.TrimPath()).TrimPath()));
     }
 
     public static HttpRequestBuilder AppendPathSegment(this HttpRequestBuilder requestBuilder, string path)
     {
-        requestBuilder.RequestUri = new Uri(requestBuilder.RequestUri.AbsoluteUri.TrimPath() + "/" + path.TrimPath());
+        requestBuilder.RequestUri = new Uri((requestBuilder.RequestUri.AbsoluteUri.TrimPath() + "/" + path.TrimPath()).TrimPath());
 
         return requestBuilder;
     }
@@ -75,6 +75,6 @@ public static partial class HttpRequestBuilderExtensions
     }
     private static string TrimPath(this string pathSegment)
     {
-        return pathSegment.Trim().Trim('/');
+        return pathSegment.Trim().Trim('/').Trim('\\');
     }
 }
