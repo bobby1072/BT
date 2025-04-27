@@ -20,6 +20,12 @@ public static partial class HttpRequestBuilderExtensions
         
         return requestBuilder.SendAndDeserializeJson<T>(httpClient, jsonSerializerOptions,  cancellationToken);
     }
+    public static Task<string> GetStringAsync(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default)
+    {
+        requestBuilder.HttpMethod = HttpMethod.Get;
+        
+        return requestBuilder.SendAndReadString(httpClient, cancellationToken);
+    }
     public static Task<T> PostJsonAsync<T>(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default) where T : notnull
     {
         requestBuilder.HttpMethod = HttpMethod.Post;
@@ -32,6 +38,12 @@ public static partial class HttpRequestBuilderExtensions
         
         return requestBuilder.SendAndDeserializeJson<T>(httpClient, jsonSerializerOptions,  cancellationToken);
     }
+    public static Task<string> PostStringAsync(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default)
+    {
+        requestBuilder.HttpMethod = HttpMethod.Post;
+
+        return requestBuilder.SendAndReadString(httpClient, cancellationToken);
+    }
     
     
     
@@ -40,17 +52,60 @@ public static partial class HttpRequestBuilderExtensions
         JsonSerializerOptions? jsonSerializerOptions = null,
         CancellationToken cancellationToken = default) where T : notnull
     {
-        var httpReqMessage = requestBuilder.ToHttpRequestMessage();
-        
-        using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
-        
-        httpResponse.EnsureSuccessStatusCode();
-        
-        var deserializedResponse = 
-            await httpResponse.Content.ReadFromJsonAsync<T>(cancellationToken)
-            ?? throw new JsonException($"Failed to deserialize http response content to type of {typeof(T).Name}.");
-        
-        return deserializedResponse;  
+        try
+        {
+            using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
+            
+            using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
+            
+            httpResponse.EnsureSuccessStatusCode();
+            
+            var deserializedResponse = 
+                await httpResponse.Content.ReadFromJsonAsync<T>(jsonSerializerOptions, cancellationToken);
+
+            if (deserializedResponse is null)
+            {
+                var jsonException =
+                    new JsonException($"Failed to deserialize http response content to type of {typeof(T).Name}.");
+                throw new HttpRequestException(jsonException.Message, jsonException);
+            }
+            
+            return deserializedResponse;  
+        }
+        catch (HttpRequestBuilderException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new HttpRequestException(ex.Message, ex);
+        }
+    } 
+    private static async Task<string> SendAndReadString(this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
+            using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
+
+            httpResponse.EnsureSuccessStatusCode();
+
+            var deserializedResponse =
+                await httpResponse.Content.ReadAsStringAsync(cancellationToken)
+                ?? throw new HttpRequestException("Failed to read http response content");
+
+            return deserializedResponse;
+        }
+        catch (HttpRequestBuilderException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new HttpRequestException(ex.Message, ex);
+        }
     } 
     private static HttpRequestMessage ToHttpRequestMessage(this HttpRequestBuilder requestBuilder)
     {
