@@ -5,7 +5,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 
-namespace AiTrainer.Web.TestBase.Helpers;
+namespace BT.Common.Http.Tests.TestHelpers;
 
 public class StaticJsonHandler<T> : HttpMessageHandler where T: class
 {

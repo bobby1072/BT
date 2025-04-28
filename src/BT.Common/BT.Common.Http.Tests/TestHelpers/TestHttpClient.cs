@@ -1,4 +1,4 @@
-﻿namespace AiTrainer.Web.TestBase;
+﻿namespace BT.Common.Http.Tests.TestHelpers;
 
 public class TestHttpClient: HttpClient
 {
