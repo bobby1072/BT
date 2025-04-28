@@ -35,6 +35,7 @@ public class HttpRequestBuilderExtensionsTests
         Assert.NotNull(result);
         Assert.Equal(expected.Name, result.Name);
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
 
     [Fact]
@@ -55,6 +56,7 @@ public class HttpRequestBuilderExtensionsTests
         Assert.NotNull(result);
         Assert.Equal(expected.Name, result.Name);
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Post);
     }
 
     [Fact]
@@ -70,6 +72,7 @@ public class HttpRequestBuilderExtensionsTests
         // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.GetJsonAsync<TestDto>(client));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
 
     [Fact]
@@ -89,25 +92,54 @@ public class HttpRequestBuilderExtensionsTests
         Assert.NotNull(result);
         Assert.False(string.IsNullOrEmpty(result));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
-
     [Fact]
-    public async Task ShouldCaptureHeadersCorrectly()
+    public async Task PostJsonAsync_ShouldThrow_OnFailedHttpStatus()
     {
         // Arrange
-        var expected = new TestDto { Name = "Header Test" };
-        var handler = new StaticJsonHandler<TestDto>(expected, HttpStatusCode.OK);
+        var expected = new TestDto { Name = "Broken Post" };
+        var handler = new StaticJsonHandler<TestDto>(expected, HttpStatusCode.BadRequest);
         var client = new TestHttpClient(handler);
 
         var requestBuilder = CreateValidRequestBuilder();
-        requestBuilder.Headers.Add("X-Test-Header", "TestValue");
+        requestBuilder.HttpMethod = HttpMethod.Post;
 
-        // Act
-        var result = await requestBuilder.GetJsonAsync<TestDto>(client);
-
-        // Assert
-        Assert.NotNull(result);
-        client.ShouldHaveUsedHeader("X-Test-Header", "TestValue");
+        // Act & Assert
+        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.PostJsonAsync<TestDto>(client));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Post);
+    }
+
+    [Fact]
+    public async Task PostJsonAsync_ShouldThrow_OnDeserializationFailure()
+    {
+        // Arrange
+        var handler = new StaticJsonHandler<string>("invalid json for TestDto", HttpStatusCode.OK);
+        var client = new TestHttpClient(handler);
+
+        var requestBuilder = CreateValidRequestBuilder();
+        requestBuilder.HttpMethod = HttpMethod.Post;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.PostJsonAsync<TestDto>(client));
+        client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Post);
+    }
+    
+    [Fact]
+    public async Task PostStringAsync_ShouldThrow_OnFailedHttpStatus()
+    {
+        // Arrange
+        var handler = new StaticJsonHandler<string>("Error Content", HttpStatusCode.InternalServerError);
+        var client = new TestHttpClient(handler);
+
+        var requestBuilder = CreateValidRequestBuilder();
+        requestBuilder.HttpMethod = HttpMethod.Post;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.PostStringAsync(client));
+        client.ShouldHaveCalledExpectedUrl("https://example.com/");
+        client.ShouldHaveUsedMethod(HttpMethod.Post);
     }
 }
