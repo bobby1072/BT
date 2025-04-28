@@ -1,8 +1,7 @@
 using System.Net;
-using AiTrainer.Web.TestBase;
-using AiTrainer.Web.TestBase.Helpers;
 using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
+using BT.Common.Http.Tests.TestHelpers;
 
 namespace BT.Common.Http.Tests.ExtensionsTests;
 
