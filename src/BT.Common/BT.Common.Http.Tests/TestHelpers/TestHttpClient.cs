@@ -2,18 +2,13 @@
 
 public class TestHttpClient: HttpClient
 {
-    private readonly string _expectedUrl;
     private string? _actualUri;
-    private Dictionary<string, string> _headersCalled = [];
-    
-    public TestHttpClient(HttpMessageHandler handler, string expectedUrl) : base(handler)
+    private readonly Dictionary<string, string> _headersCalled = [];
+    private HttpMethod? _methodUsed;
+    public TestHttpClient(HttpMessageHandler handler) : base(handler) { }
+    public void ShouldHaveCalledExpectedUrl(string expectedUrl)
     {
-        _expectedUrl = expectedUrl;
-    }
-
-    public void ShouldHaveCalledExpectedUrl()
-    {
-        Assert.Equal(_expectedUrl, _actualUri);
+        Assert.Equal(expectedUrl, _actualUri);
     }
 
     public void ShouldHaveUsedHeader(string headerName, string headerValue)
@@ -21,9 +16,14 @@ public class TestHttpClient: HttpClient
         Assert.Contains(_headersCalled, h => h.Key == headerName && h.Value == headerValue);
     }
 
+    public void ShouldHaveUsedMethod(HttpMethod method)
+    {
+        Assert.Equal(_methodUsed, method);
+    }
     public override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         _actualUri = request.RequestUri?.ToString();
+        _methodUsed = request.Method;
         foreach (var header in request.Headers)
         {
             _headersCalled.Add(header.Key, header.Value.FirstOrDefault() ?? string.Empty);
