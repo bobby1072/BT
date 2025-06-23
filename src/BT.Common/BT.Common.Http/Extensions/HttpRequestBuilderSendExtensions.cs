@@ -8,69 +8,111 @@ namespace BT.Common.Http.Extensions;
 
 public static partial class HttpRequestBuilderExtensions
 {
-    public static Task<T> GetJsonAsync<T>(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default) where T : notnull
+    public static Task<T> GetJsonAsync<T>(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
     {
         requestBuilder.HttpMethod = HttpMethod.Get;
-        
-        return requestBuilder.SendAndDeserializeJson<T>(httpClient, null,  cancellationToken);
+
+        return requestBuilder.SendAndDeserializeJson<T>(httpClient, null, cancellationToken);
     }
-    public static Task<T> GetJsonAsync<T>(this HttpRequestBuilder requestBuilder, HttpClient httpClient, JsonSerializerOptions jsonSerializerOptions, CancellationToken cancellationToken = default) where T : notnull
+
+    public static Task<T> GetJsonAsync<T>(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        JsonSerializerOptions jsonSerializerOptions,
+        CancellationToken cancellationToken = default
+    )
     {
         requestBuilder.HttpMethod = HttpMethod.Get;
-        
-        return requestBuilder.SendAndDeserializeJson<T>(httpClient, jsonSerializerOptions,  cancellationToken);
+
+        return requestBuilder.SendAndDeserializeJson<T>(
+            httpClient,
+            jsonSerializerOptions,
+            cancellationToken
+        );
     }
-    public static Task<string> GetStringAsync(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default)
+
+    public static Task<string> GetStringAsync(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
     {
         requestBuilder.HttpMethod = HttpMethod.Get;
-        
+
         return requestBuilder.SendAndReadString(httpClient, cancellationToken);
     }
-    public static Task<T> PostJsonAsync<T>(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default) where T : notnull
+
+    public static Task<T> PostJsonAsync<T>(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
     {
         requestBuilder.HttpMethod = HttpMethod.Post;
-        
-        return requestBuilder.SendAndDeserializeJson<T>(httpClient, null,  cancellationToken);
+
+        return requestBuilder.SendAndDeserializeJson<T>(httpClient, null, cancellationToken);
     }
-    public static Task<T> PostJsonAsync<T>(this HttpRequestBuilder requestBuilder, HttpClient httpClient, JsonSerializerOptions jsonSerializerOptions, CancellationToken cancellationToken = default) where T : notnull
+
+    public static Task<T> PostJsonAsync<T>(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        JsonSerializerOptions jsonSerializerOptions,
+        CancellationToken cancellationToken = default
+    )
     {
         requestBuilder.HttpMethod = HttpMethod.Post;
-        
-        return requestBuilder.SendAndDeserializeJson<T>(httpClient, jsonSerializerOptions,  cancellationToken);
+
+        return requestBuilder.SendAndDeserializeJson<T>(
+            httpClient,
+            jsonSerializerOptions,
+            cancellationToken
+        );
     }
-    public static Task<string> PostStringAsync(this HttpRequestBuilder requestBuilder, HttpClient httpClient, CancellationToken cancellationToken = default)
+
+    public static Task<string> PostStringAsync(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
     {
         requestBuilder.HttpMethod = HttpMethod.Post;
 
         return requestBuilder.SendAndReadString(httpClient, cancellationToken);
     }
-    
-    
-    
-    private static async Task<T> SendAndDeserializeJson<T>(this HttpRequestBuilder requestBuilder,
+
+    private static async Task<T> SendAndDeserializeJson<T>(
+        this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
         JsonSerializerOptions? jsonSerializerOptions = null,
-        CancellationToken cancellationToken = default) where T : notnull
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
             using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
-            
+
             using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
-            
+
             httpResponse.EnsureSuccessStatusCode();
-            
-            var deserializedResponse = 
-                await httpResponse.Content.ReadFromJsonAsync<T>(jsonSerializerOptions, cancellationToken);
+
+            var deserializedResponse = await httpResponse.Content.ReadFromJsonAsync<T>(
+                jsonSerializerOptions,
+                cancellationToken
+            );
 
             if (deserializedResponse is null)
             {
-                var jsonException =
-                    new JsonException($"Failed to deserialize http response content to type of {typeof(T).Name}.");
+                var jsonException = new JsonException(
+                    $"Failed to deserialize http response content to type of {typeof(T).Name}."
+                );
                 throw new HttpRequestException(jsonException.Message, jsonException);
             }
-            
-            return deserializedResponse;  
+
+            return deserializedResponse;
         }
         catch (HttpRequestBuilderException)
         {
@@ -80,10 +122,13 @@ public static partial class HttpRequestBuilderExtensions
         {
             throw new HttpRequestException(ex.Message, ex);
         }
-    } 
-    private static async Task<string> SendAndReadString(this HttpRequestBuilder requestBuilder,
+    }
+
+    private static async Task<string> SendAndReadString(
+        this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -106,7 +151,8 @@ public static partial class HttpRequestBuilderExtensions
         {
             throw new HttpRequestException(ex.Message, ex);
         }
-    } 
+    }
+
     private static HttpRequestMessage ToHttpRequestMessage(this HttpRequestBuilder requestBuilder)
     {
         if (!requestBuilder.IsValidRequest())
@@ -119,8 +165,11 @@ public static partial class HttpRequestBuilderExtensions
             }
             throw new HttpRequestBuilderException(sb.ToString().Trim());
         }
-        
-        var httpRequestMessage = new HttpRequestMessage(requestBuilder.HttpMethod!, requestBuilder.RequestUri);
+
+        var httpRequestMessage = new HttpRequestMessage(
+            requestBuilder.HttpMethod!,
+            requestBuilder.RequestUri
+        );
 
         if (requestBuilder.Content is not null)
         {
@@ -131,7 +180,7 @@ public static partial class HttpRequestBuilderExtensions
         {
             httpRequestMessage.Headers.Add(header.Key, header.Value);
         }
-        
+
         return httpRequestMessage;
     }
 }
