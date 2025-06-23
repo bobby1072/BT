@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace BT.Common.FastArray.Proto
 {
     public static partial class FastArray
