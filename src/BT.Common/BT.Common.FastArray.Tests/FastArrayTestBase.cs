@@ -220,10 +220,34 @@ namespace BT.Common.FastArray.Tests
         }
         protected static void FunctionalityTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<T>> actualFunc, Func<IEnumerable<T>, IEnumerable<T>> yourFunc)
         {
-            var expected = actualFunc.Invoke(arrayData);
-            var yourResult = yourFunc.Invoke(arrayData);
+            Exception? expectedEx = null;
+            Exception? yourEx = null;
+            IEnumerable<T> expected = [];
+            IEnumerable<T> yourResult = [];
+            try
+            {
+                expected = actualFunc.Invoke(arrayData);
+            }
+            catch (Exception e)
+            {
+                expectedEx = e;
+            }
+            try
+            {
+                yourResult = yourFunc.Invoke(arrayData);
+            }
+            catch (Exception e)
+            {
+                yourEx = e;
+            }
 
-
+            if (expectedEx != null || yourEx != null)
+            {
+                Assert.Equal(expectedEx, expectedEx);
+                return;
+            }
+            
+            
             expected.Count().Should().Be(yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
