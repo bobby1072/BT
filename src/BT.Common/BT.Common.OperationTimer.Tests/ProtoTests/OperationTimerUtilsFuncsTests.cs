@@ -1,7 +1,6 @@
 using BT.Common.OperationTimer.Proto;
 using BT.Common.UkHoliday.Client.Client.Concrete;
 using BT.Common.UkHoliday.Client.Models;
-using FluentAssertions;
 using System.Globalization;
 
 namespace BT.Common.OperationTimer.Tests.ProtoTests
@@ -19,10 +18,10 @@ namespace BT.Common.OperationTimer.Tests.ProtoTests
             var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(_ukHolidaysClient.InvokeAsync);
 
 
-            timeTaken.Should().BePositive();
+            Assert.InRange(timeTaken.Nanoseconds, 0, timeTaken.Nanoseconds + 1);
 
-            result.Should().NotBeNull();
-            result.Should().BeOfType<UkHolidays>();
+            Assert.NotNull(result);
+            Assert.IsType<UkHolidays>(result);
         }
         [Fact]
         public void TimeWithResult_Should_Return_TimeSpan_And_Result_For_Real_Request()
@@ -30,10 +29,10 @@ namespace BT.Common.OperationTimer.Tests.ProtoTests
             var (timeTaken, result) = OperationTimerUtils.TimeWithResults(_ukHolidaysClient.InvokeAsync);
 
 
-            timeTaken.Should().BePositive();
+            Assert.InRange(timeTaken.Nanoseconds, 0, timeTaken.Nanoseconds + 1);
 
-            result.Should().NotBeNull();
-            result.Should().BeOfType<UkHolidays>();
+            Assert.NotNull(result);
+            Assert.IsType<UkHolidays>(result);
         }
         [Theory]
         [InlineData("2018-01-01")]
@@ -49,10 +48,10 @@ namespace BT.Common.OperationTimer.Tests.ProtoTests
             var parsedDate = DateOnly.Parse(date, new CultureInfo("en-US"));
             var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(() => Task.FromResult(holidayData.EnglandAndWales.Events.FirstOrDefault(x => x.Date == parsedDate)));
 
-            timeTaken.Should().BePositive();
+            Assert.InRange(timeTaken.Nanoseconds, 0, timeTaken.Nanoseconds + 1);
 
-            result.Should().NotBeNull();
-            result.Should().BeOfType<HolidayEvent>();
+            Assert.NotNull(result);
+            Assert.IsType<HolidayEvent>(result);
         }
         [Theory]
         [InlineData("2018-01-01")]
@@ -67,11 +66,11 @@ namespace BT.Common.OperationTimer.Tests.ProtoTests
             var holidayData = await GetUkHolidaysFromJson();
             var parsedDate = DateOnly.Parse(date, new CultureInfo("en-US"));
             var (timeTaken, result) = OperationTimerUtils.TimeWithResults(() => holidayData.EnglandAndWales.Events.FirstOrDefault(x => x.Date == parsedDate));
+            
+            Assert.InRange(timeTaken.Nanoseconds, 0, timeTaken.Nanoseconds + 1);
 
-            timeTaken.Should().BePositive();
-
-            result.Should().NotBeNull();
-            result.Should().BeOfType<HolidayEvent>();
+            Assert.NotNull(result);
+            Assert.IsType<HolidayEvent>(result);
         }
     }
 }
