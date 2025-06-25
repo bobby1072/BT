@@ -1,6 +1,5 @@
 ﻿using BT.Common.FastArray.Tests.TestModels;
 using BT.Common.OperationTimer.Proto;
-using FluentAssertions;
 
 namespace BT.Common.FastArray.Tests
 {
@@ -220,15 +219,38 @@ namespace BT.Common.FastArray.Tests
         }
         protected static void FunctionalityTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<T>> actualFunc, Func<IEnumerable<T>, IEnumerable<T>> yourFunc)
         {
-            var expected = actualFunc.Invoke(arrayData);
-            var yourResult = yourFunc.Invoke(arrayData);
+            Exception? expectedEx = null;
+            Exception? yourEx = null;
+            IEnumerable<T> expected = [];
+            IEnumerable<T> yourResult = [];
+            try
+            {
+                expected = actualFunc.Invoke(arrayData);
+            }
+            catch (Exception e)
+            {
+                expectedEx = e;
+            }
+            try
+            {
+                yourResult = yourFunc.Invoke(arrayData);
+            }
+            catch (Exception e)
+            {
+                yourEx = e;
+            }
 
-
-            expected.Count().Should().Be(yourResult.Count());
+            if (expectedEx != null || yourEx != null)
+            {
+                Assert.Equal(expectedEx, expectedEx);
+                return;
+            }
+            
+            Assert.Equal(expected.Count(), yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
-                yourResult.ElementAt(i)?.Should().BeAssignableTo(expected.ElementAt(i)?.GetType());
-                yourResult.ElementAt(i)?.Should().Be(expected.ElementAt(i));
+                Assert.Equal(expected.ElementAt(i)?.GetType(), yourResult.ElementAt(i)?.GetType());
+                Assert.Equal(expected.ElementAt(i), yourResult.ElementAt(i));
             }
         }
         protected static async Task FunctionalityTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<Task<T>>> actualFunc, Func<IEnumerable<T>, IEnumerable<Task<T>>> yourFunc)
@@ -241,12 +263,11 @@ namespace BT.Common.FastArray.Tests
             var expected = await expectedJob;
             var yourResult = await yourResultJob;
 
-
-            expected.Count().Should().Be(yourResult.Count());
+            Assert.Equal(expected.Count(), yourResult.Count());
             for (int i = 0; i < expected.Count(); i++)
             {
-                yourResult.ElementAt(i)?.Should().BeAssignableTo(expected.ElementAt(i)?.GetType());
-                yourResult.ElementAt(i)?.Should().Be(expected.ElementAt(i));
+                Assert.Equal(expected.ElementAt(i)?.GetType(), yourResult.ElementAt(i)?.GetType());
+                Assert.Equal(expected.ElementAt(i), yourResult.ElementAt(i));
             }
         }
         protected static void PerformanceTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<T>> actualFunc, Func<IEnumerable<T>, IEnumerable<T>> yourFunc)
@@ -254,7 +275,7 @@ namespace BT.Common.FastArray.Tests
             var actualTime = OperationTimerUtils.Time(actualFunc, arrayData);
             var yourTime = OperationTimerUtils.Time(yourFunc, arrayData);
 
-            yourTime.Should().BeLessThanOrEqualTo(actualTime);
+            Assert.InRange(yourTime.Nanoseconds, 0, actualTime.Nanoseconds);
         }
 
         private static async Task<IEnumerable<T>> ResolveAsyncListItems<T>(IEnumerable<Task<T>> data)
