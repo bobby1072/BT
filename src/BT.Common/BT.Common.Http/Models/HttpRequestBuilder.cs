@@ -1,4 +1,6 @@
-﻿using BT.Common.Http.Validators;
+﻿using System.Text;
+using BT.Common.Http.Exceptions;
+using BT.Common.Http.Validators;
 using FluentValidation.Results;
 
 namespace BT.Common.Http.Models;
@@ -39,28 +41,6 @@ public sealed class HttpRequestBuilder
         }
     }
     internal Dictionary<string, string> Headers { get; init; } = [];
-
-    internal void AddHeader(string name, string value)
-    {
-        PropertiesHaveChangedSinceLastValidation = true;
-        Headers[name] = value;
-    }
-    
-    internal bool IsValidRequest()
-    {
-        return ValidationResult.IsValid;
-    }
-
-    internal IReadOnlyCollection<string> GetRequestValidationErrors()
-    {
-        return ValidationResult.Errors.Select(x => x.ErrorMessage).ToArray();
-    }
-
-    internal HttpRequestBuilder(Uri requestUri)
-    {
-        RequestUri = requestUri;
-    }
-    
     private bool PropertiesHaveChangedSinceLastValidation { get; set; } = false;
     private ValidationResult? _currentValidationResult;
     private ValidationResult ValidationResult
@@ -77,5 +57,73 @@ public sealed class HttpRequestBuilder
                 return _currentValidationResult;
             }
         }
+    }
+
+    private Dictionary<string, string> _queryParams = [];
+    internal HttpRequestBuilder(Uri requestUri)
+    {
+        RequestUri = requestUri;
+    }
+    internal HttpRequestMessage ToHttpRequestMessage()
+    {
+        if (!IsValidRequest())
+        {
+            var sb = new StringBuilder();
+
+            foreach (var error in GetRequestValidationErrors())
+            {
+                sb.AppendLine($"{error} ");
+            }
+            throw new HttpRequestBuilderException(sb.ToString().Trim());
+        }
+
+        var httpRequestMessage = new HttpRequestMessage(
+            HttpMethod!,
+            GetFinalUrl()
+        );
+
+        if (Content is not null)
+        {
+            httpRequestMessage.Content = Content;
+        }
+
+        foreach (var header in Headers)
+        {
+            httpRequestMessage.Headers.Add(header.Key, header.Value);
+        }
+
+        return httpRequestMessage;
+    }
+    internal void AddQueryParameter(string key, string value)
+    {
+        PropertiesHaveChangedSinceLastValidation = true;
+        _queryParams.Add(key, value);
+    }
+    internal void AddHeader(string name, string value)
+    {
+        PropertiesHaveChangedSinceLastValidation = true;
+        Headers[name] = value;
+    }
+
+    internal Uri GetFinalUrl()
+    {
+        var uriBuilder = new UriBuilder(RequestUri);
+        var queryParams = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+        foreach (var kvp in _queryParams)
+        {
+            queryParams[kvp.Key] = kvp.Value;
+        }
+        uriBuilder.Query = queryParams.ToString();
+
+        return uriBuilder.Uri;
+    }
+    private bool IsValidRequest()
+    {
+        return ValidationResult.IsValid;
+    }
+
+    private string[] GetRequestValidationErrors()
+    {
+        return ValidationResult.Errors.Select(x => x.ErrorMessage).ToArray();
     }
 }

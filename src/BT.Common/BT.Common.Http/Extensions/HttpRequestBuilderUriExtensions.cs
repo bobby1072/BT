@@ -5,6 +5,32 @@ namespace BT.Common.Http.Extensions;
 
 public static partial class HttpRequestBuilderExtensions
 {
+    public static HttpRequestBuilder AppendQueryParameter(this string baseUri, string name,
+        string value)
+    {
+        var builder = new HttpRequestBuilder(new Uri(baseUri));
+        
+        builder.AddQueryParameter(name, value);
+        
+        return builder;
+    }    
+    public static HttpRequestBuilder AppendQueryParameter(this Uri baseUri, string name,
+        string value)
+    {
+        var builder = new HttpRequestBuilder(baseUri);
+        
+        builder.AddQueryParameter(name, value);
+        
+        return builder;
+    }    
+    public static HttpRequestBuilder AppendQueryParameter(this HttpRequestBuilder httpRequestBuilder, string name,
+        string value)
+    {
+        httpRequestBuilder.AddQueryParameter(name, value);
+        
+        return httpRequestBuilder;
+    }
+    
     public static HttpRequestBuilder WithAuthorizationHeader(this string baseUri, string value)
     {
         var reqBuilder = new HttpRequestBuilder(new Uri(baseUri));
@@ -65,13 +91,13 @@ public static partial class HttpRequestBuilderExtensions
         return requestBuilder;
     }
 
-    public static Uri ToUri(this string requestBuilder)
-    {
-        return new Uri(requestBuilder);
-    }
     public static HttpRequestBuilder ToHttpRequestBuilder(this Uri requestUri)
     {
         return new HttpRequestBuilder(requestUri);
+    }
+    internal static Uri ToUri(this string requestBuilder)
+    {
+        return new Uri(requestBuilder);
     }
     private static string TrimPath(this string pathSegment)
     {
