@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Polly", "BT.Commo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Http.Tests", "BT.Common.Http.Tests\BT.Common.Http.Tests.csproj", "{A06B2C60-FC1A-4B1E-84B0-609F76F9E084}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Http.TestBase", "BT.Common.Http.TestBase\BT.Common.Http.TestBase.csproj", "{02621ACA-9024-40BA-89B0-256D67B1CCB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{A06B2C60-FC1A-4B1E-84B0-609F76F9E084}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A06B2C60-FC1A-4B1E-84B0-609F76F9E084}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A06B2C60-FC1A-4B1E-84B0-609F76F9E084}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02621ACA-9024-40BA-89B0-256D67B1CCB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02621ACA-9024-40BA-89B0-256D67B1CCB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02621ACA-9024-40BA-89B0-256D67B1CCB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02621ACA-9024-40BA-89B0-256D67B1CCB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
