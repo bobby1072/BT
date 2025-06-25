@@ -153,34 +153,5 @@ public static partial class HttpRequestBuilderExtensions
         }
     }
 
-    private static HttpRequestMessage ToHttpRequestMessage(this HttpRequestBuilder requestBuilder)
-    {
-        if (!requestBuilder.IsValidRequest())
-        {
-            var sb = new StringBuilder();
 
-            foreach (var error in requestBuilder.GetRequestValidationErrors())
-            {
-                sb.AppendLine($"{error} ");
-            }
-            throw new HttpRequestBuilderException(sb.ToString().Trim());
-        }
-
-        var httpRequestMessage = new HttpRequestMessage(
-            requestBuilder.HttpMethod!,
-            requestBuilder.RequestUri
-        );
-
-        if (requestBuilder.Content is not null)
-        {
-            httpRequestMessage.Content = requestBuilder.Content;
-        }
-
-        foreach (var header in requestBuilder.Headers)
-        {
-            httpRequestMessage.Headers.Add(header.Key, header.Value);
-        }
-
-        return httpRequestMessage;
-    }
 }

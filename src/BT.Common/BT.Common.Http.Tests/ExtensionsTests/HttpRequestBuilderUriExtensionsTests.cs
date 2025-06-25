@@ -5,8 +5,50 @@ using BT.Common.Http.Models;
 
 namespace BT.Common.Http.Tests.ExtensionsTests;
 
-public class HttpRequestBuilderUriExtensionsTests
+public sealed class HttpRequestBuilderUriExtensionsTests
 {
+    
+    [Theory]
+    [InlineData("http://localhost:5000", "key", "value", "http://localhost:5000/?key=value")]
+    [InlineData("http://localhost:5000/api", "search", "test", "http://localhost:5000/api?search=test")]
+    [InlineData("http://localhost:5000/path?existing=1", "new", "2", "http://localhost:5000/path?existing=1&new=2")]
+    public void String_AppendQueryParameter_Should_Add_Query_Correctly(string baseUrl, string key, string value, string expected)
+    {
+        // Act
+        var builder = baseUrl.AppendQueryParameter(key, value);
+
+        // Assert
+        Assert.Equal(expected, builder.GetFinalUrl().AbsoluteUri);
+    }
+
+    [Theory]
+    [InlineData("http://localhost:5000", "key", "value", "http://localhost:5000/?key=value")]
+    [InlineData("http://localhost:5000/api", "search", "test", "http://localhost:5000/api?search=test")]
+    [InlineData("http://localhost:5000/path?existing=1", "new", "2", "http://localhost:5000/path?existing=1&new=2")]
+    public void Uri_AppendQueryParameter_Should_Add_Query_Correctly(string baseUrl, string key, string value, string expected)
+    {
+        // Act
+        var builder = new Uri(baseUrl).AppendQueryParameter(key, value);
+
+        // Assert
+        Assert.Equal(expected, builder.GetFinalUrl().AbsoluteUri);
+    }
+
+    [Theory]
+    [InlineData("http://localhost:5000", "key", "value", "http://localhost:5000/?key=value")]
+    [InlineData("http://localhost:5000/api", "search", "test", "http://localhost:5000/api?search=test")]
+    [InlineData("http://localhost:5000/path?existing=1", "new", "2", "http://localhost:5000/path?existing=1&new=2")]
+    public void Builder_AppendQueryParameter_Should_Add_Query_Correctly(string baseUrl, string key, string value, string expected)
+    {
+        // Arrange
+        var builder = new Uri(baseUrl).ToHttpRequestBuilder();
+
+        // Act
+        var updated = builder.AppendQueryParameter(key, value);
+
+        // Assert
+        Assert.Equal(expected, updated.GetFinalUrl().AbsoluteUri);
+    }
     [Fact]
     public void String_WithAuthorizationHeader_Should_Add_Authorization_Header_Correctly()
     {
