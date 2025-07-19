@@ -6,12 +6,12 @@ public static partial class FastArray
     {
         var newArray = values.Skip(1).ToArray();
 
-        return newArray.First();
+        return newArray.FastArrayFirst(predicate);
     }    
     public static T? FastArraySecondOrDefault<T>(this IEnumerable<T> values, Func<T, bool>? predicate = null)
     {
         var newArray = values.Skip(1).ToArray();
 
-        return newArray.FirstOrDefault();
+        return newArray.FastArrayFirstOrDefault(predicate);
     }    
 }
