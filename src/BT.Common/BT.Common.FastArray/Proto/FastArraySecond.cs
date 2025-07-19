@@ -2,7 +2,7 @@
 
 public static partial class FastArray
 {
-    public static T? FastArraySecond<T>(this IEnumerable<T> values, Func<T, bool>? predicate = null)
+    public static T FastArraySecond<T>(this IEnumerable<T> values, Func<T, bool>? predicate = null)
     {
         var newArray = values.Skip(1).ToArray();
 
