@@ -7,6 +7,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         where TEnt : BaseEntity<TEntId, TModel>
         where TModel : class
     {
+        Task<DbGetManyResult<TModel>> GetAll(params string[] relations);
         Task<DbResult<int>> GetCount();
         Task<DbGetManyResult<TModel>> GetMany<T>(
             T value,
@@ -28,7 +29,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         Task<DbDeleteResult<TModel>> Delete(IReadOnlyCollection<TModel> entObj);
         Task<DbDeleteResult<TModel>> Delete(TModel entObj);
         Task<DbDeleteResult<TEntId>> Delete(IReadOnlyCollection<TEntId> entIds);
-        Task<DbResult<bool>> Exists<T>(T value, string propertyName, params string[] relations);
+        Task<DbResult<bool>> Exists<T>(T value, string propertyName);
         Task<DbResult<bool>> Exists(TEntId entityId);
     }
 }

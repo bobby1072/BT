@@ -32,14 +32,23 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
         protected abstract TEnt RuntimeToEntity(TModel runtimeObj);
 
+        public virtual async Task<DbGetManyResult<TModel>> GetAll(params string[] relations)
+        {
+            await using var dbContext = await ContextFactory.CreateDbContextAsync();
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
+
+            var allEnts = await TimeAndLogDbOperation(() => foundOneQuerySet.ToArrayAsync(),
+                nameof(GetAll));
+
+            return new DbGetManyResult<TModel>(allEnts?.FastArraySelect(x => x.ToModel()).ToArray());
+        }
         public virtual async Task<DbResult<int>> GetCount()
         {
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
             var foundOneQuerySet = dbContext.Set<TEnt>();
             var count = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.CountAsync(),
-                nameof(GetCount),
-                EntityType.Name
+                nameof(GetCount)
             );
 
             return new DbResult<int>(true, count);
@@ -53,14 +62,13 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         {
             ThrowIfPropertyDoesNotExist<T>(propertyName);
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
-            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 () =>
                     foundOneQuerySet
                         .Where(x => EF.Property<T>(x, propertyName)!.Equals(value))
                         .ToArrayAsync(),
-                nameof(GetMany),
-                EntityType.Name
+                nameof(GetMany)
             );
 
             return new DbGetManyResult<TModel>(
@@ -80,8 +88,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.Where(x => entityIds.Contains(x.Id!)).ToArrayAsync(),
-                nameof(GetMany),
-                EntityType.Name
+                nameof(GetMany)
             );
 
             return new DbGetManyResult<TModel>(
@@ -95,12 +102,10 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         )
         {
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
-            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.Where(x => x.Id!.Equals(entityId)).ToArrayAsync(),
-                nameof(GetMany),
-                EntityType.Name
-            );
+                nameof(GetMany));
 
             return new DbGetManyResult<TModel>(
                 foundOne?.FastArraySelect(x => x.ToModel()).ToArray()
@@ -116,8 +121,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.FirstOrDefaultAsync(x => x.Id!.Equals(entityId)),
-                nameof(GetOne),
-                EntityType.Name
+                nameof(GetOne)
             );
 
             return new DbGetOneResult<TModel>(foundOne?.ToModel());
@@ -129,17 +133,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOneQuerySet = dbContext.Set<TEnt>();
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.AnyAsync(x => x.Id!.Equals(entityId)),
-                nameof(Exists),
-                EntityType.Name
-            );
+                nameof(Exists));
 
             return new DbResult<bool>(true, foundOne);
         }
 
         public virtual async Task<DbResult<bool>> Exists<T>(
             T value,
-            string propertyName,
-            params string[] relations
+            string propertyName
         )
         {
             ThrowIfPropertyDoesNotExist<T>(propertyName);
@@ -147,8 +148,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
             var foundOne = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.AnyAsync(x => EF.Property<T>(x, propertyName)!.Equals(value)),
-                nameof(Exists),
-                EntityType.Name
+                nameof(Exists)
             );
 
             return new DbResult<bool>(true, foundOne);
@@ -162,14 +162,13 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         {
             ThrowIfPropertyDoesNotExist<T>(propertyName);
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
-            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>());
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 () =>
                     foundOneQuerySet.FirstOrDefaultAsync(x =>
                         EF.Property<T>(x, propertyName)!.Equals(value)
                     ),
-                nameof(GetOne),
-                EntityType.Name
+                nameof(GetOne)
             );
 
             return new DbGetOneResult<TModel>(foundOne?.ToModel());
@@ -189,7 +188,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync();
                 return null;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Create), EntityType.Name);
+            await TimeAndLogDbOperation(Operation, nameof(Create));
             var runtimeObjs = set.Local.FastArraySelect(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
@@ -209,7 +208,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync();
                 return null;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Delete), EntityType.Name);
+            await TimeAndLogDbOperation(Operation, nameof(Delete));
             return new DbDeleteResult<TModel>(entObj);
         }
 
@@ -227,7 +226,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync();
                 return default;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Delete), EntityType.Name);
+            await TimeAndLogDbOperation(Operation, nameof(Delete));
 
             return new DbDeleteResult<TEntId>(entIds);
         }
@@ -248,7 +247,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync();
                 return null;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Update), EntityType.Name);
+            await TimeAndLogDbOperation(Operation, nameof(Update));
 
             var runtimeObjs = set.Local.FastArraySelect(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
@@ -288,7 +287,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                         await action.Invoke(dbSet);
                         await dbContext.SaveChangesAsync();
                         return true;
-                    }, nameof(TimeAndLogDbTransaction), EntityType.Name);
+                    }, nameof(TimeAndLogDbTransaction));
                     
                     await dbContext.SaveChangesAsync();
                 }
@@ -303,7 +302,6 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         protected async Task<T> TimeAndLogDbOperation<T>(
             Func<Task<T>> func,
             string operationName,
-            string entityName,
             string? entityId = null
         )
         {
@@ -312,42 +310,18 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             {
                 logMessageBuilder.Append(" with id {EntityId}");
             }
-            _logger.LogDebug(logMessageBuilder.ToString(), operationName, entityName, entityId);
+            _logger.LogDebug(logMessageBuilder.ToString(), operationName, entityId);
 
             var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(func);
 
             _logger.LogDebug(
                 "finished {OperationName} on {EntityName} in {TimeTaken}ms",
                 operationName,
-                entityId is not null ? $"{entityName} with id {entityId}" : entityName,
+                entityId is not null ? $"{EntityType.Name} with id {entityId}" : EntityType.Name,
                 timeTaken.TotalMilliseconds
             );
 
             return result;
-        }
-
-        protected async Task TimeAndLogDbOperation(
-            Func<Task> func,
-            string operationName,
-            string entityName,
-            string? entityId = null
-        )
-        {
-            var logMessageBuilder = new StringBuilder("Performing {OperationName} on {EntityName}");
-            if (entityId != null)
-            {
-                logMessageBuilder.Append(" with id {EntityId}");
-            }
-            _logger.LogDebug(logMessageBuilder.ToString(), operationName, entityName, entityId);
-
-            var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(func);
-
-            _logger.LogDebug(
-                "finished {OperationName} on {EntityName} in {TimeTaken}ms",
-                operationName,
-                entityId is not null ? $"{entityName} with id {entityId}" : entityName,
-                timeTaken.TotalMilliseconds
-            );
         }
 
         private static bool DoesPropertyExist<T>(string propertyName)
