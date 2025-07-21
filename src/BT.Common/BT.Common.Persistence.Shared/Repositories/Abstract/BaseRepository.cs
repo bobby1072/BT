@@ -301,23 +301,17 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         }
         protected async Task<T> TimeAndLogDbOperation<T>(
             Func<Task<T>> func,
-            string operationName,
-            string? entityId = null
+            string operationName
         )
         {
-            var logMessageBuilder = new StringBuilder("Performing {OperationName} on {EntityName}");
-            if (entityId != null)
-            {
-                logMessageBuilder.Append(" with id {EntityId}");
-            }
-            _logger.LogDebug(logMessageBuilder.ToString(), operationName, entityId);
+            _logger.LogDebug("Performing {OperationName} on {EntityName}", operationName, EntityType.Name);
 
             var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(func);
 
             _logger.LogDebug(
                 "finished {OperationName} on {EntityName} in {TimeTaken}ms",
                 operationName,
-                entityId is not null ? $"{EntityType.Name} with id {entityId}" : EntityType.Name,
+                EntityType.Name,
                 timeTaken.TotalMilliseconds
             );
 
