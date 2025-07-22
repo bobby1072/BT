@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace BT.Common.Api.Helpers.Extensions;
+namespace BT.Common.Helpers.Extensions;
 
 public static class ServiceCollectionExtensions
 {
