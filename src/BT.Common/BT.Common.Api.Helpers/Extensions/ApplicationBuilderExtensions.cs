@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Builder;
 
 namespace BT.Common.Api.Helpers.Extensions;
 
-public static class WebApplicationExtensions
+public static class ApplicationBuilderExtensions
 {
-    public static WebApplication UseCorrelationIdMiddleware(this WebApplication app)
+    public static IApplicationBuilder UseCorrelationIdMiddleware(this IApplicationBuilder app)
     {
         app.UseMiddleware<CorrelationIdMiddleware>();
         
