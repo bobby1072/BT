@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Api.Helpers.Midddlewares;
 
-public sealed class CorrelationIdMiddleware
+internal sealed class CorrelationIdMiddleware
 {
     private readonly RequestDelegate _next;
 
