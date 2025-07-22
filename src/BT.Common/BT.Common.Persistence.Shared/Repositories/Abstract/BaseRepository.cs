@@ -127,6 +127,18 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbGetOneResult<TModel>(foundOne?.ToModel());
         }
 
+        public virtual async Task<DbResult<bool>> AnyExists(IReadOnlyCollection<TEntId> entityIds)
+        {
+            await using var dbContext = await ContextFactory.CreateDbContextAsync();
+            var foundOneQuerySet = dbContext.Set<TEnt>();
+            
+            var anyExists = await TimeAndLogDbOperation(
+                () => foundOneQuerySet.AnyAsync(x => entityIds.Contains(x.Id!)),
+                nameof(AnyExists)
+            );
+            
+            return new DbResult<bool>(true, anyExists);
+        }
         public virtual async Task<DbResult<bool>> Exists(TEntId entityId)
         {
             await using var dbContext = await ContextFactory.CreateDbContextAsync();

@@ -31,5 +31,6 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         Task<DbDeleteResult<TEntId>> Delete(IReadOnlyCollection<TEntId> entIds);
         Task<DbResult<bool>> Exists<T>(T value, string propertyName);
         Task<DbResult<bool>> Exists(TEntId entityId);
+        Task<DbResult<bool>> AnyExists(IReadOnlyCollection<TEntId> entityIds);
     }
 }
