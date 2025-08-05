@@ -1,4 +1,4 @@
-using BT.Common.Api.Helpers.Midddlewares;
+using BT.Common.Api.Helpers.Middlewares;
 using Microsoft.AspNetCore.Builder;
 
 namespace BT.Common.Api.Helpers.Extensions;

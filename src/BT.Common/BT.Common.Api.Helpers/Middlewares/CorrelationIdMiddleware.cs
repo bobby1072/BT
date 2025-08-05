@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace BT.Common.Api.Helpers.Midddlewares;
+namespace BT.Common.Api.Helpers.Middlewares;
 
 internal sealed class CorrelationIdMiddleware
 {
