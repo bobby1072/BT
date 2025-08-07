@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Http.TestBase", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Api.Helpers", "BT.Common.Api.Helpers\BT.Common.Api.Helpers.csproj", "{4A96F8E2-F651-4BF2-B1F3-AE3771D361B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BT.Common.Services", "BT.Common.Services\BT.Common.Services.csproj", "{1DA4B92F-131B-4E69-90D8-228421A2001F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{4A96F8E2-F651-4BF2-B1F3-AE3771D361B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A96F8E2-F651-4BF2-B1F3-AE3771D361B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A96F8E2-F651-4BF2-B1F3-AE3771D361B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DA4B92F-131B-4E69-90D8-228421A2001F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DA4B92F-131B-4E69-90D8-228421A2001F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DA4B92F-131B-4E69-90D8-228421A2001F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DA4B92F-131B-4E69-90D8-228421A2001F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
