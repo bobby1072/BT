@@ -1,6 +1,6 @@
 ﻿namespace BT.Common.Services.Models;
 
-internal sealed class BatchedAsyncOperationExecutorOptions<TInputItem>
+public sealed class BatchedAsyncOperationExecutorOptions<TInputItem>
 {
     public required TimeSpan BatchExecutionInterval { get; init; }
     public required int BatchSize { get; init; }

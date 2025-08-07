@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BT.Common.Services.Concrete;
 
-internal sealed class BatchedAsyncOperationExecutor<TInputItem>
+public sealed class BatchedAsyncOperationExecutor<TInputItem>
 {
     private readonly ILogger<BatchedAsyncOperationExecutor<TInputItem>> _logger;
     private readonly BatchedAsyncOperationExecutorOptions<TInputItem> _options;
