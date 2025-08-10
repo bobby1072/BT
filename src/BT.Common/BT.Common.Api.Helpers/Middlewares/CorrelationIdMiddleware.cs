@@ -24,7 +24,7 @@ internal sealed class CorrelationIdMiddleware
         }
         else
         {
-            logger.LogInformation("CorrelationId: {CorrelationId} added to request headers successfully", correlationIdToUse);
+            logger.LogInformation("CorrelationId: {CorrelationId} added to response headers successfully", correlationIdToUse);
         }
         
         context.Items[ApiConstants.CorrelationIdHeader] = correlationIdToUse;
