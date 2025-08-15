@@ -14,12 +14,12 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             string propertyName,
             params string[] relations
         );
-        Task<DbGetManyResult<TModel>> GetMany(Dictionary<string, object> propertiesToMatch,
+        Task<DbGetManyResult<TModel>> GetMany(Dictionary<string, object?> propertiesToMatch,
             params string[] relations);
         Task<DbGetManyResult<TModel>> GetMany(TEntId entityId, params string[] relations);
         Task<DbGetManyResult<TModel>> GetMany(IReadOnlyCollection<TEntId> entityIds, params string[] relations);
         Task<DbGetOneResult<TModel>> GetOne(TEntId entityId, params string[] relations);
-        Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object> propertiesToMatch, params string[] relations);
+        Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object?> propertiesToMatch, params string[] relations);
         Task<DbGetOneResult<TModel>> GetOne<T>(
             T value,
             string propertyName,

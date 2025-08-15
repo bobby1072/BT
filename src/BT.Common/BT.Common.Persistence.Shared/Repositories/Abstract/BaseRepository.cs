@@ -53,7 +53,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbResult<int>(true, count);
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetMany(Dictionary<string, object> propertiesToMatch,
+        public virtual async Task<DbGetManyResult<TModel>> GetMany(Dictionary<string, object?> propertiesToMatch,
             params string[] relations)
         {
             ThrowIfPropertyDoesNotExist(propertiesToMatch.Keys);
@@ -75,7 +75,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbGetManyResult<TModel>(foundMany?.FastArraySelect(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object> propertiesToMatch, params string[] relations)
+        public virtual async Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object?> propertiesToMatch, params string[] relations)
         {
             ThrowIfPropertyDoesNotExist(propertiesToMatch.Keys);
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
