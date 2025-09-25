@@ -21,11 +21,11 @@ public sealed class DistributedCachingService : ICachingService
         _logger = logger;
     }
 
-    public async Task<bool> TryRemoveObjectAsync(string key)
+    public async Task<bool> TryRemoveObjectAsync(string key, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _distributedCache.RemoveAsync(key);
+            await _distributedCache.RemoveAsync(key, cancellationToken);
             return true;
         }
         catch (Exception e)
@@ -36,12 +36,12 @@ public sealed class DistributedCachingService : ICachingService
         }
     }
 
-    public async Task<T?> TryGetObjectAsync<T>(string key)
+    public async Task<T?> TryGetObjectAsync<T>(string key, CancellationToken cancellationToken = default)
         where T : class
     {
         try
         {
-            return await GetObject<T>(key);
+            return await GetObject<T>(key, cancellationToken);
         }
         catch (KeyNotFoundException e)
         {
@@ -60,7 +60,8 @@ public sealed class DistributedCachingService : ICachingService
     public Task<string> SetObjectAsync<T>(
         string key,
         T value,
-        CacheObjectTimeToLiveInSeconds timeToLive = CacheObjectTimeToLiveInSeconds.TenMinutes
+        CacheObjectTimeToLiveInSeconds timeToLive = CacheObjectTimeToLiveInSeconds.TenMinutes,
+        CancellationToken cancellationToken = default
     )
         where T : class
     {
@@ -70,14 +71,16 @@ public sealed class DistributedCachingService : ICachingService
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds((int)timeToLive),
-            }
+            },
+             cancellationToken
         );
     }
 
     public async Task<string> SetObjectAsync<T>(
         string key,
         T value,
-        DistributedCacheEntryOptions options
+        DistributedCacheEntryOptions options,
+        CancellationToken cancellationToken = default
     )
         where T : class
     {
@@ -85,7 +88,7 @@ public sealed class DistributedCachingService : ICachingService
         {
             _logger.LogDebug("Attempting to cache {StringValue}", value);
 
-            await _distributedCache.SetStringAsync(key, (value as string)!, options);
+            await _distributedCache.SetStringAsync(key, (value as string)!, options, cancellationToken);
         }
         else
         {
@@ -94,16 +97,16 @@ public sealed class DistributedCachingService : ICachingService
 
             var serializedValue = JsonSerializer.Serialize(value);
             
-            await _distributedCache.SetStringAsync(key, serializedValue, options);
+            await _distributedCache.SetStringAsync(key, serializedValue, options, cancellationToken);
         }
         return key;
     }
 
-    private async Task<T> GetObject<T>(string key)
+    private async Task<T> GetObject<T>(string key, CancellationToken cancellationToken)
         where T : class
     {
         var foundValue =
-            await _distributedCache.GetStringAsync(key)
+            await _distributedCache.GetStringAsync(key, cancellationToken)
             ?? throw new KeyNotFoundException("Cannot find object with that key");
         if (typeof(T) == _typeofString)
         {
