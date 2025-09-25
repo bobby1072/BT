@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Services.Concrete;
 
-internal sealed class DistributedCachingService : ICachingService
+public sealed class DistributedCachingService : ICachingService
 {
     private static readonly Type _typeofString = typeof(string);
     private readonly IDistributedCache _distributedCache;

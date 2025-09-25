@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text;
 using BT.Common.FastArray.Proto;
 using BT.Common.OperationTimer.Proto;
 using BT.Common.Persistence.Shared.Entities;
@@ -54,6 +53,48 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbResult<int>(true, count);
         }
 
+        public virtual async Task<DbGetManyResult<TModel>> GetMany(Dictionary<string, object?> propertiesToMatch,
+            params string[] relations)
+        {
+            ThrowIfPropertyDoesNotExist(propertiesToMatch.Keys);
+            await using var dbContext = await ContextFactory.CreateDbContextAsync();
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
+
+            foreach (var kvp in propertiesToMatch)
+            {
+                var propertyName = kvp.Key;
+                var value = kvp.Value;
+                foundOneQuerySet = foundOneQuerySet.Where(x => EF.Property<object>(x, propertyName).Equals(value));
+            }
+
+            var foundMany = await TimeAndLogDbOperation(
+                () => foundOneQuerySet.ToArrayAsync(),
+                nameof(GetMany)
+            );
+
+            return new DbGetManyResult<TModel>(foundMany?.FastArraySelect(x => x.ToModel()).ToArray());
+        }
+
+        public virtual async Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object?> propertiesToMatch, params string[] relations)
+        {
+            ThrowIfPropertyDoesNotExist(propertiesToMatch.Keys);
+            await using var dbContext = await ContextFactory.CreateDbContextAsync();
+            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
+
+            foreach (var kvp in propertiesToMatch)
+            {
+                var propertyName = kvp.Key;
+                var value = kvp.Value;
+                foundOneQuerySet = foundOneQuerySet.Where(x => EF.Property<object>(x, propertyName).Equals(value));
+            }
+
+            var foundOne = await TimeAndLogDbOperation(
+                () => foundOneQuerySet.FirstOrDefaultAsync(),
+                nameof(GetOne)
+            );
+
+            return new DbGetOneResult<TModel>(foundOne?.ToModel());
+        }
         public virtual async Task<DbGetManyResult<TModel>> GetMany<T>(
             T value,
             string propertyName,
@@ -131,12 +172,12 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         {
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
             var foundOneQuerySet = dbContext.Set<TEnt>();
-            
+
             var anyExists = await TimeAndLogDbOperation(
                 () => foundOneQuerySet.AnyAsync(x => entityIds.Contains(x.Id!)),
                 nameof(AnyExists)
             );
-            
+
             return new DbResult<bool>(true, anyExists);
         }
         public virtual async Task<DbResult<bool>> Exists(TEntId entityId)
@@ -286,7 +327,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             {
                 return;
             }
-            
+
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
@@ -300,7 +341,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                         await dbContext.SaveChangesAsync();
                         return true;
                     }, nameof(TimeAndLogDbTransaction));
-                    
+
                     await dbContext.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
@@ -336,7 +377,21 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 x.Name == propertyName && x.PropertyType == typeof(T)
             );
         }
-
+        private static bool DoesPropertyExist(string propertyName)
+        {
+            return EntityProperties.Any(x =>
+                x.Name == propertyName
+            );
+        }
+        private static void ThrowIfPropertyDoesNotExist(IReadOnlyCollection<string> propertyNames)
+        {
+            if (propertyNames.Any(x => !DoesPropertyExist(x)))
+            {
+                throw new ArgumentException(
+                    $"Properties does not exist on entity {EntityType.Name}"
+                );
+            }
+        }
         private static void ThrowIfPropertyDoesNotExist<T>(string propertyName)
         {
             if (!DoesPropertyExist<T>(propertyName))
