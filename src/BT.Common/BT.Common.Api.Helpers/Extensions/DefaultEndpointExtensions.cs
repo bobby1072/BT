@@ -17,14 +17,15 @@ public static class DefaultEndpointExtensions
         {
             logger.LogInformation("Service appears healthy...");
 
-            return Task.FromResult((ActionResult<WebOutcome<HealthResponse>>)new WebOutcome<HealthResponse>
+            return new WebOutcome<HealthResponse>
             {
                 Data = new HealthResponse
                 {
                     ServiceInfo = serviceInfo.Value,
                 },
-            });
-        });
+            };
+        })
+        .WithName("Health");
         
         
         return application;
