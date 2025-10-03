@@ -29,10 +29,7 @@ internal sealed class CorrelationIdMiddleware
         
         context.Items[ApiConstants.CorrelationIdHeader] = correlationIdToUse;
 
-        using (logger.BeginScope(new Dictionary<string, object>
-               {
-                   [ApiConstants.CorrelationIdHeader] = correlationIdToUse
-               }))
+        using (logger.BeginScope(new KeyValuePair<string, object>(ApiConstants.CorrelationIdHeader, correlationIdToUse)))
         {
             await _next.Invoke(context);
         }
