@@ -3,7 +3,7 @@
 public record WebOutcome
 {
     public string? ExceptionMessage { get; init; }
-    public Dictionary<string, object>? ExtraData { get; init; }
+    public Dictionary<string, object> ExtraData { get; init; } = new();
     public bool IsSuccess => string.IsNullOrEmpty(ExceptionMessage);
 }
 
