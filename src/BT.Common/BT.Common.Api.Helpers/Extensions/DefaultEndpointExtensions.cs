@@ -11,7 +11,7 @@ public static class DefaultEndpointExtensions
     public static WebApplication UseHealthGetEndpoint(this WebApplication application)
     {
         application.MapGet("/Api/Health/", (
-                [FromServices]ILogger logger,
+                [FromServices]ILogger<ServiceInfo> logger,
                 [FromServices]IOptions<ServiceInfo> serviceInfo
             ) =>
         {
