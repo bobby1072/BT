@@ -7,7 +7,7 @@ public record WebOutcome
     public bool IsSuccess => string.IsNullOrEmpty(ExceptionMessage);
 }
 
-public sealed record WebOutcome<T>: WebOutcome
+public record WebOutcome<T>: WebOutcome
 {
     public T? Data { get; init; }
 }
