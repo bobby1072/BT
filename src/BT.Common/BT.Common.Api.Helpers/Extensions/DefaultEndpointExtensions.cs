@@ -8,7 +8,7 @@ namespace BT.Common.Api.Helpers.Extensions;
 
 public static class DefaultEndpointExtensions
 {
-    public static WebApplication UseHealthGetEndpoint(this WebApplication application)
+    public static WebApplication UseHealthGetEndpoints(this WebApplication application)
     {
         application.MapGet("/Api/Healthz/", (
                 [FromServices]ILogger<ServiceInfo> logger,
