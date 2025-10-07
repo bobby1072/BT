@@ -20,7 +20,7 @@ public sealed class HttpRequestBuilder
 
     private Uri _uri = null!;
 
-    internal Uri RequestUri
+    public Uri RequestUri
     {
         get => _uri;
         set
@@ -50,7 +50,8 @@ public sealed class HttpRequestBuilder
             if (_currentValidationResult is null || PropertiesHaveChangedSinceLastValidation)
             {
                 PropertiesHaveChangedSinceLastValidation = false;
-                return _currentValidationResult ??= HttpRequestBuilderValidator.DefaultValidator.Validate(this);
+                return _currentValidationResult ??=
+                    HttpRequestBuilderValidator.DefaultValidator.Validate(this);
             }
             else
             {
@@ -60,10 +61,12 @@ public sealed class HttpRequestBuilder
     }
 
     private Dictionary<string, string> _queryParams = [];
+
     internal HttpRequestBuilder(Uri requestUri)
     {
         RequestUri = requestUri;
     }
+
     internal HttpRequestMessage ToHttpRequestMessage()
     {
         if (!IsValidRequest())
@@ -77,10 +80,7 @@ public sealed class HttpRequestBuilder
             throw new HttpRequestBuilderException(sb.ToString().Trim());
         }
 
-        var httpRequestMessage = new HttpRequestMessage(
-            HttpMethod!,
-            GetFinalUrl()
-        );
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod!, GetFinalUrl());
 
         if (Content is not null)
         {
@@ -94,11 +94,13 @@ public sealed class HttpRequestBuilder
 
         return httpRequestMessage;
     }
+
     internal void AddQueryParameter(string key, string value)
     {
         PropertiesHaveChangedSinceLastValidation = true;
         _queryParams.Add(key, value);
     }
+
     internal void AddHeader(string name, string value)
     {
         PropertiesHaveChangedSinceLastValidation = true;
@@ -117,6 +119,7 @@ public sealed class HttpRequestBuilder
 
         return uriBuilder.Uri;
     }
+
     private bool IsValidRequest()
     {
         return ValidationResult.IsValid;
