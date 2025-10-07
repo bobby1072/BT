@@ -7,6 +7,15 @@ namespace BT.Common.Helpers.Extensions;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureSingletonOptions<TOptions>(this IServiceCollection services,
+        TOptions opts) where TOptions : class
+    {
+        services
+            .AddSingleton(Options.Create(opts))
+            .AddSingleton<TOptions>(sp => sp.GetRequiredService<IOptions<TOptions>>().Value);
+
+        return services;
+    }
+    public static IServiceCollection ConfigureSingletonOptions<TOptions>(this IServiceCollection services,
         IConfiguration configSection) where TOptions : class
     {
         services
