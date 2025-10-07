@@ -8,9 +8,16 @@ namespace BT.Common.Http.Extensions;
 public static class HttpServiceCollectionExtensions
 {
     private const string _resiliencePipelinePrefix = "resilience-pipeline-";
-    
-    
-    public static IServiceCollection AddHttpClientWithResilience<TService, TImplementation>(this IServiceCollection services, IPollyRetrySettings pollyRetrySettings)
+
+    public static IServiceCollection AddHttpClientWithResilience<TService, TImplementation>(
+        this IServiceCollection services,
+        Func<HttpClient, IServiceProvider, TImplementation> spFunc,
+        IPollyRetrySettings pollyRetrySettings)
+        where TService : class
+        where TImplementation : class, TService
+            => services.AddHttpClientWithResilience<TService, TImplementation>(pollyRetrySettings, spFunc);
+    public static IServiceCollection AddHttpClientWithResilience<TService, TImplementation>(this IServiceCollection services, IPollyRetrySettings pollyRetrySettings,
+        Func<HttpClient, IServiceProvider, TImplementation>? spFunc = null)
         where TService : class
         where TImplementation : class, TService
     {
@@ -18,24 +25,47 @@ public static class HttpServiceCollectionExtensions
         var delay = TimeSpan.FromSeconds((pollyRetrySettings.DelayBetweenAttemptsInSeconds ?? 0) > 0
             ? pollyRetrySettings.DelayBetweenAttemptsInSeconds ?? 0
             : 0);
-        
-        services
-            .AddHttpClient<TService, TImplementation>()
-            .AddResilienceHandler($"{_resiliencePipelinePrefix}{typeof(TService).Name}", x =>
-            {
-                x.AddRetry(new HttpRetryStrategyOptions
-                {
-                    UseJitter = pollyRetrySettings.UseJitter ?? false,
-                    MaxRetryAttempts = numberOfRetries,
-                    Delay = delay,
-                    BackoffType = DelayBackoffType.Constant
-                });
 
-                if (pollyRetrySettings.TimeoutInSeconds is not null)
+        if (spFunc != null)
+        {
+            services
+                .AddHttpClient<TService, TImplementation>(spFunc)
+                .AddResilienceHandler($"{_resiliencePipelinePrefix}{typeof(TService).Name}", x =>
                 {
-                    x.AddTimeout(TimeSpan.FromSeconds(pollyRetrySettings.TimeoutInSeconds.Value));
-                }
-            });
+                    x.AddRetry(new HttpRetryStrategyOptions
+                    {
+                        UseJitter = pollyRetrySettings.UseJitter ?? false,
+                        MaxRetryAttempts = numberOfRetries,
+                        Delay = delay,
+                        BackoffType = DelayBackoffType.Constant
+                    });
+
+                    if (pollyRetrySettings.TimeoutInSeconds is not null)
+                    {
+                        x.AddTimeout(TimeSpan.FromSeconds(pollyRetrySettings.TimeoutInSeconds.Value));
+                    }
+                });
+        }
+        else
+        {
+            services
+                .AddHttpClient<TService, TImplementation>()
+                .AddResilienceHandler($"{_resiliencePipelinePrefix}{typeof(TService).Name}", x =>
+                {
+                    x.AddRetry(new HttpRetryStrategyOptions
+                    {
+                        UseJitter = pollyRetrySettings.UseJitter ?? false,
+                        MaxRetryAttempts = numberOfRetries,
+                        Delay = delay,
+                        BackoffType = DelayBackoffType.Constant
+                    });
+
+                    if (pollyRetrySettings.TimeoutInSeconds is not null)
+                    {
+                        x.AddTimeout(TimeSpan.FromSeconds(pollyRetrySettings.TimeoutInSeconds.Value));
+                    }
+                });
+        }
         
         
         return services;
