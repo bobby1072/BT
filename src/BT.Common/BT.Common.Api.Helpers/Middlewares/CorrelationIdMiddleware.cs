@@ -1,4 +1,6 @@
+using BT.Common.Helpers.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Api.Helpers.Middlewares;
@@ -29,7 +31,7 @@ internal sealed class CorrelationIdMiddleware
         
         context.Items[ApiConstants.CorrelationIdHeader] = correlationIdToUse;
 
-        using (logger.BeginScope(new { CorrelationId = correlationIdToUse } ))
+        using (logger.BeginScope(new LoggingScopeVariableDictionary { ["CorrelationId"] = correlationIdToUse } ))
         {
             await _next.Invoke(context);
         }
