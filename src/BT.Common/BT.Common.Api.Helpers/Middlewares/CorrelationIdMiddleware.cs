@@ -31,7 +31,7 @@ internal sealed class CorrelationIdMiddleware
         
         context.Items[ApiConstants.CorrelationIdHeader] = correlationIdToUse;
 
-        using (logger.BeginScope(new LoggingScopeVariableDictionary { ["CorrelationId"] = correlationIdToUse } ))
+        using (logger.BeginScope(new LoggingScopeVariableDictionary { [ApiConstants.CorrelationIdHeader] = correlationIdToUse } ))
         {
             await _next.Invoke(context);
         }
