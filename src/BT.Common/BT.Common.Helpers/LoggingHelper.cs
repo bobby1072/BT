@@ -12,11 +12,7 @@ public static class LoggingHelper
         services.AddLogging(opts =>
         {
             opts.ClearProviders();
-            opts.AddJsonConsole(ctx =>
-            {
-                ctx.IncludeScopes = true;
-                ctx.UseUtcTimestamp = true;
-            });
+            opts.AddJsonConsole(ConfigureJsonConsole);
         });
         
         return services;
