@@ -7,7 +7,7 @@ public class ApiException: Exception
 {
     public LogLevel LogLevel { get; }
     public HttpStatusCode StatusCode { get; }
-    public Dictionary<string, object> ExtraData { get; set; } = new();
+    public Dictionary<string, object?> ExtraData { get; set; } = new();
     public ApiException(LogLevel logLevel, HttpStatusCode statusCode, string message, Exception? innerException = null) : base(message, innerException)
     {
         StatusCode = statusCode;
