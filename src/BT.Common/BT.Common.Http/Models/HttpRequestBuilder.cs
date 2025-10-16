@@ -67,7 +67,7 @@ public sealed class HttpRequestBuilder
         RequestUri = requestUri;
     }
 
-    internal HttpRequestMessage ToHttpRequestMessage()
+    public HttpRequestMessage ToHttpRequestMessage()
     {
         if (!IsValidRequest())
         {
