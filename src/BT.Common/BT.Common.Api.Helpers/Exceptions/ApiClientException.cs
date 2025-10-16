@@ -5,6 +5,6 @@ namespace BT.Common.Api.Helpers.Exceptions;
 
 public sealed class ApiClientException: ApiException
 {
-    public ApiClientException(HttpStatusCode httpStatusCode, string message): base(LogLevel.Information, httpStatusCode, message) { }
-    public ApiClientException(LogLevel logLevel, HttpStatusCode statusCode, string message) : base(logLevel, statusCode, message) { }
+    public ApiClientException(HttpStatusCode httpStatusCode, string message, Exception? innerException = null): base(LogLevel.Information, httpStatusCode, message, innerException) { }
+    public ApiClientException(LogLevel logLevel, HttpStatusCode statusCode, string message, Exception? innerException = null) : base(logLevel, statusCode, message, innerException) { }
 }
