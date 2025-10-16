@@ -114,10 +114,6 @@ public static partial class HttpRequestBuilderExtensions
 
             return deserializedResponse;
         }
-        catch (HttpRequestBuilderException)
-        {
-            throw;
-        }
         catch (Exception ex)
         {
             throw new HttpRequestException(ex.Message, ex);
@@ -142,10 +138,6 @@ public static partial class HttpRequestBuilderExtensions
                 ?? throw new HttpRequestException("Failed to read http response content");
 
             return deserializedResponse;
-        }
-        catch (HttpRequestBuilderException)
-        {
-            throw;
         }
         catch (Exception ex)
         {
