@@ -8,7 +8,7 @@ namespace BT.Common.Http.Models;
 public sealed class HttpRequestBuilder
 {
     private HttpMethod? _httpMethod;
-    internal HttpMethod? HttpMethod
+    public HttpMethod? HttpMethod
     {
         get => _httpMethod;
         set
