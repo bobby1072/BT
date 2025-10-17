@@ -16,9 +16,4 @@ public static class EnumExtensions
     {
         return value.GetAttribute<DisplayAttribute>()?.Name ?? value.ToString();
     }
-
-    public static IEnumerable<string> GetDisplayNames<T>() where T : struct, Enum
-    {
-        return Enum.GetValues<T>().Select(x => x.GetDisplayName()).ToArray();
-    }
 }
