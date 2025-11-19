@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BT.Common.Persistence.Shared.Entities;
 using BT.Common.Persistence.Shared.Models;
 
@@ -8,7 +9,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         where TModel : class
     {
         Task<DbGetManyResult<TModel>> GetAll(params string[] relations);
-        Task<DbResult<int>> GetCount();
+        Task<DbResult<int>> GetCount(Expression<Func<TEnt,bool>>? predicate = null);
         Task<DbGetManyResult<TModel>> GetMany<T>(
             T value,
             string propertyName,
