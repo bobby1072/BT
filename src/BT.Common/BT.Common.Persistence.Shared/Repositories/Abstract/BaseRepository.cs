@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Reflection;
 using BT.Common.FastArray.Proto;
 using BT.Common.OperationTimer.Proto;
@@ -41,12 +42,12 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             return new DbGetManyResult<TModel>(allEnts?.FastArraySelect(x => x.ToModel()).ToArray());
         }
-        public virtual async Task<DbResult<int>> GetCount()
+        public virtual async Task<DbResult<int>> GetCount(Expression<Func<TEnt,bool>>? predicate = null)
         {
             await using var dbContext = await ContextFactory.CreateDbContextAsync();
             var foundOneQuerySet = dbContext.Set<TEnt>();
             var count = await TimeAndLogDbOperation(
-                () => foundOneQuerySet.CountAsync(),
+                () => predicate is null ? foundOneQuerySet.CountAsync(): foundOneQuerySet.CountAsync(predicate),
                 nameof(GetCount)
             );
 
