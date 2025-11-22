@@ -1,5 +1,4 @@
-﻿using BT.Common.OperationTimer.Common;
-using BT.Common.Services.Concrete;
+﻿using BT.Common.Services.Concrete;
 using BT.Common.Services.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -48,22 +47,6 @@ public sealed class BatchedAsyncOperationExecutorTests
         // Act & Assert: Should NOT throw
         var ex = await Record.ExceptionAsync(() => executor.DoWorkAsync(1, 2));
         Assert.Null(ex);
-    }
-
-    [Fact]
-    public async Task Should_Rethrow_On_Exception_When_Configured()
-    {
-        // Arrange
-        var handler = new Func<IReadOnlyCollection<int>, CancellationToken, Task>((_, _) => throw new InvalidOperationException("fail"));
-
-        var options = GetOptions(handler, rethrow: true);
-        var executor = new BatchedAsyncOperationExecutor<int>(options);
-
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<OperationTimerException>(() => executor.DoWorkAsync(1, 2));
-        
-        Assert.IsType<InvalidOperationException>(ex.InnerException);
-        Assert.Equal("fail", ex.InnerException?.Message);
     }
 
     [Fact]

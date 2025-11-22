@@ -52,11 +52,5 @@ namespace BT.Common.FastArray.Tests.ProtoTests
                 }
             }
         }
-        [Theory(Skip = "Performance Test")]
-        [ClassData(typeof(FastArrayWhereTestsPerformanceClassData))]
-        public void FastArrayWhereTests_Performance(IReadOnlyCollection<object> arrayData, Func<IEnumerable<object>, IEnumerable<object>> actualFunc, Func<IEnumerable<object>, IEnumerable<object>> yourFunc)
-        {
-            PerformanceTestRunner(arrayData, actualFunc, yourFunc);
-        }
     }
 }

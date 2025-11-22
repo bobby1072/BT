@@ -1,4 +1,4 @@
-﻿using BT.Common.OperationTimer.Proto;
+﻿using System.Diagnostics;
 using BT.Common.Services.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -50,11 +50,13 @@ public sealed class BatchedAsyncOperationExecutor<TInputItem>
             {
                 return;
             }
-            var timeTaken = await OperationTimerUtils.TimeAsync(() => ExecuteBatch(singleBatch));
+            var timeout = Stopwatch.StartNew(); 
+            await ExecuteBatch(singleBatch);
+            timeout.Stop();
             
             _logger.LogDebug("Single batch of {NumberOfOperations} operations took {TimeTaken}ms to execute for correlationId: {CorrelationId}",
                 singleBatch.Count, 
-                timeTaken,
+                timeout,
                 _options.CorrelationId
             );
             if(_queue.Count > 0 && _options.BatchExecutionInterval > TimeSpan.Zero)

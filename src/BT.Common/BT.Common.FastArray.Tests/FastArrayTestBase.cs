@@ -1,5 +1,4 @@
 ﻿using BT.Common.FastArray.Tests.TestModels;
-using BT.Common.OperationTimer.Proto;
 
 namespace BT.Common.FastArray.Tests
 {
@@ -269,13 +268,6 @@ namespace BT.Common.FastArray.Tests
                 Assert.Equal(expected.ElementAt(i)?.GetType(), yourResult.ElementAt(i)?.GetType());
                 Assert.Equal(expected.ElementAt(i), yourResult.ElementAt(i));
             }
-        }
-        protected static void PerformanceTestRunner<T>(IEnumerable<T> arrayData, Func<IEnumerable<T>, IEnumerable<T>> actualFunc, Func<IEnumerable<T>, IEnumerable<T>> yourFunc)
-        {
-            var actualTime = OperationTimerUtils.Time(actualFunc, arrayData);
-            var yourTime = OperationTimerUtils.Time(yourFunc, arrayData);
-
-            Assert.InRange(yourTime.Nanoseconds, 0, actualTime.Nanoseconds);
         }
 
         private static async Task<IEnumerable<T>> ResolveAsyncListItems<T>(IEnumerable<Task<T>> data)

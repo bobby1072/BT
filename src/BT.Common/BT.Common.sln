@@ -5,8 +5,6 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.FastArray.Tests", "BT.Common.FastArray.Tests\BT.Common.FastArray.Tests.csproj", "{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.OperationTimer", "BT.Common.OperationTimer\BT.Common.OperationTimer.csproj", "{B5FD9A0F-41D0-49DB-80AE-7184C9ACF638}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.FastArray", "BT.Common.FastArray\BT.Common.FastArray.csproj", "{ED21D392-490F-43D9-92B9-D9A5F1C857C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Helpers", "BT.Common.Helpers\BT.Common.Helpers.csproj", "{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}"
@@ -39,10 +37,6 @@ Global
 		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3B0CB60-E2F2-4277-904E-718AC9C3DAB3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5FD9A0F-41D0-49DB-80AE-7184C9ACF638}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5FD9A0F-41D0-49DB-80AE-7184C9ACF638}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5FD9A0F-41D0-49DB-80AE-7184C9ACF638}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5FD9A0F-41D0-49DB-80AE-7184C9ACF638}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Release|Any CPU.ActiveCfg = Release|Any CPU

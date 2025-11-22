@@ -1,7 +1,7 @@
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using BT.Common.FastArray.Proto;
-using BT.Common.OperationTimer.Proto;
 using BT.Common.Persistence.Shared.Entities;
 using BT.Common.Persistence.Shared.Models;
 using Microsoft.EntityFrameworkCore;
@@ -360,13 +360,15 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         {
             _logger.LogDebug("Performing {OperationName} on {EntityName}", operationName, EntityType.Name);
 
-            var (timeTaken, result) = await OperationTimerUtils.TimeWithResultsAsync(func);
-
+            var stopWatch = Stopwatch.StartNew();
+            var result = await func.Invoke();
+            stopWatch.Stop();    
+            
             _logger.LogDebug(
                 "finished {OperationName} on {EntityName} in {TimeTaken}ms",
                 operationName,
                 EntityType.Name,
-                timeTaken.TotalMilliseconds
+                stopWatch.ElapsedMilliseconds
             );
 
             return result;
