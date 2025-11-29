@@ -20,7 +20,8 @@ public static class ServiceCollectionExtensions
                     .AddSource(activitySourceName)
                     .SetSampler(new AlwaysOnSampler())
                     .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter();
             });
         
         

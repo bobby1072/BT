@@ -7,21 +7,18 @@ namespace BT.Common.Helpers;
 
 public static class LoggingHelper
 {
-    public static IServiceCollection AddJsonLogging(this IServiceCollection services)
+    public static ILoggingBuilder AddJsonLogging(this ILoggingBuilder builder,  Action<JsonConsoleFormatterOptions>? optionAction = null)
     {
-        services.AddLogging(opts =>
-        {
-            opts.ClearProviders();
-            opts.AddJsonConsole(ConfigureJsonConsole);
-        });
+        builder.ClearProviders();
+        builder.AddJsonConsole(x => ConfigureJsonConsole(x, optionAction));
         
-        return services;
+        return builder;
     }
     
     public static ILogger CreateLogger()
     {
         using var loggerFactory = LoggerFactory.Create(logBuilder =>
-            logBuilder.AddJsonConsole(ConfigureJsonConsole)
+            logBuilder.AddJsonConsole(x => ConfigureJsonConsole(x))
         );
 
         var logger = loggerFactory.CreateLogger<WebApplicationBuilder>();
@@ -29,9 +26,16 @@ public static class LoggingHelper
         return logger;
     }
 
-    private static void ConfigureJsonConsole(JsonConsoleFormatterOptions options)
+    private static void ConfigureJsonConsole(JsonConsoleFormatterOptions options, Action<JsonConsoleFormatterOptions>? optionAction = null)
     {
-        options.IncludeScopes = true;
-        options.UseUtcTimestamp = true;
+        if (optionAction is not null)
+        {
+            optionAction.Invoke(options);
+        }
+        else
+        {
+            options.IncludeScopes = true;
+            options.UseUtcTimestamp = true;
+        }
     }
 }
