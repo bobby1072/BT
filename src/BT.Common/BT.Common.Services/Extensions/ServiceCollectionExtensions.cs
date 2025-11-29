@@ -1,11 +1,32 @@
-﻿using BT.Common.Services.Abstract;
+﻿using System.Diagnostics;
+using BT.Common.Services.Abstract;
 using BT.Common.Services.Concrete;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Trace;
 
 namespace BT.Common.Services.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddTelemetryService(this IServiceCollection services, string activitySourceName)
+    {
+        TelemetryHelperService.SetActivitySource(new ActivitySource(activitySourceName));
+        
+        services
+            .AddOpenTelemetry()
+            .WithTracing(ctx =>
+            {
+                ctx
+                    .AddSource(activitySourceName)
+                    .SetSampler(new AlwaysOnSampler())
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+            });
+        
+        
+        return services;
+    }
+    
     public static IServiceCollection AddDistributedCachingService(this IServiceCollection services)
     {
         services
