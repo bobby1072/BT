@@ -2,6 +2,7 @@
 using BT.Common.Services.Abstract;
 using BT.Common.Services.Concrete;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Trace;
 
 namespace BT.Common.Services.Extensions;
 
@@ -15,7 +16,11 @@ public static class ServiceCollectionExtensions
             .AddOpenTelemetry()
             .WithTracing(ctx =>
             {
-                ctx.AddSource(activitySourceName);
+                ctx
+                    .AddSource(activitySourceName)
+                    .SetSampler(new AlwaysOnSampler())
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
             });
         
         
