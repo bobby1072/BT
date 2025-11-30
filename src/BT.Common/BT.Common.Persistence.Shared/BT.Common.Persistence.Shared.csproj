@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\BT.Common.FastArray\BT.Common.FastArray.csproj" />
+	  <ProjectReference Include="..\BT.Common.Polly\BT.Common.Polly.csproj" />
 	</ItemGroup>
 
 </Project>
