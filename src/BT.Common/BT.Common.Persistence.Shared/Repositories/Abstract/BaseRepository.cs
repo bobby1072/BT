@@ -4,6 +4,8 @@ using System.Reflection;
 using BT.Common.FastArray.Proto;
 using BT.Common.Persistence.Shared.Entities;
 using BT.Common.Persistence.Shared.Models;
+using BT.Common.Polly.Extensions;
+using BT.Common.Polly.Models.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -19,15 +21,17 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             EntityType.GetProperties();
         protected readonly IDbContextFactory<TDbContext> ContextFactory;
         private readonly ILogger<BaseRepository<TEnt, TEntId, TModel, TDbContext>> _logger;
-
+        private readonly IPollyRetrySettings? _pollyRetrySettings;
         protected BaseRepository(
             IDbContextFactory<TDbContext> dbContextFactory,
-            ILogger<BaseRepository<TEnt, TEntId, TModel, TDbContext>> logger
+            ILogger<BaseRepository<TEnt, TEntId, TModel, TDbContext>> logger,
+            IPollyRetrySettings? pollyRetrySettings = null
         )
         {
             _logger = logger;
             ContextFactory =
                 dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
+            _pollyRetrySettings = pollyRetrySettings;
         }
 
         protected abstract TEnt RuntimeToEntity(TModel runtimeObj);
@@ -360,8 +364,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         {
             _logger.LogDebug("Performing {OperationName} on {EntityName}", operationName, EntityType.Name);
 
+            var retryPipeline = _pollyRetrySettings?.ToPipeline();
+            
+            Func<Task<T>> opToInvoke = retryPipeline is not null ? 
+                () => retryPipeline.ExecuteAsync(async _ => await func.Invoke()).AsTask() :
+                func.Invoke;
+            
             var stopWatch = Stopwatch.StartNew();
-            var result = await func.Invoke();
+            var result = await opToInvoke.Invoke();
             stopWatch.Stop();    
             
             _logger.LogDebug(
