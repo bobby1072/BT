@@ -9,14 +9,14 @@ public static class HttpServiceCollectionExtensions
 {
     private const string _resiliencePipelinePrefix = "resilience-pipeline-";
 
-    public static IServiceCollection AddHttpClientWithResilience<TService, TImplementation>(
+    public static IHttpResiliencePipelineBuilder AddHttpClientWithResilience<TService, TImplementation>(
         this IServiceCollection services,
         Func<HttpClient, IServiceProvider, TImplementation> spFunc,
         IPollyRetrySettings pollyRetrySettings)
         where TService : class
         where TImplementation : class, TService
             => services.AddHttpClientWithResilience<TService, TImplementation>(pollyRetrySettings, spFunc);
-    public static IServiceCollection AddHttpClientWithResilience<TService, TImplementation>(this IServiceCollection services, IPollyRetrySettings pollyRetrySettings,
+    public static IHttpResiliencePipelineBuilder AddHttpClientWithResilience<TService, TImplementation>(this IServiceCollection services, IPollyRetrySettings pollyRetrySettings,
         Func<HttpClient, IServiceProvider, TImplementation>? spFunc = null)
         where TService : class
         where TImplementation : class, TService
@@ -28,7 +28,7 @@ public static class HttpServiceCollectionExtensions
 
         if (spFunc != null)
         {
-            services
+            return services
                 .AddHttpClient<TService, TImplementation>(spFunc)
                 .AddResilienceHandler($"{_resiliencePipelinePrefix}{typeof(TService).Name}", x =>
                 {
@@ -48,7 +48,7 @@ public static class HttpServiceCollectionExtensions
         }
         else
         {
-            services
+            return services
                 .AddHttpClient<TService, TImplementation>()
                 .AddResilienceHandler($"{_resiliencePipelinePrefix}{typeof(TService).Name}", x =>
                 {
@@ -66,8 +66,5 @@ public static class HttpServiceCollectionExtensions
                     }
                 });
         }
-        
-        
-        return services;
     }
 }
