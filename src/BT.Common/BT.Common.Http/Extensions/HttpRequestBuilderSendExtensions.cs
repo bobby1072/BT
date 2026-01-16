@@ -115,7 +115,16 @@ public static partial class HttpRequestBuilderExtensions
 
             using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
 
-            httpResponse.EnsureSuccessStatusCode();
+            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
+                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+            
 
             var deserializedResponse = await httpResponse.Content.ReadFromJsonAsync<T>(
                 jsonSerializerOptions,
