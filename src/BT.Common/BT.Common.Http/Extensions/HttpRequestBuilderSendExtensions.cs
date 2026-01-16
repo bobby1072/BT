@@ -8,14 +8,6 @@ namespace BT.Common.Http.Extensions;
 
 public static partial class HttpRequestBuilderExtensions
 {
-    public static Task GetAsync(this HttpRequestBuilder builder, 
-        HttpClient httpClient,
-        CancellationToken cancellationToken = default)
-    {
-        builder.HttpMethod = HttpMethod.Get;
-
-        return httpClient.GetAsync(builder.RequestUri, cancellationToken);
-    }
     public static Task<T> GetJsonAsync<T>(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -80,17 +72,6 @@ public static partial class HttpRequestBuilderExtensions
             cancellationToken
         );
     }
-
-    public static Task PostAsync(this HttpRequestBuilder requestBuilder,
-        HttpClient httpClient,
-        CancellationToken cancellationToken = default)
-    {
-        requestBuilder.HttpMethod = HttpMethod.Post;
-
-        return httpClient.PostAsync(requestBuilder.RequestUri,
-            requestBuilder.Content,
-            cancellationToken);
-    }
     public static Task<string> PostStringAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -101,7 +82,74 @@ public static partial class HttpRequestBuilderExtensions
 
         return requestBuilder.SendAndReadString(httpClient, cancellationToken);
     }
-
+    public static async Task PostAsync(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
+    {
+        string? errorMessage = null;
+        try
+        {
+            using var httpResponse = await httpClient.PostAsync(requestBuilder.RequestUri, 
+                requestBuilder.Content,
+                cancellationToken);
+            
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                    await httpResponse.TryReadStringFromResponse() :
+                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+            }
+            
+            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
+                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
+        }
+    }
+    public static async Task GetAsync(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
+    {
+        string? errorMessage = null;
+        try
+        {
+            using var httpResponse = await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken);
+            
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                    await httpResponse.TryReadStringFromResponse() :
+                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+            }
+            
+            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
+                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
+        }
+    }
     private static async Task<T> SendAndDeserializeJson<T>(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -118,7 +166,9 @@ public static partial class HttpRequestBuilderExtensions
 
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = await httpResponse.TryReadStringFromResponse();
+                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                    await httpResponse.TryReadStringFromResponse() :
+                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
             }
             
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
@@ -166,7 +216,9 @@ public static partial class HttpRequestBuilderExtensions
             
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = await httpResponse.TryReadStringFromResponse();
+                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                    await httpResponse.TryReadStringFromResponse() :
+                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
             }
             
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
