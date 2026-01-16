@@ -5,9 +5,9 @@ namespace BT.Common.Http.Extensions;
 public static partial class HttpRequestBuilderExtensions
 {
     public static HttpRequestBuilder AddErrorExtractor(this HttpRequestBuilder requestBuilder,
-        Func<HttpResponseMessage, string?> errorExtractor)
+        Func<HttpResponseMessage, Task<string?>> errorExtractor)
     {
-        requestBuilder.AddErrorExtractor(errorExtractor);
+        requestBuilder.AddAsyncErrorExtractor(errorExtractor);
         
         return requestBuilder;
     }
