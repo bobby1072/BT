@@ -109,12 +109,18 @@ public static partial class HttpRequestBuilderExtensions
         CancellationToken cancellationToken = default
     )
     {
+        string? errorMessage = null;
         try
         {
             using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
 
             using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
 
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                errorMessage = await httpResponse.TryReadStringFromResponse();
+            }
+            
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
                 !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
             {
@@ -143,22 +149,35 @@ public static partial class HttpRequestBuilderExtensions
         }
         catch (Exception ex)
         {
-            throw new HttpRequestException(ex.Message, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
         }
     }
-
     private static async Task<string> SendAndReadString(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
         CancellationToken cancellationToken = default
     )
     {
+        string? errorMessage = null;
         try
         {
             using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
             using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
-
-            httpResponse.EnsureSuccessStatusCode();
+            
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                errorMessage = await httpResponse.TryReadStringFromResponse();
+            }
+            
+            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
+                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
 
             var deserializedResponse =
                 await httpResponse.Content.ReadAsStringAsync(cancellationToken)
@@ -168,9 +187,19 @@ public static partial class HttpRequestBuilderExtensions
         }
         catch (Exception ex)
         {
-            throw new HttpRequestException(ex.Message, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
         }
     }
 
-
+    private static async Task<string?> TryReadStringFromResponse(this HttpResponseMessage httpResponseMessage)
+    {
+        try
+        {
+            return await httpResponseMessage.Content.ReadAsStringAsync();
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }
