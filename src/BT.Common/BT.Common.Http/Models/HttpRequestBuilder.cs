@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text;
 using BT.Common.Http.Exceptions;
 using BT.Common.Http.Validators;
 using FluentValidation.Results;
@@ -7,55 +9,54 @@ namespace BT.Common.Http.Models;
 
 public sealed class HttpRequestBuilder
 {
-    private HttpMethod? _httpMethod;
     public HttpMethod? HttpMethod
     {
-        get => _httpMethod;
+        get;
         set
         {
             PropertiesHaveChangedSinceLastValidation = true;
-            _httpMethod = value;
+            field = value;
         }
     }
-
-    private Uri _uri = null!;
 
     public Uri RequestUri
     {
-        get => _uri;
+        get;
         set
         {
             PropertiesHaveChangedSinceLastValidation = true;
-            _uri = value;
+            field = value;
         }
-    }
-    private HttpContent? _httpContent;
+    } = null!;
 
     internal HttpContent? Content
     {
-        get => _httpContent;
+        get;
         set
         {
             PropertiesHaveChangedSinceLastValidation = true;
-            _httpContent = value;
+            field = value;
         }
     }
+
+    internal HttpStatusCode[] AllowedHttpStatusCodes { get; set; } = [];
     internal Dictionary<string, string> Headers { get; init; } = [];
     private bool PropertiesHaveChangedSinceLastValidation { get; set; } = false;
-    private ValidationResult? _currentValidationResult;
+
+    [field: AllowNull, MaybeNull]
     private ValidationResult ValidationResult
     {
         get
         {
-            if (_currentValidationResult is null || PropertiesHaveChangedSinceLastValidation)
+            if (field is null || PropertiesHaveChangedSinceLastValidation)
             {
                 PropertiesHaveChangedSinceLastValidation = false;
-                return _currentValidationResult ??=
+                return field ??=
                     HttpRequestBuilderValidator.DefaultValidator.Validate(this);
             }
             else
             {
-                return _currentValidationResult;
+                return field;
             }
         }
     }
@@ -66,7 +67,6 @@ public sealed class HttpRequestBuilder
     {
         RequestUri = requestUri;
     }
-
     public HttpRequestMessage ToHttpRequestMessage()
     {
         if (!IsValidRequest())
@@ -95,6 +95,13 @@ public sealed class HttpRequestBuilder
         return httpRequestMessage;
     }
 
+    internal void AddHttpStatusCodes(params HttpStatusCode[] httpStatusCodes)
+    {
+        AllowedHttpStatusCodes = AllowedHttpStatusCodes.Length < 1 ? httpStatusCodes: AllowedHttpStatusCodes
+            .ToList()
+            .Concat(httpStatusCodes)
+            .ToArray();
+    }
     internal void AddQueryParameter(string key, string value)
     {
         PropertiesHaveChangedSinceLastValidation = true;
