@@ -8,6 +8,14 @@ namespace BT.Common.Http.Extensions;
 
 public static partial class HttpRequestBuilderExtensions
 {
+    public static Task GetAsync(this HttpRequestBuilder builder, 
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default)
+    {
+        builder.HttpMethod = HttpMethod.Get;
+
+        return httpClient.GetAsync(builder.RequestUri, cancellationToken);
+    }
     public static Task<T> GetJsonAsync<T>(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -73,6 +81,16 @@ public static partial class HttpRequestBuilderExtensions
         );
     }
 
+    public static Task PostAsync(this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default)
+    {
+        requestBuilder.HttpMethod = HttpMethod.Post;
+
+        return httpClient.PostAsync(requestBuilder.RequestUri,
+            requestBuilder.Content,
+            cancellationToken);
+    }
     public static Task<string> PostStringAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
