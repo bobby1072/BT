@@ -40,6 +40,7 @@ public sealed class HttpRequestBuilder
     }
 
     internal HttpStatusCode[] AllowedHttpStatusCodes { get; set; } = [];
+    internal Func<HttpResponseMessage, string?>? ErrorExtractor { get; set; }
     internal Dictionary<string, string> Headers { get; init; } = [];
     private bool PropertiesHaveChangedSinceLastValidation { get; set; } = false;
 
@@ -95,6 +96,10 @@ public sealed class HttpRequestBuilder
         return httpRequestMessage;
     }
 
+    internal void AddErrorExtractor(Func<HttpResponseMessage, string?>? errorExtractor)
+    {
+        ErrorExtractor = errorExtractor;
+    }
     internal void AddHttpStatusCodes(params HttpStatusCode[] httpStatusCodes)
     {
         AllowedHttpStatusCodes = AllowedHttpStatusCodes.Length < 1 ? httpStatusCodes: AllowedHttpStatusCodes
