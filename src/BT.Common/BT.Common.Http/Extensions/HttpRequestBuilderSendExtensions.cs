@@ -82,17 +82,27 @@ public static partial class HttpRequestBuilderExtensions
 
         return requestBuilder.SendAndReadString(httpClient, cancellationToken);
     }
-    public static async Task PostAsync(
+    public static Task PostAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return requestBuilder.SendAsync(httpClient, HttpMethod.Post, cancellationToken);
+    }
+    public static async Task SendAsync(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        HttpMethod httpMethod,
         CancellationToken cancellationToken = default
     )
     {
         string? errorMessage = null;
         try
         {
-            using var httpResponse = await httpClient.PostAsync(requestBuilder.RequestUri, 
-                requestBuilder.Content,
+            requestBuilder.HttpMethod = httpMethod;
+            
+            using var httpResponse = await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), 
                 cancellationToken);
             
             if (!httpResponse.IsSuccessStatusCode)
