@@ -17,6 +17,6 @@ public class ApiException: Exception
 
     public IResult ToResult()
     {
-        return Results.Problem(Message, null, StatusCode);
+        return Results.Problem(Message, null, (int)StatusCode);
     }
 }
