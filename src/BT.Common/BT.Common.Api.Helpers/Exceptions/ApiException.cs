@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Api.Helpers.Exceptions;
@@ -12,5 +13,10 @@ public class ApiException: Exception
     {
         StatusCode = statusCode;
         LogLevel = logLevel;
+    }
+
+    public IResult ToResult()
+    {
+        return Results.Problem(Message, null, (int)StatusCode);
     }
 }
