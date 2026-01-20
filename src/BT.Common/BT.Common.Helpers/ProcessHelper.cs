@@ -5,10 +5,10 @@ namespace BT.Common.Helpers
 {
     public static class ProcessHelper
     {
-        public static ProcessStartInfo GetDefaultProcessStartInfo(string? workingDirectory = null)
+        public static ProcessStartInfo GetDefaultProcessStartInfo(string? workingDirectory = null, string? shellFileName = null)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var shell = isWindows ? "cmd.exe" : "/bin/bash";
+            var shell = shellFileName ?? (isWindows ? "pwsh" : "/bin/bash");
             var processInfo = new ProcessStartInfo
             {
                 FileName = shell,
@@ -18,7 +18,10 @@ namespace BT.Common.Helpers
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
-
+            if (shell == "pwsh")
+            {
+                processInfo.Arguments = "-NoLogo -NoProfile";
+            }
             if (!string.IsNullOrEmpty(workingDirectory))
             {
                 processInfo.WorkingDirectory = workingDirectory;
