@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using BT.Common.Http.Exceptions;
 using BT.Common.Http.Models;
+using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
 
 namespace BT.Common.Http.Extensions;
 
@@ -122,9 +123,13 @@ public static partial class HttpRequestBuilderExtensions
                 httpResponse.EnsureSuccessStatusCode();
             }
         }
+        catch (System.Net.Http.HttpRequestException httpRequestException)
+        {
+            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
         }
     }
     public static async Task GetAsync(
@@ -155,9 +160,13 @@ public static partial class HttpRequestBuilderExtensions
                 httpResponse.EnsureSuccessStatusCode();
             }
         }
+        catch (System.Net.Http.HttpRequestException httpRequestException)
+        {
+            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
         }
     }
     private static async Task<T> SendAndDeserializeJson<T>(
@@ -176,21 +185,21 @@ public static partial class HttpRequestBuilderExtensions
 
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
-                    await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+                errorMessage = requestBuilder.ErrorExtractor is null
+                    ? await httpResponse.TryReadStringFromResponse()
+                    : await requestBuilder.ErrorExtractor.Invoke(httpResponse);
             }
-            
+
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
                 !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
             {
                 httpResponse.EnsureSuccessStatusCode();
             }
-            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+            else if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
             {
                 httpResponse.EnsureSuccessStatusCode();
             }
-            
+
 
             var deserializedResponse = await httpResponse.Content.ReadFromJsonAsync<T>(
                 jsonSerializerOptions,
@@ -202,14 +211,18 @@ public static partial class HttpRequestBuilderExtensions
                 var jsonException = new JsonException(
                     $"Failed to deserialize http response content to type of {typeof(T).Name}."
                 );
-                throw new HttpRequestException(jsonException.Message, jsonException);
+                throw new HttpRequestException(jsonException.Message, null, jsonException);
             }
 
             return deserializedResponse;
         }
+        catch (System.Net.Http.HttpRequestException httpRequestException)
+        {
+            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
         }
     }
     private static async Task<string> SendAndReadString(
@@ -247,9 +260,13 @@ public static partial class HttpRequestBuilderExtensions
 
             return deserializedResponse;
         }
+        catch (System.Net.Http.HttpRequestException httpRequestException)
+        {
+            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
         }
     }
 
