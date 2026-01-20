@@ -2,7 +2,7 @@
 
 namespace BT.Common.Http.Exceptions;
 
-internal class HttpRequestException: Exception
+public sealed class HttpRequestException: Exception
 {
     public HttpStatusCode? HttpStatusCode { get; set; }
 
