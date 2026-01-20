@@ -5,10 +5,13 @@ namespace BT.Common.Helpers
 {
     public static class ProcessHelper
     {
-        public static ProcessStartInfo GetDefaultProcessStartInfo(string? workingDirectory = null, string? shellFileName = null)
+        public static ProcessStartInfo GetDefaultProcessStartInfo(
+            string? workingDirectory = null,
+            string? shellFileName = null
+        )
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var shell = shellFileName ?? (isWindows ? "pwsh" : "/bin/bash");
+            var shell = shellFileName ?? (isWindows ? "powershell.exe" : "/bin/bash");
             var processInfo = new ProcessStartInfo
             {
                 FileName = shell,
@@ -18,7 +21,7 @@ namespace BT.Common.Helpers
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
-            if (shell == "pwsh")
+            if (shell == "pwsh" || shell == "powershell.exe")
             {
                 processInfo.Arguments = "-NoLogo -NoProfile";
             }
@@ -32,7 +35,10 @@ namespace BT.Common.Helpers
 
         public static string GetInnerStandardOutput(string standardOutput, string commandToSplitOn)
         {
-            string[] lines = standardOutput.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = standardOutput.Split(
+                Environment.NewLine,
+                StringSplitOptions.RemoveEmptyEntries
+            );
 
             int commandIndex = -1;
             string? prefixLine = null;
