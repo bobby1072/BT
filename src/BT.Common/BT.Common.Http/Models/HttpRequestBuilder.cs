@@ -4,6 +4,7 @@ using System.Text;
 using BT.Common.Http.Exceptions;
 using BT.Common.Http.Validators;
 using FluentValidation.Results;
+using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
 
 namespace BT.Common.Http.Models;
 
@@ -78,7 +79,7 @@ public sealed class HttpRequestBuilder
             {
                 sb.AppendLine($"{error} ");
             }
-            throw new HttpRequestBuilderException(sb.ToString().Trim());
+            throw new HttpRequestException(sb.ToString().Trim());
         }
 
         var httpRequestMessage = new HttpRequestMessage(HttpMethod!, GetFinalUrl());

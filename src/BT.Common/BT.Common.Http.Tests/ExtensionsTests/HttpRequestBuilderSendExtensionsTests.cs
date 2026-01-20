@@ -69,7 +69,7 @@ public class HttpRequestBuilderExtensionsTests
         var requestBuilder = CreateValidRequestBuilder();
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.GetJsonAsync<TestDto>(client));
+        await Assert.ThrowsAsync<Exceptions.HttpRequestException>(() => requestBuilder.GetJsonAsync<TestDto>(client));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
         client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
@@ -105,7 +105,7 @@ public class HttpRequestBuilderExtensionsTests
         requestBuilder.HttpMethod = HttpMethod.Post;
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.PostJsonAsync<TestDto>(client));
+        await Assert.ThrowsAsync<Exceptions.HttpRequestException>(() => requestBuilder.PostJsonAsync<TestDto>(client));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
         client.ShouldHaveUsedMethod(HttpMethod.Post);
     }
@@ -121,7 +121,7 @@ public class HttpRequestBuilderExtensionsTests
         requestBuilder.HttpMethod = HttpMethod.Post;
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.PostJsonAsync<TestDto>(client));
+        await Assert.ThrowsAsync<Exceptions.HttpRequestException>(() => requestBuilder.PostJsonAsync<TestDto>(client));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
         client.ShouldHaveUsedMethod(HttpMethod.Post);
     }
@@ -137,7 +137,7 @@ public class HttpRequestBuilderExtensionsTests
         requestBuilder.HttpMethod = HttpMethod.Post;
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.PostStringAsync(client));
+        await Assert.ThrowsAsync<Exceptions.HttpRequestException>(() => requestBuilder.PostStringAsync(client));
         client.ShouldHaveCalledExpectedUrl("https://example.com/");
         client.ShouldHaveUsedMethod(HttpMethod.Post);
     }
