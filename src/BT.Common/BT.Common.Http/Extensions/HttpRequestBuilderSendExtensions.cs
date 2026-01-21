@@ -1,7 +1,5 @@
 ﻿using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using BT.Common.Http.Exceptions;
 using BT.Common.Http.Models;
 using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
 

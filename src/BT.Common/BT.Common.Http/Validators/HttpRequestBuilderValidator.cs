@@ -1,6 +1,6 @@
-﻿using BT.Common.Http.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using BT.Common.Http.Models;
 using FluentValidation;
-using System.Diagnostics.CodeAnalysis;
 
 namespace BT.Common.Http.Validators;
 

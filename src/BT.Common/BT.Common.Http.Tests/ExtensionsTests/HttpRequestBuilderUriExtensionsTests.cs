@@ -1,5 +1,4 @@
-﻿
-using System.Net;
+﻿using System.Net;
 using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
 

@@ -1,8 +1,5 @@
 ﻿using BT.Common.Services.Concrete;
 using BT.Common.Services.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 
 namespace AiTrainer.Web.Domain.Services.Tests;
 

@@ -1,6 +1,5 @@
 using BT.Common.Helpers.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Api.Helpers.Middlewares;
