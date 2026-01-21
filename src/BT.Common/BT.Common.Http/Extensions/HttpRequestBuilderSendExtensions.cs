@@ -177,9 +177,9 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
-
-            using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
+            using var httpResponse = requestBuilder.HttpMethod == HttpMethod.Get ?
+                await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken) :
+                await httpClient.PostAsync(requestBuilder.RequestUri, requestBuilder.Content, cancellationToken);
 
             if (!httpResponse.IsSuccessStatusCode)
             {
@@ -232,8 +232,9 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpReqMessage = requestBuilder.ToHttpRequestMessage();
-            using var httpResponse = await httpClient.SendAsync(httpReqMessage, cancellationToken);
+            using var httpResponse = requestBuilder.HttpMethod == HttpMethod.Get ?
+                await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken) :
+                await httpClient.PostAsync(requestBuilder.RequestUri, requestBuilder.Content, cancellationToken);
             
             if (!httpResponse.IsSuccessStatusCode)
             {

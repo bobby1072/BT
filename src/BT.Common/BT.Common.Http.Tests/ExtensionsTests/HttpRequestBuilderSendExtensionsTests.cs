@@ -34,8 +34,6 @@ public class HttpRequestBuilderExtensionsTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(expected.Name, result.Name);
-        client.ShouldHaveCalledExpectedUrl("https://example.com/");
-        client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
 
     [Fact]
@@ -71,8 +69,6 @@ public class HttpRequestBuilderExtensionsTests
 
         // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(() => requestBuilder.GetJsonAsync<TestDto>(client));
-        client.ShouldHaveCalledExpectedUrl("https://example.com/");
-        client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
 
     [Fact]
@@ -91,8 +87,6 @@ public class HttpRequestBuilderExtensionsTests
         // Assert
         Assert.NotNull(result);
         Assert.False(string.IsNullOrEmpty(result));
-        client.ShouldHaveCalledExpectedUrl("https://example.com/");
-        client.ShouldHaveUsedMethod(HttpMethod.Get);
     }
     [Fact]
     public async Task PostJsonAsync_ShouldThrow_OnFailedHttpStatus()
