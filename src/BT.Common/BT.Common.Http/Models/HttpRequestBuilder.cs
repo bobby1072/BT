@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
-using BT.Common.Http.Exceptions;
+using System.Web;
 using BT.Common.Http.Validators;
 using FluentValidation.Results;
 using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
@@ -123,7 +123,7 @@ public sealed class HttpRequestBuilder
     internal Uri GetFinalUrl()
     {
         var uriBuilder = new UriBuilder(RequestUri);
-        var queryParams = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+        var queryParams = HttpUtility.ParseQueryString(uriBuilder.Query);
         foreach (var kvp in _queryParams)
         {
             queryParams[kvp.Key] = kvp.Value;
