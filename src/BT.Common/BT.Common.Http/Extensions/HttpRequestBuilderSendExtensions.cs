@@ -125,7 +125,7 @@ public static partial class HttpRequestBuilderExtensions
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
         }
         catch (Exception ex)
         {
@@ -162,7 +162,7 @@ public static partial class HttpRequestBuilderExtensions
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
         }
         catch (Exception ex)
         {
@@ -218,7 +218,7 @@ public static partial class HttpRequestBuilderExtensions
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
         }
         catch (Exception ex)
         {
@@ -262,7 +262,7 @@ public static partial class HttpRequestBuilderExtensions
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
         }
         catch (Exception ex)
         {
