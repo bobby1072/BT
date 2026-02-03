@@ -104,22 +104,9 @@ public static partial class HttpRequestBuilderExtensions
             using var httpResponse = await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), 
                 cancellationToken);
             
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
-                    await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
-            }
+            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
             
-            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
-                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
+            ThrowOnBadStatus(requestBuilder, httpResponse);
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
@@ -141,22 +128,9 @@ public static partial class HttpRequestBuilderExtensions
         {
             using var httpResponse = await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken);
             
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
-                    await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
-            }
+            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
             
-            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
-                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
+            ThrowOnBadStatus(requestBuilder, httpResponse);
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
@@ -181,38 +155,11 @@ public static partial class HttpRequestBuilderExtensions
                 await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken) :
                 await httpClient.PostAsync(requestBuilder.RequestUri, requestBuilder.Content, cancellationToken);
 
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                errorMessage = requestBuilder.ErrorExtractor is null
-                    ? await httpResponse.TryReadStringFromResponse()
-                    : await requestBuilder.ErrorExtractor.Invoke(httpResponse);
-            }
+            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
+            
+            ThrowOnBadStatus(requestBuilder, httpResponse);
 
-            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
-                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-            else if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-
-
-            var deserializedResponse = await httpResponse.Content.ReadFromJsonAsync<T>(
-                jsonSerializerOptions,
-                cancellationToken
-            );
-
-            if (deserializedResponse is null)
-            {
-                var jsonException = new JsonException(
-                    $"Failed to deserialize http response content to type of {typeof(T).Name}."
-                );
-                throw new HttpRequestException(jsonException.Message, null, jsonException);
-            }
-
-            return deserializedResponse;
+            return await ReadFromJsonAsync<T>(httpResponse, jsonSerializerOptions, cancellationToken);
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
@@ -236,23 +183,10 @@ public static partial class HttpRequestBuilderExtensions
                 await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken) :
                 await httpClient.PostAsync(requestBuilder.RequestUri, requestBuilder.Content, cancellationToken);
             
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
-                    await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
-            }
+            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
             
-            if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
-                !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-            else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-
+            ThrowOnBadStatus(requestBuilder, httpResponse);
+            
             var deserializedResponse =
                 await httpResponse.Content.ReadAsStringAsync(cancellationToken)
                 ?? throw new HttpRequestException("Failed to read http response content");
@@ -269,6 +203,50 @@ public static partial class HttpRequestBuilderExtensions
         }
     }
 
+    private static void ThrowOnBadStatus(HttpRequestBuilder requestBuilder, HttpResponseMessage httpResponse)
+    {
+                    
+        if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
+            !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
+        {
+            httpResponse.EnsureSuccessStatusCode();
+        }
+        else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+        {
+            httpResponse.EnsureSuccessStatusCode();
+        }
+    }
+    private static async Task<string?> CheckStatusAndGetErrorMessage(HttpRequestBuilder requestBuilder,
+        HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+    {
+        string? errorMessage = null;
+
+        if (!httpResponse.IsSuccessStatusCode)
+        {
+            errorMessage = requestBuilder.AsyncErrorExtractor is null ? 
+                await httpResponse.TryReadStringFromResponse() :
+                await requestBuilder.AsyncErrorExtractor.Invoke(httpResponse, cancellationToken);
+        }
+        
+        return errorMessage;
+    }
+    private static async Task<T> ReadFromJsonAsync<T>(HttpResponseMessage responseMessage, JsonSerializerOptions? opts, CancellationToken cancellationToken)
+    {
+        var deserializedResponse = await responseMessage.Content.ReadFromJsonAsync<T>(
+            opts,
+            cancellationToken
+        );
+
+        if (deserializedResponse is null)
+        {
+            var jsonException = new JsonException(
+                $"Failed to deserialize http response content to type of {typeof(T).Name}."
+            );
+            throw new HttpRequestException(jsonException.Message, null, jsonException);
+        }
+
+        return deserializedResponse;
+    }
     private static async Task<string?> TryReadStringFromResponse(this HttpResponseMessage httpResponseMessage)
     {
         try
