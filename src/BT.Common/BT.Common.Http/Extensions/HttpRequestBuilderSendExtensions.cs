@@ -106,9 +106,9 @@ public static partial class HttpRequestBuilderExtensions
             
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                errorMessage = requestBuilder.AsyncErrorExtractor is null ? 
                     await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+                    await requestBuilder.AsyncErrorExtractor.Invoke(httpResponse, cancellationToken);
             }
             
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
@@ -143,9 +143,9 @@ public static partial class HttpRequestBuilderExtensions
             
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                errorMessage = requestBuilder.AsyncErrorExtractor is null ? 
                     await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+                    await requestBuilder.AsyncErrorExtractor.Invoke(httpResponse, cancellationToken);
             }
             
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
@@ -183,9 +183,9 @@ public static partial class HttpRequestBuilderExtensions
 
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = requestBuilder.ErrorExtractor is null
+                errorMessage = requestBuilder.AsyncErrorExtractor is null
                     ? await httpResponse.TryReadStringFromResponse()
-                    : await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+                    : await requestBuilder.AsyncErrorExtractor.Invoke(httpResponse, cancellationToken);
             }
 
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
@@ -238,9 +238,9 @@ public static partial class HttpRequestBuilderExtensions
             
             if (!httpResponse.IsSuccessStatusCode)
             {
-                errorMessage = requestBuilder.ErrorExtractor is null ? 
+                errorMessage = requestBuilder.AsyncErrorExtractor is null ? 
                     await httpResponse.TryReadStringFromResponse() :
-                    await requestBuilder.ErrorExtractor.Invoke(httpResponse);
+                    await requestBuilder.AsyncErrorExtractor.Invoke(httpResponse, cancellationToken);
             }
             
             if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&

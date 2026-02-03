@@ -41,7 +41,7 @@ public sealed class HttpRequestBuilder
     }
 
     internal HttpStatusCode[] AllowedHttpStatusCodes { get; set; } = [];
-    internal Func<HttpResponseMessage, Task<string?>>? ErrorExtractor { get; set; }
+    internal Func<HttpResponseMessage, CancellationToken, Task<string?>>? AsyncErrorExtractor { get; set; }
     internal Dictionary<string, string> Headers { get; init; } = [];
     private bool PropertiesHaveChangedSinceLastValidation { get; set; } = false;
 
@@ -97,9 +97,9 @@ public sealed class HttpRequestBuilder
         return httpRequestMessage;
     }
 
-    internal void AddAsyncErrorExtractor(Func<HttpResponseMessage, Task<string?>> errorExtractor)
+    internal void AddAsyncErrorExtractor(Func<HttpResponseMessage, CancellationToken, Task<string?>> errorExtractor)
     {
-        ErrorExtractor = errorExtractor;
+        AsyncErrorExtractor = errorExtractor;
     }
     internal void AddHttpStatusCodes(params HttpStatusCode[] httpStatusCodes)
     {
