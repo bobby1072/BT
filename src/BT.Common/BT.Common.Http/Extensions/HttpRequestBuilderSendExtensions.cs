@@ -139,7 +139,7 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpResponse = await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken);
+            using var httpResponse = await httpClient.GetAsync(requestBuilder.GetFinalUrl(), cancellationToken);
             
             if (!httpResponse.IsSuccessStatusCode)
             {
@@ -178,8 +178,8 @@ public static partial class HttpRequestBuilderExtensions
         try
         {
             using var httpResponse = requestBuilder.HttpMethod == HttpMethod.Get ?
-                await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken) :
-                await httpClient.PostAsync(requestBuilder.RequestUri, requestBuilder.Content, cancellationToken);
+                await httpClient.GetAsync(requestBuilder.GetFinalUrl(), cancellationToken) :
+                await httpClient.PostAsync(requestBuilder.GetFinalUrl(), requestBuilder.Content, cancellationToken);
 
             if (!httpResponse.IsSuccessStatusCode)
             {
@@ -233,8 +233,8 @@ public static partial class HttpRequestBuilderExtensions
         try
         {
             using var httpResponse = requestBuilder.HttpMethod == HttpMethod.Get ?
-                await httpClient.GetAsync(requestBuilder.RequestUri, cancellationToken) :
-                await httpClient.PostAsync(requestBuilder.RequestUri, requestBuilder.Content, cancellationToken);
+                await httpClient.GetAsync(requestBuilder.GetFinalUrl(), cancellationToken) :
+                await httpClient.PostAsync(requestBuilder.GetFinalUrl(), requestBuilder.Content, cancellationToken);
             
             if (!httpResponse.IsSuccessStatusCode)
             {
