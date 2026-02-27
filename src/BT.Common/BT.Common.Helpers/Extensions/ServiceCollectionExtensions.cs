@@ -33,4 +33,26 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+    
+    
+    public static T CheckAndAddSingletonOptions<T>(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string? nameofSection = null
+    )
+        where T : class
+    {
+        var sectname = nameofSection ?? typeof(T).Name;
+
+        var configSection = configuration.GetSection(sectname);
+
+        if (!configSection.Exists())
+        {
+            throw new ArgumentException(sectname);
+        }
+
+        services.ConfigureSingletonOptions<T>(configSection);
+
+        return configSection.Get<T>() ?? throw new ArgumentException(sectname);
+    }   
 }
