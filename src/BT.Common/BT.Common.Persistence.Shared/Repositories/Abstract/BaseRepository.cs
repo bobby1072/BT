@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
-using BT.Common.FastArray.Proto;
 using BT.Common.Persistence.Shared.Entities;
 using BT.Common.Persistence.Shared.Models;
 using BT.Common.Polly.Extensions;
@@ -44,7 +43,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var allEnts = await TimeAndLogDbOperation(() => foundOneQuerySet.ToArrayAsync(),
                 nameof(GetAll));
 
-            return new DbGetManyResult<TModel>(allEnts?.FastArraySelect(x => x.ToModel()).ToArray());
+            return new DbGetManyResult<TModel>(allEnts?.Select(x => x.ToModel()).ToArray());
         }
         public virtual async Task<DbResult<int>> GetCount(Expression<Func<TEnt,bool>>? predicate = null)
         {
@@ -77,7 +76,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 nameof(GetMany)
             );
 
-            return new DbGetManyResult<TModel>(foundMany?.FastArraySelect(x => x.ToModel()).ToArray());
+            return new DbGetManyResult<TModel>(foundMany?.Select(x => x.ToModel()).ToArray());
         }
 
         public virtual async Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object?> propertiesToMatch, params string[] relations)
@@ -118,7 +117,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             );
 
             return new DbGetManyResult<TModel>(
-                foundOne?.FastArraySelect(x => x.ToModel()).ToArray()
+                foundOne?.Select(x => x.ToModel()).ToArray()
             );
         }
 
@@ -138,7 +137,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             );
 
             return new DbGetManyResult<TModel>(
-                foundOne?.FastArraySelect(x => x.ToModel()).ToArray()
+                foundOne?.Select(x => x.ToModel()).ToArray()
             );
         }
 
@@ -154,7 +153,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 nameof(GetMany));
 
             return new DbGetManyResult<TModel>(
-                foundOne?.FastArraySelect(x => x.ToModel()).ToArray()
+                foundOne?.Select(x => x.ToModel()).ToArray()
             );
         }
 
@@ -242,12 +241,12 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var set = dbContext.Set<TEnt>();
             async Task<TModel?> Operation()
             {
-                await set.AddRangeAsync(entObj.FastArraySelect(x => RuntimeToEntity(x)));
+                await set.AddRangeAsync(entObj.Select(x => RuntimeToEntity(x)));
                 await dbContext.SaveChangesAsync();
                 return null;
             }
             await TimeAndLogDbOperation(Operation, nameof(Create));
-            var runtimeObjs = set.Local.FastArraySelect(x => x.ToModel());
+            var runtimeObjs = set.Local.Select(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
@@ -262,7 +261,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var set = dbContext.Set<TEnt>();
             async Task<TModel?> Operation()
             {
-                set.RemoveRange(entObj.FastArraySelect(x => RuntimeToEntity(x)));
+                set.RemoveRange(entObj.Select(x => RuntimeToEntity(x)));
                 await dbContext.SaveChangesAsync();
                 return null;
             }
@@ -301,13 +300,13 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var set = dbContext.Set<TEnt>();
             async Task<TModel?> Operation()
             {
-                set.UpdateRange(entObj.FastArraySelect(x => RuntimeToEntity(x)));
+                set.UpdateRange(entObj.Select(x => RuntimeToEntity(x)));
                 await dbContext.SaveChangesAsync();
                 return null;
             }
             await TimeAndLogDbOperation(Operation, nameof(Update));
 
-            var runtimeObjs = set.Local.FastArraySelect(x => x.ToModel());
+            var runtimeObjs = set.Local.Select(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
