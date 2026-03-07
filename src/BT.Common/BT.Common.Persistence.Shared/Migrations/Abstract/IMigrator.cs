@@ -1,7 +1,7 @@
 ﻿namespace BT.Common.Persistence.Shared.Migrations.Abstract
 {
-    public interface IMigrator
+    internal interface IMigrator
     {
-        internal Task Migrate();
+        Task Migrate();
     }
 }
