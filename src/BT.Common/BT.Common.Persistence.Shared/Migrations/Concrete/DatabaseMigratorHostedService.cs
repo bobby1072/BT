@@ -28,7 +28,6 @@ namespace BT.Common.Persistence.Shared.Migrations.Concrete
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await Task.Delay(2000, cancellationToken);
             var pipeline = _dbMigrationsConfiguration.ToPipeline();
 
             await pipeline.ExecuteAsync(async _ => await Migrate(), cancellationToken);
