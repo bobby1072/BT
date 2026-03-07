@@ -28,6 +28,9 @@ namespace BT.Common.Persistence.Shared.Migrations.Concrete
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Starting database migrations at {MigrationTime}...",
+                DateTime.UtcNow);
+            
             var pipeline = _dbMigrationsConfiguration.ToPipeline();
 
             await pipeline.ExecuteAsync(async _ => await Migrate(), cancellationToken);
