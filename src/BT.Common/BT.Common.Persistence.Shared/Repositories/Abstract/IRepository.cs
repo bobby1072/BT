@@ -8,33 +8,88 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
         where TEnt : BaseEntity<TEntId, TModel>
         where TModel : class
     {
-        Task<DbGetManyResult<TModel>> GetAll(params string[] relations);
-        Task<DbResult<int>> GetCount(Expression<Func<TEnt,bool>>? predicate = null);
+        Task<DbGetManyResult<TModel>> GetAll(
+            CancellationToken cancellationToken = default,
+            params string[] relations
+        );
+        Task<DbResult<int>> GetCount(
+            Expression<Func<TEnt, bool>>? predicate = null,
+            CancellationToken cancellationToken = default
+        );
         Task<DbGetManyResult<TModel>> GetMany<T>(
             T value,
             string propertyName,
+            CancellationToken cancellationToken = default,
             params string[] relations
         );
-        Task<DbGetManyResult<TModel>> GetMany(Dictionary<string, object?> propertiesToMatch,
-            params string[] relations);
-        Task<DbGetManyResult<TModel>> GetMany(TEntId entityId, params string[] relations);
-        Task<DbGetManyResult<TModel>> GetMany(IReadOnlyCollection<TEntId> entityIds, params string[] relations);
-        Task<DbGetOneResult<TModel>> GetOne(TEntId entityId, params string[] relations);
-        Task<DbGetOneResult<TModel>> GetOne(Dictionary<string, object?> propertiesToMatch, params string[] relations);
+        Task<DbGetManyResult<TModel>> GetMany(
+            Dictionary<string, object?> propertiesToMatch,
+            CancellationToken cancellationToken = default,
+            params string[] relations
+        );
+        Task<DbGetManyResult<TModel>> GetMany(
+            TEntId entityId,
+            CancellationToken cancellationToken = default,
+            params string[] relations
+        );
+        Task<DbGetManyResult<TModel>> GetMany(
+            IReadOnlyCollection<TEntId> entityIds,
+            CancellationToken cancellationToken = default,
+            params string[] relations
+        );
+        Task<DbGetOneResult<TModel>> GetOne(
+            TEntId entityId,
+            CancellationToken cancellationToken = default,
+            params string[] relations
+        );
+        Task<DbGetOneResult<TModel>> GetOne(
+            Dictionary<string, object?> propertiesToMatch,
+            CancellationToken cancellationToken = default,
+            params string[] relations
+        );
         Task<DbGetOneResult<TModel>> GetOne<T>(
             T value,
             string propertyName,
+            CancellationToken cancellationToken = default,
             params string[] relations
         );
-        Task<DbSaveResult<TModel>> Create(IReadOnlyCollection<TModel> entObj);
-        Task<DbSaveResult<TModel>> Create(TModel entObj);
-        Task<DbSaveResult<TModel>> Update(IReadOnlyCollection<TModel> entObj);
-        Task<DbSaveResult<TModel>> Update(TModel entObj);
-        Task<DbDeleteResult<TModel>> Delete(IReadOnlyCollection<TModel> entObj);
-        Task<DbDeleteResult<TModel>> Delete(TModel entObj);
-        Task<DbDeleteResult<TEntId>> Delete(IReadOnlyCollection<TEntId> entIds);
-        Task<DbResult<bool>> Exists<T>(T value, string propertyName);
-        Task<DbResult<bool>> Exists(TEntId entityId);
-        Task<DbResult<bool>> AnyExists(IReadOnlyCollection<TEntId> entityIds);
+        Task<DbSaveResult<TModel>> Create(
+            IReadOnlyCollection<TModel> entObj,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbSaveResult<TModel>> Create(
+            TModel entObj,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbSaveResult<TModel>> Update(
+            IReadOnlyCollection<TModel> entObj,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbSaveResult<TModel>> Update(
+            TModel entObj,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbDeleteResult<TModel>> Delete(
+            IReadOnlyCollection<TModel> entObj,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbDeleteResult<TModel>> Delete(
+            TModel entObj,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbDeleteResult<TEntId>> Delete(
+            IReadOnlyCollection<TEntId> entIds,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbResult<bool>> Exists<T>(
+            T value,
+            string propertyName,
+            CancellationToken cancellationToken = default
+        );
+        Task<DbResult<bool>> Exists(TEntId entityId, CancellationToken cancellationToken = default);
+        Task<DbResult<bool>> AnyExists(
+            IReadOnlyCollection<TEntId> entityIds,
+            CancellationToken cancellationToken = default
+        );
     }
 }
