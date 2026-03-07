@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Data.Common;
 using BT.Common.Persistence.Shared.Configurations;
 using BT.Common.Persistence.Shared.Migrations.Abstract;
@@ -47,7 +48,13 @@ public static class ServiceCollectionExtensions
                 )
             );
         }
-        services.AddHostedService<DatabaseMigratorHostedService>();
+
+        services.AddHostedService<DatabaseMigratorHostedService>(sp => new DatabaseMigratorHostedService(
+            sp.GetRequiredService<IEnumerable<IMigrator>>(),
+            migrationSettings,
+            sp.GetRequiredService<IDatabaseMigratorHealthCheck>(),
+            sp.GetRequiredService<ILoggerFactory>().CreateLogger<DatabaseMigratorHostedService>())
+        );
 
         return services;
     }
