@@ -1,5 +1,6 @@
 ﻿using BT.Common.Api.Helpers.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,13 +18,7 @@ public static class DefaultEndpointExtensions
         {
             logger.LogInformation("Service appears healthy...");
 
-            return new WebOutcome<HealthResponse>
-            {
-                Data = new HealthResponse
-                {
-                    ServiceInfo = serviceInfo.Value,
-                },
-            };
+            return Results.Ok(new HealthResponse { ServiceInfo =  serviceInfo.Value });
         })
         .WithName("Health");
         

@@ -8,7 +8,7 @@ namespace BT.Common.Services.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddTelemetryService(this IServiceCollection services, string activitySourceName)
+    public static IServiceCollection AddTelemetryServices(this IServiceCollection services, string activitySourceName)
     {
         TelemetryHelperService.SetActivitySource(new ActivitySource(activitySourceName));
         
