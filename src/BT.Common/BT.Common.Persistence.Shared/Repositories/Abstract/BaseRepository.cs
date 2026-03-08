@@ -37,7 +37,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
         protected abstract TEnt RuntimeToEntity(TModel runtimeObj);
 
-        public virtual async Task<DbGetManyResult<TModel>> GetAll(
+        public virtual async Task<DbGetManyResult<TModel>> GetAllAsync(
             CancellationToken cancellationToken = default,
             params string[] relations
         )
@@ -49,14 +49,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             var allEnts = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.ToArrayAsync(ct),
-                nameof(GetAll),
+                nameof(GetAllAsync),
                 cancellationToken
             );
 
             return new DbGetManyResult<TModel>(allEnts?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbResult<int>> GetCount(
+        public virtual async Task<DbResult<int>> GetCountAsync(
             Expression<Func<TEnt, bool>>? predicate = null,
             CancellationToken cancellationToken = default
         )
@@ -70,14 +70,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                     predicate is null
                         ? foundOneQuerySet.CountAsync(ct)
                         : foundOneQuerySet.CountAsync(predicate, ct),
-                nameof(GetCount),
+                nameof(GetCountAsync),
                 cancellationToken
             );
 
             return new DbResult<int>(true, count);
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetMany(
+        public virtual async Task<DbGetManyResult<TModel>> GetManyAsync(
             Dictionary<string, object?> propertiesToMatch,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -100,14 +100,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             var foundMany = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.ToArrayAsync(ct),
-                nameof(GetMany),
+                nameof(GetManyAsync),
                 cancellationToken
             );
 
             return new DbGetManyResult<TModel>(foundMany?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOne(
+        public virtual async Task<DbGetOneResult<TModel>> GetOneAsync(
             Dictionary<string, object?> propertiesToMatch,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -130,14 +130,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             var foundOne = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.FirstOrDefaultAsync(ct),
-                nameof(GetOne),
+                nameof(GetOneAsync),
                 cancellationToken
             );
 
             return new DbGetOneResult<TModel>(foundOne?.ToModel());
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetMany<T>(
+        public virtual async Task<DbGetManyResult<TModel>> GetManyAsync<T>(
             T value,
             string propertyName,
             CancellationToken cancellationToken = default,
@@ -154,14 +154,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                     foundOneQuerySet
                         .Where(x => EF.Property<T>(x, propertyName)!.Equals(value))
                         .ToArrayAsync(ct),
-                nameof(GetMany),
+                nameof(GetManyAsync),
                 cancellationToken
             );
 
             return new DbGetManyResult<TModel>(foundOne?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetMany(
+        public virtual async Task<DbGetManyResult<TModel>> GetManyAsync(
             IReadOnlyCollection<TEntId> entityIds,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -179,14 +179,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             var foundOne = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.Where(x => entityIds.Contains(x.Id!)).ToArrayAsync(ct),
-                nameof(GetMany),
+                nameof(GetManyAsync),
                 cancellationToken
             );
 
             return new DbGetManyResult<TModel>(foundOne?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetMany(
+        public virtual async Task<DbGetManyResult<TModel>> GetManyAsync(
             TEntId entityId,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -198,14 +198,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.Where(x => x.Id!.Equals(entityId)).ToArrayAsync(ct),
-                nameof(GetMany),
+                nameof(GetManyAsync),
                 cancellationToken
             );
 
             return new DbGetManyResult<TModel>(foundOne?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOne(
+        public virtual async Task<DbGetOneResult<TModel>> GetOneAsync(
             TEntId entityId,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -217,14 +217,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
             var foundOne = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.FirstOrDefaultAsync(x => x.Id!.Equals(entityId), ct),
-                nameof(GetOne),
+                nameof(GetOneAsync),
                 cancellationToken
             );
 
             return new DbGetOneResult<TModel>(foundOne?.ToModel());
         }
 
-        public virtual async Task<DbResult<bool>> AnyExists(
+        public virtual async Task<DbResult<bool>> AnyExistsAsync(
             IReadOnlyCollection<TEntId> entityIds,
             CancellationToken cancellationToken = default
         )
@@ -236,14 +236,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
             var anyExists = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.AnyAsync(x => entityIds.Contains(x.Id!), ct),
-                nameof(AnyExists),
+                nameof(AnyExistsAsync),
                 cancellationToken
             );
 
             return new DbResult<bool>(true, anyExists);
         }
 
-        public virtual async Task<DbResult<bool>> Exists(
+        public virtual async Task<DbResult<bool>> ExistsAsync(
             TEntId entityId,
             CancellationToken cancellationToken = default
         )
@@ -254,14 +254,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             var foundOneQuerySet = dbContext.Set<TEnt>();
             var foundOne = await TimeAndLogDbOperation(
                 ct => foundOneQuerySet.AnyAsync(x => x.Id!.Equals(entityId), ct),
-                nameof(Exists),
+                nameof(ExistsAsync),
                 cancellationToken
             );
 
             return new DbResult<bool>(true, foundOne);
         }
 
-        public virtual async Task<DbResult<bool>> Exists<T>(
+        public virtual async Task<DbResult<bool>> ExistsAsync<T>(
             T value,
             string propertyName,
             CancellationToken cancellationToken = default
@@ -278,14 +278,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                         x => EF.Property<T>(x, propertyName)!.Equals(value),
                         ct
                     ),
-                nameof(Exists),
+                nameof(ExistsAsync),
                 cancellationToken
             );
 
             return new DbResult<bool>(true, foundOne);
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOne<T>(
+        public virtual async Task<DbGetOneResult<TModel>> GetOneAsync<T>(
             T value,
             string propertyName,
             CancellationToken cancellationToken = default,
@@ -303,14 +303,14 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                         x => EF.Property<T>(x, propertyName)!.Equals(value),
                         ct
                     ),
-                nameof(GetOne),
+                nameof(GetOneAsync),
                 cancellationToken
             );
 
             return new DbGetOneResult<TModel>(foundOne?.ToModel());
         }
 
-        public virtual async Task<DbSaveResult<TModel>> Create(
+        public virtual async Task<DbSaveResult<TModel>> CreateAsync(
             IReadOnlyCollection<TModel> entObj,
             CancellationToken cancellationToken = default
         )
@@ -329,17 +329,17 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync(ct);
                 return null;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Create), cancellationToken);
+            await TimeAndLogDbOperation(Operation, nameof(CreateAsync), cancellationToken);
             var runtimeObjs = set.Local.Select(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
-        public virtual Task<DbSaveResult<TModel>> Create(
+        public virtual Task<DbSaveResult<TModel>> CreateAsync(
             TModel entObj,
             CancellationToken cancellationToken = default
-        ) => Create([entObj], cancellationToken);
+        ) => CreateAsync([entObj], cancellationToken);
 
-        public virtual async Task<DbDeleteResult<TModel>> Delete(
+        public virtual async Task<DbDeleteResult<TModel>> DeleteAsync(
             IReadOnlyCollection<TModel> entObj,
             CancellationToken cancellationToken = default
         )
@@ -358,11 +358,11 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync(ct);
                 return null;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Delete), cancellationToken);
+            await TimeAndLogDbOperation(Operation, nameof(DeleteAsync), cancellationToken);
             return new DbDeleteResult<TModel>(entObj);
         }
 
-        public virtual async Task<DbDeleteResult<TEntId>> Delete(
+        public virtual async Task<DbDeleteResult<TEntId>> DeleteAsync(
             IReadOnlyCollection<TEntId> entIds,
             CancellationToken cancellationToken = default
         )
@@ -381,17 +381,17 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync(ct);
                 return default;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Delete), cancellationToken);
+            await TimeAndLogDbOperation(Operation, nameof(DeleteAsync), cancellationToken);
 
             return new DbDeleteResult<TEntId>(entIds);
         }
 
-        public virtual Task<DbDeleteResult<TModel>> Delete(
+        public virtual Task<DbDeleteResult<TModel>> DeleteAsync(
             TModel entObj,
             CancellationToken cancellationToken = default
-        ) => Delete([entObj], cancellationToken);
+        ) => DeleteAsync([entObj], cancellationToken);
 
-        public virtual async Task<DbSaveResult<TModel>> Update(
+        public virtual async Task<DbSaveResult<TModel>> UpdateAsync(
             IReadOnlyCollection<TModel> entObj,
             CancellationToken cancellationToken = default
         )
@@ -410,16 +410,16 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 await dbContext.SaveChangesAsync(ct);
                 return null;
             }
-            await TimeAndLogDbOperation(Operation, nameof(Update), cancellationToken);
+            await TimeAndLogDbOperation(Operation, nameof(UpdateAsync), cancellationToken);
 
             var runtimeObjs = set.Local.Select(x => x.ToModel());
             return new DbSaveResult<TModel>(runtimeObjs.ToArray());
         }
 
-        public virtual Task<DbSaveResult<TModel>> Update(
+        public virtual Task<DbSaveResult<TModel>> UpdateAsync(
             TModel entObj,
             CancellationToken cancellationToken = default
-        ) => Update([entObj], cancellationToken);
+        ) => UpdateAsync([entObj], cancellationToken);
 
         protected IQueryable<TEnt> AddRelationsToSet(
             IQueryable<TEnt> set,
