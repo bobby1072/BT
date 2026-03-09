@@ -46,6 +46,8 @@ namespace BT.Common.Persistence.Shared.Migrations.Concrete
 
             if (_shutDownProgram)
             {
+                _logger.LogInformation("Application is shutting down...");
+                    
                 Environment.Exit(0);
                 _lifetime.StopApplication();
             }
