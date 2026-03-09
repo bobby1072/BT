@@ -54,7 +54,7 @@ public static class ServiceCollectionExtensions
             sp.GetRequiredService<IEnumerable<IMigrator>>(),
             migrationSettings,
             sp.GetRequiredService<IDatabaseMigratorHealthCheck>(),
-            sp.GetRequiredService<IHostedLifecycleService>(),
+            sp.GetRequiredService<IHostApplicationLifetime>(),
             shutdownAppAfterMigration,
             sp.GetRequiredService<ILoggerFactory>().CreateLogger<DatabaseMigratorHostedService>())
         );
