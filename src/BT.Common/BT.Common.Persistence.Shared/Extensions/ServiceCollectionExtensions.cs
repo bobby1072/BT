@@ -1,9 +1,9 @@
-using System.Collections;
 using System.Data.Common;
 using BT.Common.Persistence.Shared.Configurations;
 using BT.Common.Persistence.Shared.Migrations.Abstract;
 using BT.Common.Persistence.Shared.Migrations.Concrete;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace BT.Common.Persistence.Shared.Extensions;
@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         DbMigrationSettings migrationSettings,
         IHealthChecksBuilder healthChecksBuilder,
+        bool shutdownAppAfterMigration,
         params (
             Func<DbConnection> ConnectionFactory,
             string SqlFolderPath
@@ -53,6 +54,8 @@ public static class ServiceCollectionExtensions
             sp.GetRequiredService<IEnumerable<IMigrator>>(),
             migrationSettings,
             sp.GetRequiredService<IDatabaseMigratorHealthCheck>(),
+            sp.GetRequiredService<IHostedLifecycleService>(),
+            shutdownAppAfterMigration,
             sp.GetRequiredService<ILoggerFactory>().CreateLogger<DatabaseMigratorHostedService>())
         );
 
