@@ -13,7 +13,7 @@ internal sealed class CorrelationIdMiddleware
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, ILogger<CorrelationIdMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context, ILogger<CorrelationIdMiddleware> logger)
     {
         var correlationIdToUse = context.Request.Headers.TryGetValue(ApiConstants.CorrelationIdHeader, out var foundCorrelationId) 
             ? foundCorrelationId.ToString() : Guid.NewGuid().ToString();

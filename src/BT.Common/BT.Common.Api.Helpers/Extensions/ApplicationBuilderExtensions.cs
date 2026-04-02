@@ -11,4 +11,11 @@ public static class ApplicationBuilderExtensions
         
         return app;
     }
+    
+    public static IApplicationBuilder UseBadRequestExceptionHandlingMiddleware(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<BadRequestExceptionHandlingMiddleware>();
+        
+        return app;
+    }
 }
