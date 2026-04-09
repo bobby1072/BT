@@ -71,6 +71,7 @@ public static partial class HttpRequestBuilderExtensions
             cancellationToken
         );
     }
+
     public static Task<string> PostStringAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -81,6 +82,7 @@ public static partial class HttpRequestBuilderExtensions
 
         return requestBuilder.SendAndReadString(httpClient, cancellationToken);
     }
+
     public static Task PostAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -89,6 +91,7 @@ public static partial class HttpRequestBuilderExtensions
     {
         return requestBuilder.SendAsync(httpClient, HttpMethod.Post, cancellationToken);
     }
+
     public static Task GetAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -99,6 +102,7 @@ public static partial class HttpRequestBuilderExtensions
 
         return requestBuilder.SendAsync(httpClient, HttpMethod.Get, cancellationToken);
     }
+
     public static async Task SendAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -110,23 +114,40 @@ public static partial class HttpRequestBuilderExtensions
         try
         {
             requestBuilder.HttpMethod = httpMethod;
-            
-            using var httpResponse = await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), 
-                cancellationToken);
-            
-            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
-            
+
+            using var httpResponse = await httpClient
+                .SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken)
+                .ConfigureAwait(false);
+
+            errorMessage = await CheckStatusAndGetErrorMessage(
+                    requestBuilder,
+                    httpResponse,
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+
             ThrowOnBadStatus(requestBuilder, httpResponse);
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(errorMessage)
+                    ? errorMessage
+                    : httpRequestException.Message,
+                httpRequestException.StatusCode,
+                httpRequestException
+            );
         }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(errorMessage) ? errorMessage : ex.Message,
+                null,
+                ex
+            );
         }
     }
+
     private static async Task<T> SendAndDeserializeJson<T>(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -137,24 +158,46 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpResponse =
-                await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken);
-            
-            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
-            
+            using var httpResponse = await httpClient
+                .SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken)
+                .ConfigureAwait(false);
+
+            errorMessage = await CheckStatusAndGetErrorMessage(
+                    requestBuilder,
+                    httpResponse,
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+
             ThrowOnBadStatus(requestBuilder, httpResponse);
 
-            return await ReadFromJsonAsync<T>(httpResponse, jsonSerializerOptions, cancellationToken);
+            return await ReadFromJsonAsync<T>(
+                    httpResponse,
+                    jsonSerializerOptions,
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(errorMessage)
+                    ? errorMessage
+                    : httpRequestException.Message,
+                httpRequestException.StatusCode,
+                httpRequestException
+            );
         }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(errorMessage) ? errorMessage : ex.Message,
+                null,
+                ex
+            );
         }
     }
+
     private static async Task<string> SendAndReadString(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -164,62 +207,98 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpResponse =
-                await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken);
-            
-            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
-            
+            using var httpResponse = await httpClient
+                .SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken)
+                .ConfigureAwait(false);
+
+            errorMessage = await CheckStatusAndGetErrorMessage(
+                    requestBuilder,
+                    httpResponse,
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+
             ThrowOnBadStatus(requestBuilder, httpResponse);
-            
+
             var deserializedResponse =
-                await httpResponse.Content.ReadAsStringAsync(cancellationToken)
+                await httpResponse
+                    .Content.ReadAsStringAsync(cancellationToken)
+                    .ConfigureAwait(false)
                 ?? throw new HttpRequestException("Failed to read http response content");
 
             return deserializedResponse;
         }
         catch (System.Net.Http.HttpRequestException httpRequestException)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(errorMessage)
+                    ? errorMessage
+                    : httpRequestException.Message,
+                httpRequestException.StatusCode,
+                httpRequestException
+            );
         }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(errorMessage) ? errorMessage : ex.Message,
+                null,
+                ex
+            );
         }
     }
 
-    private static void ThrowOnBadStatus(HttpRequestBuilder requestBuilder, HttpResponseMessage httpResponse)
+    private static void ThrowOnBadStatus(
+        HttpRequestBuilder requestBuilder,
+        HttpResponseMessage httpResponse
+    )
     {
-                    
-        if (!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length > 0 &&
-            !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode))
+        if (
+            !httpResponse.IsSuccessStatusCode
+            && requestBuilder.AllowedHttpStatusCodes.Length > 0
+            && !requestBuilder.AllowedHttpStatusCodes.Contains(httpResponse.StatusCode)
+        )
         {
             httpResponse.EnsureSuccessStatusCode();
         }
-        else if(!httpResponse.IsSuccessStatusCode && requestBuilder.AllowedHttpStatusCodes.Length == 0)
+        else if (
+            !httpResponse.IsSuccessStatusCode
+            && requestBuilder.AllowedHttpStatusCodes.Length == 0
+        )
         {
             httpResponse.EnsureSuccessStatusCode();
         }
     }
-    private static async Task<string?> CheckStatusAndGetErrorMessage(HttpRequestBuilder requestBuilder,
-        HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+
+    private static async Task<string?> CheckStatusAndGetErrorMessage(
+        HttpRequestBuilder requestBuilder,
+        HttpResponseMessage httpResponse,
+        CancellationToken cancellationToken
+    )
     {
         string? errorMessage = null;
 
         if (!httpResponse.IsSuccessStatusCode)
         {
-            errorMessage = requestBuilder.AsyncErrorExtractor is null ? 
-                await httpResponse.TryReadStringFromResponse() :
-                await requestBuilder.AsyncErrorExtractor.Invoke(httpResponse, cancellationToken);
+            errorMessage = requestBuilder.AsyncErrorExtractor is null
+                ? await httpResponse.TryReadStringFromResponse().ConfigureAwait(false)
+                : await requestBuilder
+                    .AsyncErrorExtractor.Invoke(httpResponse, cancellationToken)
+                    .ConfigureAwait(false);
         }
-        
+
         return errorMessage;
     }
-    private static async Task<T> ReadFromJsonAsync<T>(HttpResponseMessage responseMessage, JsonSerializerOptions? opts, CancellationToken cancellationToken)
+
+    private static async Task<T> ReadFromJsonAsync<T>(
+        HttpResponseMessage responseMessage,
+        JsonSerializerOptions? opts,
+        CancellationToken cancellationToken
+    )
     {
-        var deserializedResponse = await responseMessage.Content.ReadFromJsonAsync<T>(
-            opts,
-            cancellationToken
-        );
+        var deserializedResponse = await responseMessage
+            .Content.ReadFromJsonAsync<T>(opts, cancellationToken)
+            .ConfigureAwait(false);
 
         if (deserializedResponse is null)
         {
@@ -231,11 +310,14 @@ public static partial class HttpRequestBuilderExtensions
 
         return deserializedResponse;
     }
-    private static async Task<string?> TryReadStringFromResponse(this HttpResponseMessage httpResponseMessage)
+
+    private static async Task<string?> TryReadStringFromResponse(
+        this HttpResponseMessage httpResponseMessage
+    )
     {
         try
         {
-            return await httpResponseMessage.Content.ReadAsStringAsync();
+            return await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
         catch
         {
