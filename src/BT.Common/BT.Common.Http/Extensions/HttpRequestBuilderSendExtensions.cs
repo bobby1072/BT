@@ -89,6 +89,16 @@ public static partial class HttpRequestBuilderExtensions
     {
         return requestBuilder.SendAsync(httpClient, HttpMethod.Post, cancellationToken);
     }
+    public static Task GetAsync(
+        this HttpRequestBuilder requestBuilder,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default
+    )
+    {
+        requestBuilder.HttpMethod = HttpMethod.Get;
+
+        return requestBuilder.SendAsync(httpClient, HttpMethod.Get, cancellationToken);
+    }
     public static async Task SendAsync(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -117,30 +127,6 @@ public static partial class HttpRequestBuilderExtensions
             throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
         }
     }
-    public static async Task GetAsync(
-        this HttpRequestBuilder requestBuilder,
-        HttpClient httpClient,
-        CancellationToken cancellationToken = default
-    )
-    {
-        string? errorMessage = null;
-        try
-        {
-            using var httpResponse = await httpClient.GetAsync(requestBuilder.GetFinalUrl(), cancellationToken);
-            
-            errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
-            
-            ThrowOnBadStatus(requestBuilder, httpResponse);
-        }
-        catch (System.Net.Http.HttpRequestException httpRequestException)
-        {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
-        }
-        catch (Exception ex)
-        {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
-        }
-    }
     private static async Task<T> SendAndDeserializeJson<T>(
         this HttpRequestBuilder requestBuilder,
         HttpClient httpClient,
@@ -151,10 +137,9 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpResponse = requestBuilder.HttpMethod == HttpMethod.Get ?
-                await httpClient.GetAsync(requestBuilder.GetFinalUrl(), cancellationToken) :
-                await httpClient.PostAsync(requestBuilder.GetFinalUrl(), requestBuilder.Content, cancellationToken);
-
+            using var httpResponse =
+                await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken);
+            
             errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
             
             ThrowOnBadStatus(requestBuilder, httpResponse);
@@ -179,9 +164,8 @@ public static partial class HttpRequestBuilderExtensions
         string? errorMessage = null;
         try
         {
-            using var httpResponse = requestBuilder.HttpMethod == HttpMethod.Get ?
-                await httpClient.GetAsync(requestBuilder.GetFinalUrl(), cancellationToken) :
-                await httpClient.PostAsync(requestBuilder.GetFinalUrl(), requestBuilder.Content, cancellationToken);
+            using var httpResponse =
+                await httpClient.SendAsync(requestBuilder.ToHttpRequestMessage(), cancellationToken);
             
             errorMessage = await CheckStatusAndGetErrorMessage(requestBuilder, httpResponse, cancellationToken);
             
