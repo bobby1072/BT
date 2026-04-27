@@ -15,7 +15,9 @@ internal sealed class BadRequestExceptionHandlingMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ILogger<BadRequestExceptionHandlingMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context, 
+        IProblemDetailsService problemDetailsService,
+        ILogger<BadRequestExceptionHandlingMiddleware> logger)
     {
         try
         {
@@ -29,31 +31,37 @@ internal sealed class BadRequestExceptionHandlingMiddleware
             logger.LogError(ex.InnerException, "Inner json exception occurred during request with message: {ExMessage}",
                 ex.InnerException.Message);
 
-            await ProduceBadRequestResponse(context, jsonEx.Message);
+            await ProduceBadRequestResponse(context, problemDetailsService, jsonEx.Message);
         }
         catch (BadHttpRequestException ex) when (ex.StatusCode is 400)
         {
             logger.LogError(ex, "Bad Request exception occurred during request with message: {ExMessage}",
                 ex.Message);
             
-            await ProduceBadRequestResponse(context);
+            await ProduceBadRequestResponse(context, problemDetailsService);
         }
     }
 
-    private static async Task ProduceBadRequestResponse(HttpContext context, string? detail = null)
+    private static async Task ProduceBadRequestResponse(
+        HttpContext context, 
+        IProblemDetailsService problemDetailsService,
+        string? detail = null)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         context.Response.ContentType = MediaTypeNames.Application.ProblemJson;
 
-        var problem = new ProblemDetails
+        var problemDetailContext = new ProblemDetailsContext
         {
-            Title = "Bad Request",
-            Status = StatusCodes.Status400BadRequest,
-            Detail = "Missing required header: X-Custom-Header",
-            Instance = context.Request.Path
+            HttpContext = context,
+            ProblemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Bad request body or headers",
+                Instance = context.Request.Path
+            }
         };
 
-        await context.Response.WriteAsJsonAsync(problem);
-        return;
+        await problemDetailsService.TryWriteAsync(problemDetailContext);
     }
 }
