@@ -28,11 +28,6 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             params string[] relations
         );
         Task<DbGetManyResult<TModel>> GetManyAsync(
-            TEntId entityId,
-            CancellationToken cancellationToken = default,
-            params string[] relations
-        );
-        Task<DbGetManyResult<TModel>> GetManyAsync(
             IReadOnlyCollection<TEntId> entityIds,
             CancellationToken cancellationToken = default,
             params string[] relations

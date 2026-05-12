@@ -25,29 +25,28 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
     {
         _memoryCache = memoryCache;
     }
-    
-    public override async Task<DbGetManyResult<TModel>> GetManyAsync<T>(
-        T value,
-        string propertyName,
-        CancellationToken cancellationToken = default,
-        params string[] relations
-    );
-    public override async Task<DbGetManyResult<TModel>> GetManyAsync(
-        Dictionary<string, object?> propertiesToMatch,
-        CancellationToken cancellationToken = default,
-        params string[] relations
-    );
-    public override async Task<DbGetManyResult<TModel>> GetManyAsync(
-        TEntId entityId,
-        CancellationToken cancellationToken = default,
-        params string[] relations
-    );
-
     public override async Task<DbGetManyResult<TModel>> GetManyAsync(
         IReadOnlyCollection<TEntId> entityIds,
         CancellationToken cancellationToken = default,
         params string[] relations
-    );
+    )
+    {
+        var cachedList = new List<TModel>();
+        var nonFoundCacheIds = entityIds.Where(x =>
+        {
+            var foundCachedEntity = GetItemFromCache(x!.ToString()!);
+            if (foundCachedEntity is not null)
+            {
+                cachedList.Add(foundCachedEntity.Data!);
+            }
+
+            return foundCachedEntity is null;
+        }).ToArray();
+
+        var foundFromDb = await base.GetManyAsync(nonFoundCacheIds, cancellationToken, relations);
+
+        return new DbGetManyResult<TModel>(cachedList.Concat(foundFromDb.Data).ToArray());
+    }
 
     public override async Task<DbGetOneResult<TModel>> GetOneAsync(
         TEntId entityId,
@@ -74,18 +73,9 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         params string[] relations
     )
     {
-        var combinedQueryParams = string.Join("__",propertiesToMatch.Select(x => $"{x.Key}_{x.Value}"));
-        
-        var foundCachedObject = GetItemFromCache(combinedQueryParams);
-
-        if (foundCachedObject is not null)
-        {
-            return foundCachedObject;
-        }
-        
         var result  = await base.GetOneAsync(propertiesToMatch, cancellationToken, relations);
         
-        CacheResultIfPossible(result, combinedQueryParams);
+        CacheResultIfPossible(result);
         
         return result;
     }
@@ -97,17 +87,9 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         params string[] relations
     )
     {
-        var combinedQueryParams = $"{propertyName}_{value?.ToString()}";
-        var foundCachedObject = GetItemFromCache(combinedQueryParams);
-
-        if (foundCachedObject is not null)
-        {
-            return foundCachedObject;
-        }
-        
         var result  = await base.GetOneAsync(value, propertyName, cancellationToken, relations);
         
-        CacheResultIfPossible(result, combinedQueryParams);
+        CacheResultIfPossible(result);
         
         return result;
     }
@@ -118,7 +100,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
 
         return foundCachedObject;
     }
-    private void CacheResultIfPossible(DbGetOneResult<TModel> result, string? combinedQueryParams = null)
+    private void CacheResultIfPossible(DbGetOneResult<TModel> result)
     {
         if (result.Data is not null)
         {
@@ -127,10 +109,6 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             {
                 _memoryCache.Set(GetCacheKey(foundResultId), result);
             }
-        }
-        if (!string.IsNullOrWhiteSpace(combinedQueryParams))
-        {
-            _memoryCache.Set(GetCacheKey(combinedQueryParams), result);
         }
     }
     private static string GetCacheKey(string objectIdOrQueryParams) => $"{EntityType.FullName}_{objectIdOrQueryParams}";

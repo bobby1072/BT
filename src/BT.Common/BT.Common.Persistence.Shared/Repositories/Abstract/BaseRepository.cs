@@ -186,25 +186,6 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbGetManyResult<TModel>(foundOne?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetManyResult<TModel>> GetManyAsync(
-            TEntId entityId,
-            CancellationToken cancellationToken = default,
-            params string[] relations
-        )
-        {
-            await using var dbContext = await ContextFactory.CreateDbContextAsync(
-                cancellationToken
-            );
-            var foundOneQuerySet = AddRelationsToSet(dbContext.Set<TEnt>(), relations);
-            var foundOne = await TimeAndLogDbOperation(
-                ct => foundOneQuerySet.Where(x => x.Id!.Equals(entityId)).ToArrayAsync(ct),
-                nameof(GetManyAsync),
-                cancellationToken
-            );
-
-            return new DbGetManyResult<TModel>(foundOne?.Select(x => x.ToModel()).ToArray());
-        }
-
         public virtual async Task<DbGetOneResult<TModel>> GetOneAsync(
             TEntId entityId,
             CancellationToken cancellationToken = default,
