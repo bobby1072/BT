@@ -417,7 +417,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
 
         protected async Task TimeAndLogDbTransaction(
             CancellationToken cancellationToken = default,
-            params Func<IQueryable<TEnt>, CancellationToken, Task>[] actions
+            params Func<DbSet<TEnt>, CancellationToken, Task>[] actions
         )
         {
             if (actions.Length < 1)
