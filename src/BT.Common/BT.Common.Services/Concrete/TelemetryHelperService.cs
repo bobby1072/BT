@@ -5,10 +5,10 @@ namespace BT.Common.Services.Concrete;
 
 public static class TelemetryHelperService
 {
-    public static ActivitySource ActivitySource = new (Assembly.GetAssembly(typeof(TelemetryHelperService))?.GetName().Name ?? string.Empty);
-
+    private static ActivitySource _internalActivitySource = new (Assembly.GetAssembly(typeof(TelemetryHelperService))?.GetName().Name ?? string.Empty);
+    public static ActivitySource ActivitySource => _internalActivitySource;
     internal static void SetActivitySource(ActivitySource activitySource)
     {
-        ActivitySource = activitySource;
+        _internalActivitySource = activitySource;
     }
 }
