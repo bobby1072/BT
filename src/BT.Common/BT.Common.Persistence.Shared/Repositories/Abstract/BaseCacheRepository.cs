@@ -1,4 +1,7 @@
-﻿using BT.Common.Persistence.Shared.Entities;
+﻿using System.Reflection;
+using BT.Common.Persistence.Shared.Attributes;
+using BT.Common.Persistence.Shared.Contexts;
+using BT.Common.Persistence.Shared.Entities;
 using BT.Common.Persistence.Shared.Models;
 using BT.Common.Polly.Models.Abstract;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +14,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
     : BaseRepository<TEnt, TEntId, TModel, TDbContext>
     where TEnt : BaseEntity<TEntId, TModel>
     where TModel : class
-    where TDbContext : DbContext
+    where TDbContext : BaseCacheDbContext
 {
     protected static Type TModelType = typeof(TModel);
     private readonly IMemoryCache _memoryCache;
@@ -96,13 +99,18 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
 
     private DbGetOneResult<TModel>? GetItemFromCache(string objectIdOrQueryParams)
     {
+        if (TModelType.GetCustomAttribute<CacheableAttribute>() is null)
+        {
+            return null;
+        }
+        
         var foundCachedObject = _memoryCache.Get<DbGetOneResult<TModel>>(GetCacheKey(objectIdOrQueryParams));
 
         return foundCachedObject;
     }
     private void CacheResultIfPossible(DbGetOneResult<TModel> result)
     {
-        if (result.Data is not null)
+        if (result.Data is not null && TModelType.GetCustomAttribute<CacheableAttribute>() is not null)
         {
             var foundResultId = GetIdFromEntity(result.Data);
             if (foundResultId is not null)
@@ -111,7 +119,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             }
         }
     }
-    private static string GetCacheKey(string objectIdOrQueryParams) => $"{EntityType.FullName}_{objectIdOrQueryParams}";
+    private static string GetCacheKey(string objectId) => $"{EntityType.FullName}_{objectId}";
     private static string? GetIdFromEntity(TModel value)
     {
         var foundIdProperty =  TModelType.GetProperty("Id");
