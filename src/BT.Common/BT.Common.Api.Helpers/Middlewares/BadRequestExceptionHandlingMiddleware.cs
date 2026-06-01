@@ -57,7 +57,7 @@ internal sealed class BadRequestExceptionHandlingMiddleware
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Bad request body or headers",
+                Detail = detail ?? "Bad request body or headers",
                 Instance = context.Request.Path
             }
         };

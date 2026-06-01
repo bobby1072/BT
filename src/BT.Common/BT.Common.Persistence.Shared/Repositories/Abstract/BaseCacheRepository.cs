@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using BT.Common.Persistence.Shared.Attributes;
 using BT.Common.Persistence.Shared.Contexts;
 using BT.Common.Persistence.Shared.Entities;
@@ -46,9 +47,15 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             return foundCachedEntity is null;
         }).ToArray();
 
-        var foundFromDb = await base.GetManyAsync(nonFoundCacheIds, cancellationToken, relations);
-
-        return new DbGetManyResult<TModel>(cachedList.Concat(foundFromDb.Data).ToArray());
+        if (nonFoundCacheIds.Length != entityIds.Count)
+        {
+            var foundFromDb = await base.GetManyAsync(nonFoundCacheIds, cancellationToken, relations);
+            
+            CacheResultIfPossible((IReadOnlyCollection<DbGetOneResult<TModel>>)foundFromDb.Data);
+            
+            return new DbGetManyResult<TModel>(cachedList.Concat(foundFromDb.Data).ToArray());
+        }
+        return new DbGetManyResult<TModel>(cachedList);
     }
 
     public override async Task<DbGetOneResult<TModel>> GetOneAsync(
@@ -82,7 +89,10 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         
         return result;
     }
-
+    /// <summary>
+    /// WARNING: this method is dangerous as it can cache something then later when a new entity is added which also satifies the condition. It still returns the original.
+    /// Should only be used for deterministic queries, like on enforced unique properties.
+    /// </summary>
     public override async Task<DbGetOneResult<TModel>> GetOneAsync<T>(
         T value,
         string propertyName,
@@ -90,6 +100,13 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         params string[] relations
     )
     {
+        var foundCachedObject = GetItemFromCache($"{propertyName}_{value?.ToString() ?? TModelType.FullName}");
+
+        if (foundCachedObject is not null)
+        {
+            return foundCachedObject;
+        }
+        
         var result  = await base.GetOneAsync(value, propertyName, cancellationToken, relations);
         
         CacheResultIfPossible(result);
@@ -119,7 +136,14 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             }
         }
     }
-    private static string GetCacheKey(string objectId) => $"{EntityType.FullName}_{objectId}";
+    private void CacheResultIfPossible(IReadOnlyCollection<DbGetOneResult<TModel>> result)
+    {
+        foreach (var item in result)
+        {
+            CacheResultIfPossible(item);
+        }
+    }
+    private static string GetCacheKey(string objectId) => $"{EntityType.FullName}__{objectId}";
     private static string? GetIdFromEntity(TModel value)
     {
         var foundIdProperty =  TModelType.GetProperty("Id");
