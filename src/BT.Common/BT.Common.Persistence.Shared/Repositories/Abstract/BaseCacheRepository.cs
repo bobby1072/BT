@@ -137,7 +137,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
     {
         if (result.Data is not null && EntityType.GetCustomAttribute<CacheableAttribute>() is not null)
         {
-            _memoryCache.Set(GetCacheKey($"{propertyName}_{value?.ToString() ?? TModelType.FullName}"), result);
+            _memoryCache.Set(GetCacheKey($"{propertyName}_{value?.ToString() ?? TModelType.FullName}"), result, new MemoryCacheEntryOptions().SetSize(1));
         }
     }
     private void CacheResultIfPossible(DbGetOneResult<TModel> result)
@@ -147,7 +147,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             var foundResultId = GetIdFromEntity(result.Data);
             if (foundResultId is not null)
             {
-                _memoryCache.Set(GetCacheKey(foundResultId), result);
+                _memoryCache.Set(GetCacheKey(foundResultId), result, new MemoryCacheEntryOptions().SetSize(1));
             }
         }
     }
