@@ -19,16 +19,19 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
 {
     protected static Type TModelType = typeof(TModel);
     private readonly IMemoryCache _memoryCache;
-
+    private readonly TimeSpan _timeToCache; 
+    
     protected BaseCacheRepository(
         IDbContextFactory<TDbContext> dbContextFactory,
         IMemoryCache memoryCache,
+        TimeSpan timeToCache,
         ILogger<BaseRepository<TEnt, TEntId, TModel, TDbContext>> logger,
         IPollyRetrySettings? pollyRetrySettings = null
     )
         : base(dbContextFactory, logger, pollyRetrySettings)
     {
         _memoryCache = memoryCache;
+        _timeToCache = timeToCache;
     }
 
     public override async Task<DbGetManyResult<TModel>> GetManyAsync(
@@ -165,7 +168,11 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             _memoryCache.Set(
                 GetCacheKey($"{propertyName}_{value?.ToString() ?? TModelType.FullName}"),
                 result,
-                new MemoryCacheEntryOptions().SetSize(1)
+                new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = _timeToCache
+                }
+                .SetSize(1)
             );
         }
     }
@@ -183,7 +190,11 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
                 _memoryCache.Set(
                     GetCacheKey(foundResultId),
                     result,
-                    new MemoryCacheEntryOptions().SetSize(1)
+                new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = _timeToCache
+                    }
+                    .SetSize(1)
                 );
             }
         }
