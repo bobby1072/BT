@@ -8,7 +8,8 @@ namespace BT.Common.Persistence.Shared.Contexts;
 public abstract class BaseCacheDbContext : DbContext
 {
     private readonly IMemoryCache _memoryCache;
-    protected BaseCacheDbContext(IMemoryCache memoryCache)
+    protected BaseCacheDbContext(IMemoryCache memoryCache, DbContextOptions<BaseCacheDbContext> options) : 
+        base(options)
     {
         _memoryCache = memoryCache;
     }
