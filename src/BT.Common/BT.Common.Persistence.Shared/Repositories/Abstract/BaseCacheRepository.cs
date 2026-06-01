@@ -117,7 +117,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
 
     private DbGetOneResult<TModel>? GetItemFromCache(string objectIdOrQueryParams, string[] relations)
     {
-        if (TModelType.GetCustomAttribute<CacheableAttribute>() is null)
+        if (EntityType.GetCustomAttribute<CacheableAttribute>() is null)
         {
             return null;
         }
@@ -135,14 +135,14 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         string propertyName, 
         DbGetOneResult<TModel> result)
     {
-        if (result.Data is not null && TModelType.GetCustomAttribute<CacheableAttribute>() is not null)
+        if (result.Data is not null && EntityType.GetCustomAttribute<CacheableAttribute>() is not null)
         {
             _memoryCache.Set(GetCacheKey($"{propertyName}_{value?.ToString() ?? TModelType.FullName}"), result);
         }
     }
     private void CacheResultIfPossible(DbGetOneResult<TModel> result)
     {
-        if (result.Data is not null && TModelType.GetCustomAttribute<CacheableAttribute>() is not null)
+        if (result.Data is not null && EntityType.GetCustomAttribute<CacheableAttribute>() is not null)
         {
             var foundResultId = GetIdFromEntity(result.Data);
             if (foundResultId is not null)
