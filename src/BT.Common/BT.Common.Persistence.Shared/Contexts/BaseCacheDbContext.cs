@@ -69,7 +69,7 @@ public abstract class BaseCacheDbContext : DbContext
 
         if (!string.IsNullOrWhiteSpace(foundIdProperty))
         {
-            return $"{typeofT.FullName}_{foundIdProperty}";
+            return $"{typeofT.FullName}__{foundIdProperty}";
         }
 
         return null;
