@@ -8,19 +8,23 @@ namespace BT.Common.Persistence.Shared.Contexts;
 public abstract class BaseCacheDbContext : DbContext
 {
     private readonly IMemoryCache _memoryCache;
-    protected BaseCacheDbContext(IMemoryCache memoryCache, DbContextOptions<BaseCacheDbContext> options) : 
-        base(options)
+
+    protected BaseCacheDbContext(IMemoryCache memoryCache, DbContextOptions options)
+        : base(options)
     {
         _memoryCache = memoryCache;
     }
-    
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         UpdateCacheIfNeeded();
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default
+    )
     {
         UpdateCacheIfNeeded();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
@@ -48,25 +52,24 @@ public abstract class BaseCacheDbContext : DbContext
         foreach (var ent in updatingEntries)
         {
             var foundCacheKey = GetCacheKeyFromEntity(ent.Entity);
-            
+
             if (!string.IsNullOrWhiteSpace(foundCacheKey))
             {
                 _memoryCache.Remove(foundCacheKey);
             }
         }
     }
-    
+
     private static string? GetCacheKeyFromEntity<T>(T value)
     {
         var typeofT = typeof(T);
 
         if (typeofT.GetCustomAttribute<CacheableAttribute>() is null)
         {
-            return  null;
+            return null;
         }
-        
-        var foundIdProperty =  
-            typeofT.GetProperty("Id")?.GetValue(value)?.ToString();
+
+        var foundIdProperty = typeofT.GetProperty("Id")?.GetValue(value)?.ToString();
 
         if (!string.IsNullOrWhiteSpace(foundIdProperty))
         {
