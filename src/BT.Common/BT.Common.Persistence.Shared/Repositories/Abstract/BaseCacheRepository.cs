@@ -38,7 +38,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         var cachedList = new List<TModel>();
         var nonFoundCacheIds = entityIds.Where(x =>
         {
-            var foundCachedEntity = GetItemFromCache(x!.ToString()!);
+            var foundCachedEntity = GetItemFromCache(x!.ToString()!, relations);
             if (foundCachedEntity is not null)
             {
                 cachedList.Add(foundCachedEntity.Data!);
@@ -64,7 +64,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         params string[] relations
     )
     {
-        var foundCachedObject = GetItemFromCache(entityId!.ToString()!);
+        var foundCachedObject = GetItemFromCache(entityId!.ToString()!, relations);
 
         if (foundCachedObject is not null)
         {
@@ -100,7 +100,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         params string[] relations
     )
     {
-        var foundCachedObject = GetItemFromCache($"{propertyName}_{value?.ToString() ?? TModelType.FullName}");
+        var foundCachedObject = GetItemFromCache($"{propertyName}_{value?.ToString() ?? TModelType.FullName}", relations);
 
         if (foundCachedObject is not null)
         {
@@ -110,11 +110,12 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         var result  = await base.GetOneAsync(value, propertyName, cancellationToken, relations);
         
         CacheResultIfPossible(result);
+        CacheResultIfPossible(value, propertyName, result);
         
         return result;
     }
 
-    private DbGetOneResult<TModel>? GetItemFromCache(string objectIdOrQueryParams)
+    private DbGetOneResult<TModel>? GetItemFromCache(string objectIdOrQueryParams, string[] relations)
     {
         if (TModelType.GetCustomAttribute<CacheableAttribute>() is null)
         {
@@ -123,7 +124,21 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         
         var foundCachedObject = _memoryCache.Get<DbGetOneResult<TModel>>(GetCacheKey(objectIdOrQueryParams));
 
+        if (relations.Length > 0 &&  foundCachedObject?.Data is not null)
+        {
+            return relations.All(x => GetValueFromProperty(foundCachedObject.Data, x) is not null) ?  new DbGetOneResult<TModel>(foundCachedObject.Data) : null;
+        }
+        
         return foundCachedObject;
+    }
+    private void CacheResultIfPossible<T>(T value,
+        string propertyName, 
+        DbGetOneResult<TModel> result)
+    {
+        if (result.Data is not null && TModelType.GetCustomAttribute<CacheableAttribute>() is not null)
+        {
+            _memoryCache.Set(GetCacheKey($"{propertyName}_{value?.ToString() ?? TModelType.FullName}"), result);
+        }
     }
     private void CacheResultIfPossible(DbGetOneResult<TModel> result)
     {
@@ -150,4 +165,6 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
 
         return foundIdProperty?.GetValue(value)?.ToString();
     }
+
+    private static object? GetValueFromProperty(TModel value, string propName) => TModelType.GetProperty(propName)?.GetValue(value);
 }
