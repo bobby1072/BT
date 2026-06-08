@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 using BT.Common.Persistence.Shared.Attributes;
 using BT.Common.Persistence.Shared.Contexts;
 using BT.Common.Persistence.Shared.Entities;
