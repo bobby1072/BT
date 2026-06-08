@@ -1,6 +1,6 @@
 ﻿namespace BT.Common.Persistence.Shared.Models
 {
-    public record DbSaveResult<TModel> : DbResult<IReadOnlyCollection<TModel>> where TModel : class
+    public record DbSaveResult<TModel> : DbResult<IReadOnlyCollection<TModel>>
     {
         public TModel FirstResult { get => Data.First(); } 
         public TModel? FirstResultOrDefault { get => Data.FirstOrDefault(); } 

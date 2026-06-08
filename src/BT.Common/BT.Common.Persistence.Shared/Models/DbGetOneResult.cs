@@ -1,7 +1,7 @@
 ﻿namespace BT.Common.Persistence.Shared.Models
 {
-    public record DbGetOneResult<TModel> : DbResult<TModel?> where TModel : class
+    public record DbGetOneResult<TModel> : DbResult<TModel?>
     {
-        public DbGetOneResult(TModel? model = null) : base(model is not null, model) { }
+        public DbGetOneResult(TModel model) : base(model is not null, model) { }
     }
 }
