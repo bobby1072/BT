@@ -1,7 +1,7 @@
 ﻿using BT.Common.Services.Concrete;
 using BT.Common.Services.Models;
 
-namespace AiTrainer.Web.Domain.Services.Tests;
+namespace BT.Common.Tests.Services;
 
 public sealed class BatchedAsyncOperationExecutorTests
 {

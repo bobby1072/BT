@@ -11,7 +11,7 @@ public sealed class DeterministicGuidGeneratorTests
     public void GenerateDeterministicId_Always_Creates_The_Same_Result(string rawValue, Guid hashedId, DeterministicGuidGenerator.GuidHashType hashType)
     {
         //Act
-        var secondTiemGeneratedHash = DeterministicGuidGenerator.GenerateDeterministicId(rawValue, hashType);
+        var secondTiemGeneratedHash = DeterministicGuidGenerator.CreateNewGuid(rawValue, hashType);
         
         //Assert
         Assert.Equal(hashedId, secondTiemGeneratedHash);
@@ -38,7 +38,7 @@ public sealed class DeterministicGuidGeneratorTests
         private (string RawValue, Guid HashedValue, DeterministicGuidGenerator.GuidHashType HashType) CreateData(DeterministicGuidGenerator.GuidHashType hashType)
         {
             var exampleEmail = _internetFaker.Email();
-            return (exampleEmail, DeterministicGuidGenerator.GenerateDeterministicId(exampleEmail, hashType), hashType);
+            return (exampleEmail, DeterministicGuidGenerator.CreateNewGuid(exampleEmail, hashType), hashType);
         }
     }
 }
