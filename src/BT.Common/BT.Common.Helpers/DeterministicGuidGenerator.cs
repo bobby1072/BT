@@ -3,7 +3,7 @@ using System.Text;
 
 namespace BT.Common.Helpers;
 
-public static class GuidGenerator
+public static class DeterministicGuidGenerator
 {
     public static Guid GenerateDeterministicId(string hash, GuidHashType guidHashType)
     {
@@ -29,13 +29,13 @@ public static class GuidGenerator
         return new Guid(guidBytes);
     }
 
-    private static Guid GenerateDeterministicIdMd5(string paymentId)
+    private static Guid GenerateDeterministicIdMd5(string hash)
     {
-        var bytes = Encoding.UTF8.GetBytes(paymentId);
+        var bytes = Encoding.UTF8.GetBytes(hash);
 
-        var hash = MD5.HashData(bytes);
+        var hashedVal = MD5.HashData(bytes);
 
-        return new Guid(hash);
+        return new Guid(hashedVal);
     }
     public enum GuidHashType
     {
