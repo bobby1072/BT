@@ -5,7 +5,7 @@ namespace BT.Common.Helpers;
 
 public static class DeterministicGuidGenerator
 {
-    public static Guid GenerateDeterministicId(string hash, GuidHashType guidHashType)
+    public static Guid CreateNewGuid(string hash, GuidHashType guidHashType)
     {
         return guidHashType == GuidHashType.SHA256
             ? GenerateDeterministicIdSHA256(hash)
