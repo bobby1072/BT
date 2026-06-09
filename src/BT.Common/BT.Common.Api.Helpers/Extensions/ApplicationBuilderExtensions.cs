@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using BT.Common.Api.Helpers.Middlewares;
 using Microsoft.AspNetCore.Builder;
 
@@ -20,22 +19,9 @@ public static class ApplicationBuilderExtensions
         return app;
     }
     
-    public static IApplicationBuilder UseTraceParentResponseHeader(this IApplicationBuilder app)
+    public static IApplicationBuilder UseTraceParentResponseHeaderMiddleware(this IApplicationBuilder app)
     {
-        app.Use(async (context, next) =>
-        {
-            context.Response.OnStarting(() =>
-            {
-                var activity = Activity.Current;
-                if (activity is not null)
-                {
-                    context.Response.Headers.TraceParent = activity.Id;
-                }
-                return Task.CompletedTask;
-            });
-
-            await next.Invoke();
-        });
+        app.UseMiddleware<AddTraceParentHeaderToResponseMiddleware>();
 
         return app;
     }
