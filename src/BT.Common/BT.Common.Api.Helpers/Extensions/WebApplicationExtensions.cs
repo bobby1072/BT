@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace BT.Common.Api.Helpers.Extensions;
 
-public static class DefaultEndpointExtensions
+public static class WebApplicationExtensions
 {
     public static WebApplication UseHealthGetEndpoints(this WebApplication application)
     {

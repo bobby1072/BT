@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using BT.Common.Api.Helpers.Middlewares;
 using Microsoft.AspNetCore.Builder;
 
@@ -16,6 +17,26 @@ public static class ApplicationBuilderExtensions
     {
         app.UseMiddleware<BadRequestExceptionHandlingMiddleware>();
         
+        return app;
+    }
+    
+    public static IApplicationBuilder UseTraceParentResponseHeader(this IApplicationBuilder app)
+    {
+        app.Use(async (context, next) =>
+        {
+            context.Response.OnStarting(() =>
+            {
+                var activity = Activity.Current;
+                if (activity is not null)
+                {
+                    context.Response.Headers.TraceParent = activity.Id;
+                }
+                return Task.CompletedTask;
+            });
+
+            await next.Invoke();
+        });
+
         return app;
     }
 }

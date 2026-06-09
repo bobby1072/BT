@@ -38,7 +38,7 @@ internal sealed class BadRequestExceptionHandlingMiddleware
             logger.LogError(ex, "Bad Request exception occurred during request with message: {ExMessage}",
                 ex.Message);
             
-            await ProduceBadRequestResponse(context, problemDetailsService);
+            await ProduceBadRequestResponse(context, problemDetailsService, ex.Message);
         }
     }
 
