@@ -32,17 +32,17 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             CancellationToken cancellationToken = default,
             params string[] relations
         );
-        Task<DbGetOneResult<TModel>> GetOneAsync(
+        Task<DbGetOneResult<TModel?>> GetOneAsync(
             TEntId entityId,
             CancellationToken cancellationToken = default,
             params string[] relations
         );
-        Task<DbGetOneResult<TModel>> GetOneAsync(
+        Task<DbGetOneResult<TModel?>> GetOneAsync(
             Dictionary<string, object?> propertiesToMatch,
             CancellationToken cancellationToken = default,
             params string[] relations
         );
-        Task<DbGetOneResult<TModel>> GetOneAsync<T>(
+        Task<DbGetOneResult<TModel?>> GetOneAsync<T>(
             T value,
             string propertyName,
             CancellationToken cancellationToken = default,
