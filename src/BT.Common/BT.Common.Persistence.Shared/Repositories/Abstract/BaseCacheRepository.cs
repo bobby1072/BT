@@ -61,14 +61,14 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
                 relations
             );
 
-            CacheResultIfPossible((IReadOnlyCollection<DbGetOneResult<TModel>>)foundFromDb.Data);
+            CacheResultIfPossible((IReadOnlyCollection<DbGetOneResult<TModel?>>)foundFromDb.Data);
 
             return new DbGetManyResult<TModel>(cachedList.Concat(foundFromDb.Data).ToArray());
         }
         return new DbGetManyResult<TModel>(cachedList);
     }
 
-    public override async Task<DbGetOneResult<TModel>> GetOneAsync(
+    public override async Task<DbGetOneResult<TModel?>> GetOneAsync(
         TEntId entityId,
         CancellationToken cancellationToken = default,
         params string[] relations
@@ -87,7 +87,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         return result;
     }
 
-    public override async Task<DbGetOneResult<TModel>> GetOneAsync(
+    public override async Task<DbGetOneResult<TModel?>> GetOneAsync(
         Dictionary<string, object?> propertiesToMatch,
         CancellationToken cancellationToken = default,
         params string[] relations
@@ -104,7 +104,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
     /// WARNING: this method is dangerous as it can cache something then later when a new entity is added which also satifies the condition. It still returns the original.
     /// Should only be used for deterministic queries, like on enforced unique properties.
     /// </summary>
-    public override async Task<DbGetOneResult<TModel>> GetOneAsync<T>(
+    public override async Task<DbGetOneResult<TModel?>> GetOneAsync<T>(
         T value,
         string propertyName,
         CancellationToken cancellationToken = default,
@@ -129,7 +129,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         return result;
     }
 
-    private DbGetOneResult<TModel>? GetItemFromCache(
+    private DbGetOneResult<TModel?>? GetItemFromCache(
         string objectIdOrQueryParams,
         string[] relations
     )
@@ -139,14 +139,14 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             return null;
         }
 
-        var foundCachedObject = _memoryCache.Get<DbGetOneResult<TModel>>(
+        var foundCachedObject = _memoryCache.Get<DbGetOneResult<TModel?>>(
             GetCacheKey(objectIdOrQueryParams)
         );
 
         if (relations.Length > 0 && foundCachedObject?.Data is not null)
         {
             return relations.All(x => GetValueFromProperty(foundCachedObject.Data, x) is not null)
-                ? new DbGetOneResult<TModel>(foundCachedObject.Data)
+                ? new DbGetOneResult<TModel?>(foundCachedObject.Data)
                 : null;
         }
 
@@ -156,7 +156,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
     private void CacheResultIfPossible<T>(
         T value,
         string propertyName,
-        DbGetOneResult<TModel> result
+        DbGetOneResult<TModel?> result
     )
     {
         if (
@@ -176,7 +176,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         }
     }
 
-    private void CacheResultIfPossible(DbGetOneResult<TModel> result)
+    private void CacheResultIfPossible(DbGetOneResult<TModel?> result)
     {
         if (
             result.Data is not null
@@ -199,7 +199,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         }
     }
 
-    private void CacheResultIfPossible(IReadOnlyCollection<DbGetOneResult<TModel>> result)
+    private void CacheResultIfPossible(IReadOnlyCollection<DbGetOneResult<TModel?>> result)
     {
         foreach (var item in result)
         {

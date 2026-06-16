@@ -107,7 +107,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbGetManyResult<TModel>(foundMany?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOneAsync(
+        public virtual async Task<DbGetOneResult<TModel?>> GetOneAsync(
             Dictionary<string, object?> propertiesToMatch,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -134,7 +134,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 cancellationToken
             );
 
-            return new DbGetOneResult<TModel>(foundOne?.ToModel());
+            return new DbGetOneResult<TModel?>(foundOne?.ToModel());
         }
 
         public virtual async Task<DbGetManyResult<TModel>> GetManyAsync<T>(
@@ -186,7 +186,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbGetManyResult<TModel>(foundOne?.Select(x => x.ToModel()).ToArray());
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOneAsync(
+        public virtual async Task<DbGetOneResult<TModel?>> GetOneAsync(
             TEntId entityId,
             CancellationToken cancellationToken = default,
             params string[] relations
@@ -202,7 +202,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 cancellationToken
             );
 
-            return new DbGetOneResult<TModel>(foundOne?.ToModel());
+            return new DbGetOneResult<TModel?>(foundOne?.ToModel());
         }
 
         public virtual async Task<DbResult<bool>> AnyExistsAsync(
@@ -266,7 +266,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
             return new DbResult<bool>(true, foundOne);
         }
 
-        public virtual async Task<DbGetOneResult<TModel>> GetOneAsync<T>(
+        public virtual async Task<DbGetOneResult<TModel?>> GetOneAsync<T>(
             T value,
             string propertyName,
             CancellationToken cancellationToken = default,
@@ -288,7 +288,7 @@ namespace BT.Common.Persistence.Shared.Repositories.Abstract
                 cancellationToken
             );
 
-            return new DbGetOneResult<TModel>(foundOne?.ToModel());
+            return new DbGetOneResult<TModel?>(foundOne?.ToModel());
         }
 
         public virtual async Task<DbSaveResult<TModel>> CreateAsync(
