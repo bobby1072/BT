@@ -14,11 +14,11 @@ public sealed class AddTraceParentHeaderToResponseMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        await _next.Invoke(context);
         var activ = Activity.Current;
         if (!string.IsNullOrWhiteSpace(activ?.Id))
         {
             context.Response.Headers.TraceParent = activ?.Id;
         }
+        await _next.Invoke(context);
     }
 }
