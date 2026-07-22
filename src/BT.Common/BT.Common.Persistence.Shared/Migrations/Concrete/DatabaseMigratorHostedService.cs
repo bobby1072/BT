@@ -1,6 +1,7 @@
 ﻿using BT.Common.Persistence.Shared.Configurations;
 using BT.Common.Persistence.Shared.Migrations.Abstract;
 using BT.Common.Polly.Extensions;
+using BT.Common.Services.Concrete;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -34,6 +35,9 @@ namespace BT.Common.Persistence.Shared.Migrations.Concrete
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            using var activity = TelemetryHelperService.ActivitySource
+                .StartActivity($"{nameof(DatabaseMigratorHostedService)}:{nameof(ExecuteAsync)}");
+            
             _logger.LogInformation("Starting database migrations at {MigrationTime}...",
                 DateTime.UtcNow);
             
@@ -55,6 +59,7 @@ namespace BT.Common.Persistence.Shared.Migrations.Concrete
 
         private async Task Migrate()
         {
+            using var activity = TelemetryHelperService.ActivitySource.StartActivity($"{nameof(DatabaseMigratorHostedService)}:{nameof(Migrate)}");
             foreach (var migrator in _databaseMigrators)
             {
                 await migrator.Migrate();

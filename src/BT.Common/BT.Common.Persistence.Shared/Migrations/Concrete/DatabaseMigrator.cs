@@ -1,6 +1,7 @@
 ﻿using System.Data.Common;
 using BT.Common.Persistence.Shared.Configurations;
 using BT.Common.Persistence.Shared.Migrations.Abstract;
+using BT.Common.Services.Concrete;
 using EvolveDb;
 using EvolveDb.Migration;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,10 @@ namespace BT.Common.Persistence.Shared.Migrations.Concrete
 
         public Task Migrate()
         {
+            using var activity = TelemetryHelperService.ActivitySource.StartActivity();
+            activity?.SetTag(nameof(Evolve.StartVersion), _startVersion);
+            activity?.SetTag(nameof(Evolve.Locations), _sqlFolderPath);
+            
             using var connection = _connectionFactory.Invoke();
             var evolve = new Evolve(connection, msg => _logger.LogInformation(msg))
             {
