@@ -2,7 +2,6 @@ using System.Net;
 using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
 using BT.Common.Http.Tests.TestHelpers;
-using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
 
 namespace BT.Common.Http.Tests.ExtensionsTests;
 

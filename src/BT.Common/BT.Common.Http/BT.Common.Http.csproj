@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BT.Common.Helpers\BT.Common.Helpers.csproj" />
       <ProjectReference Include="..\BT.Common.Polly\BT.Common.Polly.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="12.1.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
       <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.8.0" />

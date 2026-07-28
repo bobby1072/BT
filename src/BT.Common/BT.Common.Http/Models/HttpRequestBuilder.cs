@@ -2,13 +2,12 @@
 using System.Net;
 using System.Text;
 using System.Web;
-using BT.Common.Http.Validators;
-using FluentValidation.Results;
-using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
+using BT.Common.Helpers.Abstract;
+using BT.Common.Helpers.Models;
 
 namespace BT.Common.Http.Models;
 
-public sealed class HttpRequestBuilder
+public sealed class HttpRequestBuilder: IValidatable
 {
     public HttpMethod? HttpMethod
     {
@@ -45,6 +44,32 @@ public sealed class HttpRequestBuilder
     internal Dictionary<string, string> Headers { get; init; } = [];
     private bool PropertiesHaveChangedSinceLastValidation { get; set; } = false;
 
+    public ValidationResult Validate()
+    {
+        var errorList = new List<ValidationError>();
+
+        if (string.IsNullOrWhiteSpace(RequestUri.AbsoluteUri))
+        {
+            errorList.Add(new ValidationError
+            {
+                ErrorMessage = "RequestUri is required."
+            });
+        }
+
+        if (HttpMethod is null)
+        {
+            errorList.Add(new ValidationError
+            {
+                ErrorMessage = "HttpMethod is required."
+            });
+        }
+
+        return new ValidationResult
+        {
+            ValidationErrors = errorList
+        };
+    }
+    
     [field: AllowNull, MaybeNull]
     private ValidationResult ValidationResult
     {
@@ -53,8 +78,7 @@ public sealed class HttpRequestBuilder
             if (field is null || PropertiesHaveChangedSinceLastValidation)
             {
                 PropertiesHaveChangedSinceLastValidation = false;
-                return field ??=
-                    HttpRequestBuilderValidator.DefaultValidator.Validate(this);
+                return field ??= Validate();
             }
             else
             {
@@ -140,6 +164,6 @@ public sealed class HttpRequestBuilder
 
     private string[] GetRequestValidationErrors()
     {
-        return ValidationResult.Errors.Select(x => x.ErrorMessage).ToArray();
+        return ValidationResult.ValidationErrors.Select(x => x.ErrorMessage).ToArray();
     }
 }

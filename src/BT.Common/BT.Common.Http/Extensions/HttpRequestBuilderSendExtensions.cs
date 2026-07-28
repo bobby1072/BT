@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using BT.Common.Http.Models;
-using HttpRequestException = BT.Common.Http.Exceptions.HttpRequestException;
 
 namespace BT.Common.Http.Extensions;
 
@@ -118,13 +117,9 @@ public static partial class HttpRequestBuilderExtensions
             
             ThrowOnBadStatus(requestBuilder, httpResponse);
         }
-        catch (System.Net.Http.HttpRequestException httpRequestException)
-        {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
-        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
         }
     }
     private static async Task<T> SendAndDeserializeJson<T>(
@@ -146,13 +141,9 @@ public static partial class HttpRequestBuilderExtensions
 
             return await ReadFromJsonAsync<T>(httpResponse, jsonSerializerOptions, cancellationToken);
         }
-        catch (System.Net.Http.HttpRequestException httpRequestException)
-        {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
-        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
         }
     }
     private static async Task<string> SendAndReadString(
@@ -177,13 +168,9 @@ public static partial class HttpRequestBuilderExtensions
 
             return deserializedResponse;
         }
-        catch (System.Net.Http.HttpRequestException httpRequestException)
-        {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: httpRequestException.Message, httpRequestException.StatusCode, httpRequestException);
-        }
         catch (Exception ex)
         {
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, null, ex);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(errorMessage) ? errorMessage: ex.Message, ex);
         }
     }
 
@@ -226,7 +213,7 @@ public static partial class HttpRequestBuilderExtensions
             var jsonException = new JsonException(
                 $"Failed to deserialize http response content to type of {typeof(T).Name}."
             );
-            throw new HttpRequestException(jsonException.Message, null, jsonException);
+            throw new HttpRequestException(jsonException.Message, jsonException);
         }
 
         return deserializedResponse;
