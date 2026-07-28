@@ -12,7 +12,7 @@ namespace BT.Common.Persistence.Shared.Hosts;
 
 public static class EvolveDbMigratorHost
 {
-    public static IHostApplicationBuilder CreateDefaultEvolveDbUpMigratorHostBuilder<TProgram>(
+    public static HostApplicationBuilder CreateDefaultEvolveDbUpMigratorHostBuilder<TProgram>(
         string[] args,
         Func<IConfiguration, string> getConnectionStringFunc,
         Func<IConfiguration, DbMigrationSettings> getDbMigrationsSettingsFunc,
@@ -51,7 +51,7 @@ public static class EvolveDbMigratorHost
         return builder;
     }
 
-    public static IHostApplicationBuilder CreateDefaultEvolveDbUpMigratorHostBuilder(
+    public static HostApplicationBuilder CreateDefaultEvolveDbUpMigratorHostBuilder(
         string[] args,
         Func<IConfiguration, string> getConnectionStringFunc,
         Func<IConfiguration, DbMigrationSettings> getDbMigrationsSettingsFunc,
@@ -87,8 +87,8 @@ public static class EvolveDbMigratorHost
         return builder;
     }
 
-    private static IHostApplicationBuilder ConfigureEvolveDbUp(
-        this IHostApplicationBuilder builder,
+    private static HostApplicationBuilder ConfigureEvolveDbUp(
+        this HostApplicationBuilder builder,
         Func<IConfiguration, string> getConnectionStringFunc,
         Func<IConfiguration, DbMigrationSettings> getDbMigrationsSettingsFunc,
         string serviceName,
