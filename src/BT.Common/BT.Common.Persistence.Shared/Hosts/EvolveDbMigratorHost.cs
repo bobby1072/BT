@@ -19,7 +19,7 @@ public static class EvolveDbMigratorHost
         string serviceName,
         bool shutDownAppAfterMigrations = true,
         params (
-            Func<DbConnection> ConnectionFactory,
+            Func<string, DbConnection> ConnectionFactory,
             string SqlFolderPath
         )[] migratorConnectionFactories
     )
@@ -58,7 +58,7 @@ public static class EvolveDbMigratorHost
         string serviceName,
         bool shutDownAppAfterMigrations = true,
         params (
-            Func<DbConnection> ConnectionFactory,
+            Func<string, DbConnection> ConnectionFactory,
             string SqlFolderPath
         )[] migratorConnectionFactories
     )
@@ -94,7 +94,7 @@ public static class EvolveDbMigratorHost
         string serviceName,
         bool shutDownAppAfterMigrations,
         params (
-            Func<DbConnection> ConnectionFactory,
+            Func<string, DbConnection> ConnectionFactory,
             string SqlFolderPath
         )[] migratorConnectionFactories
     )
@@ -119,9 +119,17 @@ public static class EvolveDbMigratorHost
             dbMigrationsSettings,
             healthCheckBuilder,
             shutDownAppAfterMigrations,
-            migratorConnectionFactories
+            migratorConnectionFactories.Select(x => BuildConnection(x, connectionString)).ToArray()   
         );
 
         return builder;
     }
+
+    private static (Func<DbConnection> ConnectionFactory, string SqlFolderPath) BuildConnection((
+        Func<string, DbConnection> ConnectionFactory,
+        string SqlFolderPath
+        ) migratorConnectionFactory,
+        string connectionString
+    ) => (() => migratorConnectionFactory.ConnectionFactory.Invoke(connectionString),
+            migratorConnectionFactory.SqlFolderPath);
 }
