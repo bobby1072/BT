@@ -12,7 +12,7 @@ namespace BT.Common.Persistence.Shared.Hosts;
 
 public static class EvolveDbMigratorHost
 {
-    public static IHostBuilder CreateDefaultEvolveDbUpMigratorHostBuilder<TProgram>(
+    public static IHostApplicationBuilder CreateDefaultEvolveDbUpMigratorHostBuilder<TProgram>(
         string[] args,
         Func<IConfiguration, string> getConnectionStringFunc,
         Func<IConfiguration, DbMigrationSettings> getDbMigrationsSettingsFunc,
@@ -29,15 +29,16 @@ public static class EvolveDbMigratorHost
 
         localLogger.LogInformation("Application starting...");
 
-        var host = Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(config =>
-            {
-                config
-                    .SetBasePath(Environment.CurrentDirectory)
-                    .AddJsonFile(Path.GetFullPath("appsettings.json"), false)
-                    .AddUserSecrets<TProgram>()
-                    .AddEnvironmentVariables();
-            })
+        var builder = Host.CreateApplicationBuilder(args);
+        
+        builder.Configuration
+            .SetBasePath(Environment.CurrentDirectory)
+            .AddJsonFile(Path.GetFullPath("appsettings.json"), false)
+            .AddUserSecrets<TProgram>()
+            .AddEnvironmentVariables();
+        
+            
+        builder
             .ConfigureEvolveDbUp(
                 getConnectionStringFunc,
                 getDbMigrationsSettingsFunc,
@@ -45,11 +46,12 @@ public static class EvolveDbMigratorHost
                 shutDownAppAfterMigrations,
                 migratorConnectionFactories
             );
-
-        return host;
+        
+        
+        return builder;
     }
 
-    public static IHostBuilder CreateDefaultEvolveDbUpMigratorHostBuilder(
+    public static IHostApplicationBuilder CreateDefaultEvolveDbUpMigratorHostBuilder(
         string[] args,
         Func<IConfiguration, string> getConnectionStringFunc,
         Func<IConfiguration, DbMigrationSettings> getDbMigrationsSettingsFunc,
@@ -65,14 +67,15 @@ public static class EvolveDbMigratorHost
 
         localLogger.LogInformation("Application starting...");
 
-        var host = Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(config =>
-            {
-                config
-                    .SetBasePath(Environment.CurrentDirectory)
-                    .AddJsonFile(Path.GetFullPath("appsettings.json"), false)
-                    .AddEnvironmentVariables();
-            })
+        var builder = Host.CreateApplicationBuilder(args);
+        
+        builder.Configuration
+            .SetBasePath(Environment.CurrentDirectory)
+            .AddJsonFile(Path.GetFullPath("appsettings.json"), false)
+            .AddEnvironmentVariables();
+        
+            
+        builder
             .ConfigureEvolveDbUp(
                 getConnectionStringFunc,
                 getDbMigrationsSettingsFunc,
@@ -81,11 +84,11 @@ public static class EvolveDbMigratorHost
                 migratorConnectionFactories
             );
 
-        return host;
+        return builder;
     }
 
-    private static IHostBuilder ConfigureEvolveDbUp(
-        this IHostBuilder host,
+    private static IHostApplicationBuilder ConfigureEvolveDbUp(
+        this IHostApplicationBuilder builder,
         Func<IConfiguration, string> getConnectionStringFunc,
         Func<IConfiguration, DbMigrationSettings> getDbMigrationsSettingsFunc,
         string serviceName,
@@ -96,36 +99,29 @@ public static class EvolveDbMigratorHost
         )[] migratorConnectionFactories
     )
     {
-        host.ConfigureLogging(lgBuilder =>
-            {
-                lgBuilder.AddJsonLogging();
-            })
-            .ConfigureServices(
-                (ctx, serviceCol) =>
-                {
-                    serviceCol.AddTelemetryServices(serviceName);
+        builder.Logging.AddJsonLogging();
+            
+        builder.Services.AddTelemetryServices(serviceName);
 
-                    var dbMigrationsSettings = getDbMigrationsSettingsFunc.Invoke(
-                        ctx.Configuration
-                    );
+        var dbMigrationsSettings = getDbMigrationsSettingsFunc.Invoke(
+            builder.Configuration
+        );
 
-                    var connectionString = getConnectionStringFunc.Invoke(ctx.Configuration);
+        var connectionString = getConnectionStringFunc.Invoke(builder.Configuration);
 
-                    if (string.IsNullOrWhiteSpace(connectionString))
-                    {
-                        throw new InvalidDataException("Connection string string not found");
-                    }
-                    var healthCheckBuilder = serviceCol.AddHealthChecks();
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidDataException("Connection string string not found");
+        }
+        var healthCheckBuilder = builder.Services.AddHealthChecks();
 
-                    serviceCol.AddDatabaseMigrators(
-                        dbMigrationsSettings,
-                        healthCheckBuilder,
-                        shutDownAppAfterMigrations,
-                        migratorConnectionFactories
-                    );
-                }
-            );
+        builder.Services.AddDatabaseMigrators(
+            dbMigrationsSettings,
+            healthCheckBuilder,
+            shutDownAppAfterMigrations,
+            migratorConnectionFactories
+        );
 
-        return host;
+        return builder;
     }
 }
