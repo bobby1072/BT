@@ -53,7 +53,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
             })
             .ToArray();
 
-        if (nonFoundCacheIds.Length != entityIds.Count)
+        if (nonFoundCacheIds.Length > 0)
         {
             var foundFromDb = await base.GetManyAsync(
                 nonFoundCacheIds,
@@ -61,7 +61,7 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
                 relations
             );
 
-            CacheResultIfPossible((IReadOnlyCollection<DbGetOneResult<TModel?>>)foundFromDb.Data);
+            CacheResultIfPossible(foundFromDb.Data);
 
             return new DbGetManyResult<TModel>(cachedList.Concat(foundFromDb.Data).ToArray());
         }
@@ -199,11 +199,11 @@ public abstract class BaseCacheRepository<TEnt, TEntId, TModel, TDbContext>
         }
     }
 
-    private void CacheResultIfPossible(IReadOnlyCollection<DbGetOneResult<TModel?>> result)
+    private void CacheResultIfPossible(IReadOnlyCollection<TModel> results)
     {
-        foreach (var item in result)
+        foreach (var item in results)
         {
-            CacheResultIfPossible(item);
+            CacheResultIfPossible(new DbGetOneResult<TModel?>(item));
         }
     }
 

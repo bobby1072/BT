@@ -51,7 +51,7 @@ public abstract class BaseCacheDbContext : DbContext
 
         foreach (var ent in updatingEntries)
         {
-            var foundCacheKey = GetCacheKeyFromEntity(ent.Entity);
+            var foundCacheKey = GetCacheKeyFromEntity(ent.Metadata.ClrType, ent.Entity);
 
             if (!string.IsNullOrWhiteSpace(foundCacheKey))
             {
@@ -60,20 +60,18 @@ public abstract class BaseCacheDbContext : DbContext
         }
     }
 
-    private static string? GetCacheKeyFromEntity<T>(T value)
+    private static string? GetCacheKeyFromEntity(Type entityType, object entity)
     {
-        var typeofT = typeof(T);
-
-        if (typeofT.GetCustomAttribute<CacheableAttribute>() is null)
+        if (entityType.GetCustomAttribute<CacheableAttribute>() is null)
         {
             return null;
         }
 
-        var foundIdProperty = typeofT.GetProperty("Id")?.GetValue(value)?.ToString();
+        var foundIdProperty = entityType.GetProperty("Id")?.GetValue(entity)?.ToString();
 
         if (!string.IsNullOrWhiteSpace(foundIdProperty))
         {
-            return $"{typeofT.FullName}__{foundIdProperty}";
+            return $"{entityType.FullName}__{foundIdProperty}";
         }
 
         return null;
