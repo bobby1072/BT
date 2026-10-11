@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.FastArray", "BT.Common.FastArray\BT.Common.FastArray.csproj", "{ED21D392-490F-43D9-92B9-D9A5F1C857C2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Helpers", "BT.Common.Helpers\BT.Common.Helpers.csproj", "{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BT.Common.Persistence.Shared", "BT.Common.Persistence.Shared\BT.Common.Persistence.Shared.csproj", "{85D907AC-F2BC-429C-9A97-21DFCD7390A3}"
@@ -29,10 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED21D392-490F-43D9-92B9-D9A5F1C857C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E7C47DC-8E89-49AF-8EF2-13A80C4587E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
