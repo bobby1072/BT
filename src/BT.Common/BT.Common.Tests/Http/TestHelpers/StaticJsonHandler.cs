@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Text.Json;
 
-namespace BT.Common.Http.Tests.TestHelpers;
+namespace BT.Common.Tests.Http.TestHelpers;
 
 public class StaticJsonHandler<T> : HttpMessageHandler where T: class
 {

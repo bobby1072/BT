@@ -4,7 +4,7 @@ using System.Text.Json;
 using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
 
-namespace BT.Common.Http.Tests.ExtensionsTests;
+namespace BT.Common.Tests.Http.ExtensionsTests;
 
 public class HttpRequestBuilderContentExtensionsTests
 {
