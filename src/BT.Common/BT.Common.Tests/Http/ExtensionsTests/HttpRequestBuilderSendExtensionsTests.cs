@@ -1,7 +1,7 @@
 using System.Net;
 using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
-using BT.Common.Http.Tests.TestHelpers;
+using BT.Common.Tests.Http.TestHelpers;
 
 namespace BT.Common.Tests.Http.ExtensionsTests;
 
