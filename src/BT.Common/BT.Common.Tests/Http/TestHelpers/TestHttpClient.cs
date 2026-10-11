@@ -1,4 +1,4 @@
-﻿namespace BT.Common.Http.Tests.TestHelpers;
+﻿namespace BT.Common.Tests.Http.TestHelpers;
 
 public class TestHttpClient: HttpClient
 {

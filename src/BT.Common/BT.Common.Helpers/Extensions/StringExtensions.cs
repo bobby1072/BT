@@ -29,15 +29,7 @@ namespace BT.Common.Helpers.Extensions
         }
         public static bool IsValidEmail(this string email)
         {
-            try
-            {
-                MailAddress mailAddress = new MailAddress(email);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return !string.IsNullOrEmpty(email) && MailAddress.TryCreate(email, out _);
         }
 
         public static bool IsJustNumbers(this string input)

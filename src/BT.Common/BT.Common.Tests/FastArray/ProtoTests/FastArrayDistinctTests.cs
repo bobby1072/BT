@@ -1,6 +1,7 @@
 using BT.Common.FastArray.Proto;
+using BT.Common.Tests.FastArray;
 
-namespace BT.Common.FastArray.Tests.ProtoTests
+namespace BT.Common.Tests.FastArray.ProtoTests
 {
     public class FastArrayDistinctTests : FastArrayTestBase
     {

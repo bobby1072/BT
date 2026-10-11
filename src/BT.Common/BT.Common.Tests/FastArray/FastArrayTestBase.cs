@@ -1,6 +1,6 @@
-﻿using BT.Common.FastArray.Tests.TestModels;
+﻿using BT.Common.Tests.FastArray.TestModels;
 
-namespace BT.Common.FastArray.Tests
+namespace BT.Common.Tests.FastArray
 {
     public abstract class FastArrayTestBase
     {

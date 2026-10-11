@@ -3,7 +3,7 @@ using BT.Common.Http.Extensions;
 using BT.Common.Http.Models;
 using BT.Common.Http.Tests.TestHelpers;
 
-namespace BT.Common.Http.Tests.ExtensionsTests;
+namespace BT.Common.Tests.Http.ExtensionsTests;
 
 public class HttpRequestBuilderExtensionsTests
 {

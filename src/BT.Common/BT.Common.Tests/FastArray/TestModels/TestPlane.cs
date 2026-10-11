@@ -1,4 +1,4 @@
-namespace BT.Common.FastArray.Tests.TestModels
+namespace BT.Common.Tests.FastArray.TestModels
 {
     internal class TestPlane : TestVehicle
     {
