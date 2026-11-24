@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using BT.Common.Api.Helpers.Extensions;
 using BT.Common.Api.Helpers.Models;
@@ -16,6 +17,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace BT.Common.Api.Helpers;
 
+[ExcludeFromCodeCoverage]
 public static class BTCommonWebApplicationBuilder
 {
     public static WebApplication ConfigureWebApplication(this WebApplication app)
