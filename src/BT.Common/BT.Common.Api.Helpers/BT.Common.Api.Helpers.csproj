@@ -12,6 +12,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BT.Common.Helpers\BT.Common.Helpers.csproj" />
+      <ProjectReference Include="..\BT.Common.Services\BT.Common.Services.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.OpenApi" Version="3.11.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="11.0.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="11.0.1" />
     </ItemGroup>
 
 </Project>
